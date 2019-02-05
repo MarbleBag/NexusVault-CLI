@@ -1,0 +1,95 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>nexusvault</groupId>
+	<artifactId>nexusvault.cli</artifactId>
+	<version>0.1.0</version>
+
+	<properties>
+		<project.java.version>1.8</project.java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>integrated.maven.repo</id>
+			<name>imavo</name>
+			<url>file:${project.basedir}\..\maven-repo</url>
+		</repository>
+	</repositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.7.0</version>
+				<configuration>
+					<source>${project.java.version}</source>
+					<target>${project.java.version}</target>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<addMavenDescriptor>false</addMavenDescriptor>
+						<manifest>
+							<addClasspath>true</addClasspath>
+						</manifest>
+						<manifestEntries>
+							<Built-By>${project.author.name}</Built-By>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>27.0.1-jre</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-cli</groupId>
+			<artifactId>commons-cli</artifactId>
+			<version>[1.3,1.4)</version>
+		</dependency>
+		<dependency>
+			<groupId>nexusvault</groupId>
+			<artifactId>nexusvault</artifactId>
+			<version>[2,3)</version>
+		</dependency>
+		<dependency>
+			<groupId>nexusvault</groupId>
+			<artifactId>nexusvault.format.tbl</artifactId>
+			<version>[1,2)</version>
+		</dependency>
+		<dependency>
+			<groupId>nexusvault</groupId>
+			<artifactId>nexusvault.format.bin</artifactId>
+			<version>[1,2)</version>
+		</dependency>
+		<dependency>
+			<groupId>nexusvault</groupId>
+			<artifactId>nexusvault.format.tex</artifactId>
+			<version>[0,2)</version>
+		</dependency>
+		<dependency>
+			<groupId>nexusvault</groupId>
+			<artifactId>nexusvault.format.m3</artifactId>
+			<version>[0,2)</version>
+		</dependency>
+		<dependency>
+			<groupId>nexusvault</groupId>
+			<artifactId>nexusvault.format.m3.export.gltf</artifactId>
+			<version>[0,2)</version>
+		</dependency>
+	</dependencies>
+</project>
