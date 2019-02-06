@@ -1,8 +1,11 @@
 # Nexusvault CLI
+WIP 
 
 Initial setup
 
 ## Getting Started
+
+
 
 ## Built With
 
