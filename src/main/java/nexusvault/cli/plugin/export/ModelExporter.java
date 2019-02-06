@@ -29,7 +29,7 @@ import nexusvault.format.m3.export.gltf.GlTFExportMonitor;
 import nexusvault.format.m3.export.gltf.GlTFExporter;
 import nexusvault.format.m3.export.gltf.ResourceBundle;
 import nexusvault.format.m3.v100.ModelReader;
-import nexusvault.format.m3.v100.debug.ModelDebuger;
+import nexusvault.format.m3.v100.debug.ModelDebugger;
 import nexusvault.format.m3.v100.debug.Table;
 import nexusvault.format.m3.v100.debug.Table.TableColumn;
 import nexusvault.format.m3.v100.debug.Table.TableRow;
@@ -199,7 +199,7 @@ final class ModelExporter implements Exporter {
 
 		@Override
 		public void export(Model model, Path dstFolder, IdxFileLink fileLink) throws IOException {
-			final ModelDebuger debuger = ModelDebuger.createDefaultModelDebuger();
+			final ModelDebugger debuger = ModelDebugger.createDefaultModelDebugger();
 			final Table table = debuger.debugModel(model);
 			final String modelName = fileLink.getName().substring(0, fileLink.getName().lastIndexOf('.'));
 			writeTable2CSV(modelName, table, dstFolder);
