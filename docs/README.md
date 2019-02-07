@@ -5,6 +5,7 @@ Initial setup
 
 ## Getting Started
 
+* JDK 1.8
 
 
 ## Built With
