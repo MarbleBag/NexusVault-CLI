@@ -1,5 +1,6 @@
 package nexusvault.cli;
 
+@Deprecated
 public interface ModelSystem {
 
 	public static final class ModelAlreadyRegisteredException extends NexusvaultCLIBaseException {

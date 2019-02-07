@@ -48,6 +48,7 @@ public final class App {
 	private PlugInSystem plugInSystem;
 	private CLISystem cliSystem;
 	private ConsoleSystem console;
+	@Deprecated
 	private ModelSystem modelSystem;
 
 	private CommandManager commandManager;
@@ -81,6 +82,7 @@ public final class App {
 		return console;
 	}
 
+	@Deprecated
 	public ModelSystem getModelSystem() {
 		return modelSystem;
 	}
@@ -155,6 +157,7 @@ public final class App {
 		commandManager.registerCommand(new HeadlessModeCmd());
 	}
 
+	@Deprecated
 	private void initializeModel(boolean headlessMode) {
 		modelSystem = new BaseModelSystem();
 
@@ -242,7 +245,28 @@ public final class App {
 	}
 
 	public void closeApp() {
+
+		saveAppConfig();
+		savePlugInConfigs();
+
+		this.console = null;
+		this.modelSystem = null;
+		this.eventSystem = null;
+		this.commandManager = null;
+		this.cliSystem = null;
+		this.plugInSystem = null;
+		this.appConfig = null;
 		// TODO
+	}
+
+	private void saveAppConfig() {
+		// TODO Auto-generated method stub
+
+	}
+
+	private void savePlugInConfigs() {
+		// TODO Auto-generated method stub
+
 	}
 
 	private void processConsole() {
