@@ -64,6 +64,11 @@ final class ModelExporter implements Exporter {
 
 		@Override
 		public void onCommand(CommandArguments args) {
+			if (args.getNumberOfArguments() != 1) {
+				App.getInstance().getConsole().println(Level.CONSOLE, "Use '?' to get more informations.");
+				return;
+			}
+
 			final String arg0 = args.getArg(0);
 
 			ExporterType selectedType = null;
@@ -126,10 +131,11 @@ final class ModelExporter implements Exporter {
 	}
 
 	public void setExportType(ExporterType exporterType) {
+		final ExporterType oldValue = this.exporterType;
 		this.exporterType = exporterType;
 
 		App.getInstance().getEventSystem()
-				.postEvent(new ModelPropertyChangedEvent<String>("m3-type", String.valueOf(this.exporterType), String.valueOf(exporterType)) {
+				.postEvent(new ModelPropertyChangedEvent<String>("m3-type", String.valueOf(oldValue), String.valueOf(this.exporterType)) {
 				});
 	}
 
@@ -202,6 +208,8 @@ final class ModelExporter implements Exporter {
 			final ModelDebugger debuger = ModelDebugger.createDefaultModelDebugger();
 			final Table table = debuger.debugModel(model);
 			final String modelName = fileLink.getName().substring(0, fileLink.getName().lastIndexOf('.'));
+			dstFolder = dstFolder.resolve(modelName);
+			Files.createDirectories(dstFolder);
 			writeTable2CSV(modelName, table, dstFolder);
 		}
 
