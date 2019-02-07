@@ -4,6 +4,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
+
 import kreed.util.property.BasePropertySet;
 import kreed.util.property.PropertyDefaultProvider;
 import kreed.util.property.PropertyListener;
@@ -84,6 +87,25 @@ public class ModelSet<T extends PropertyKey<T>> {
 
 	public PropertyListener<T> getListener() {
 		return properties.getListener();
+	}
+
+	public void saveSet() {
+		final JsonObject base = Json.object();
+		final Set<T> keys = getAllConfigKeys();
+
+		for (final T key : keys) {
+			final PropertyOption<T> opt = key.getOptions();
+			if (!opt.isSaveable()) {
+				continue;
+			}
+			if (!isPropertySet(key)) {
+				continue;
+			}
+
+			// if(Path.class.equals(opt.)) {
+			//
+			// }
+		}
 	}
 
 }
