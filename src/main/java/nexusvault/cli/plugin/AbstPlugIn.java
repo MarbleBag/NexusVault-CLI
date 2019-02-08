@@ -88,4 +88,8 @@ public abstract class AbstPlugIn implements PlugIn {
 		App.getInstance().getConsole().println(Level.CONSOLE, msg);
 	}
 
+	protected final void sendDebug(Supplier<String> msg) {
+		App.getInstance().getConsole().println(Level.DEBUG, msg);
+	}
+
 }

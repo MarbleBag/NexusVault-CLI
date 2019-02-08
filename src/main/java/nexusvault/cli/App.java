@@ -25,6 +25,7 @@ import com.google.common.reflect.Reflection;
 import nexusvault.cli.ConsoleSystem.Level;
 import nexusvault.cli.model.ModelPropertyChangedEvent;
 import nexusvault.cli.plugin.config.AppConfigModel;
+import nexusvault.cli.plugin.config.AppConfigModel.AppConfigDebugModeChangedEvent;
 
 public final class App {
 
@@ -47,7 +48,7 @@ public final class App {
 	private EventSystem eventSystem;
 	private PlugInSystem plugInSystem;
 	private CLISystem cliSystem;
-	private ConsoleSystem console;
+	private BaseConsoleSystem console;
 	@Deprecated
 	private ModelSystem modelSystem;
 
@@ -155,6 +156,7 @@ public final class App {
 		commandManager.registerCommand(new ExitCmd((args) -> this.requestShutDown()));
 		commandManager.registerCommand(new HelpCmd((args) -> this.cliSystem.printHelp()));
 		commandManager.registerCommand(new HeadlessModeCmd());
+		commandManager.registerCommand(new DebugCmd());
 	}
 
 	@Deprecated
@@ -182,11 +184,15 @@ public final class App {
 		eventSystem.registerEventHandler(new AppConfigObserver()); // TODO
 	}
 
-	private static final class AppConfigObserver {
+	private final class AppConfigObserver {
 		@Subscribe
 		public void onAppConfigChangedEvent(ModelPropertyChangedEvent<?> event) {
 			// TODO
-			App.getInstance().getConsole().println(Level.CONSOLE, "Set " + event);
+			App.this.console.println(Level.CONSOLE, "Set " + event);
+
+			if (event instanceof AppConfigDebugModeChangedEvent) {
+				App.this.console.setDebugMode((Boolean) event.getNewValue());
+			}
 		}
 	}
 
