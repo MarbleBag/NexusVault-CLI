@@ -1,11 +1,15 @@
 package nexusvault.cli.plugin.export;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,7 +20,13 @@ import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
+
+import nexusvault.archive.IdxDirectory;
+import nexusvault.archive.IdxEntryNotAFile;
+import nexusvault.archive.IdxEntryNotFound;
 import nexusvault.archive.IdxFileLink;
+import nexusvault.archive.VaultReader;
 import nexusvault.archive.util.DataHeader;
 import nexusvault.cli.App;
 import nexusvault.cli.Command;
@@ -24,15 +34,21 @@ import nexusvault.cli.CommandArguments;
 import nexusvault.cli.CommandInfo;
 import nexusvault.cli.ConsoleSystem.Level;
 import nexusvault.cli.model.ModelPropertyChangedEvent;
+import nexusvault.cli.plugin.archive.ArchivePlugIn;
+import nexusvault.cli.plugin.archive.SourcedVaultReader;
 import nexusvault.format.m3.Model;
 import nexusvault.format.m3.export.gltf.GlTFExportMonitor;
 import nexusvault.format.m3.export.gltf.GlTFExporter;
+import nexusvault.format.m3.export.gltf.PathTextureResource;
 import nexusvault.format.m3.export.gltf.ResourceBundle;
 import nexusvault.format.m3.v100.ModelReader;
 import nexusvault.format.m3.v100.debug.ModelDebugger;
 import nexusvault.format.m3.v100.debug.Table;
 import nexusvault.format.m3.v100.debug.Table.TableColumn;
 import nexusvault.format.m3.v100.debug.Table.TableRow;
+import nexusvault.format.tex.TextureImage;
+import nexusvault.format.tex.TextureObject;
+import nexusvault.format.tex.TextureReader;
 
 final class ModelExporter implements Exporter {
 	public static enum ExporterType {
@@ -151,23 +167,93 @@ final class ModelExporter implements Exporter {
 
 	@Override
 	public void extract(IdxFileLink fileLink, ByteBuffer data) throws IOException {
+		final Model model = modelReader.read(data);
+
 		final Path outputFolder = App.getInstance().getAppConfig().getOutputPath();
 		final Path modelFolder = outputFolder.resolve(fileLink.fullName()).getParent();
 		Files.createDirectories(modelFolder);
-		final Model model = modelReader.read(data);
 		getExporter().export(model, modelFolder, fileLink);
 	}
 
 	private static final class GlTFInternalModelExporter implements InternalModelExporter {
+		private IdxFileLink findFile(IdxDirectory root, String fileName) {
+			try {
+				return root.getFile(fileName);
+			} catch (IdxEntryNotFound | IdxEntryNotAFile e) {
+				return null;
+			}
+		}
+
+		private SearchResult find(List<SourcedVaultReader> vaults, String textureId) {
+			for (final SourcedVaultReader vault : vaults) {
+				final IdxFileLink file = findFile(vault.getReader().getRootFolder(), textureId);
+				if (file != null) {
+					final SearchResult r = new SearchResult();
+					r.archive = vault.getReader();
+					r.fileLink = file;
+					return r;
+				}
+			}
+			return null;
+		}
+
+		private static class SearchResult {
+			public VaultReader archive;
+			public IdxFileLink fileLink;
+		}
+
 		@Override
 		public void export(Model model, Path dstFolder, IdxFileLink fileLink) throws IOException {
 			final GlTFExporter gltfExporter = new nexusvault.format.m3.export.gltf.GlTFExporter();
+			final String modelName = fileLink.getName().substring(0, fileLink.getName().lastIndexOf('.'));
+
+			final List<SourcedVaultReader> vaults = App.getInstance().getPlugIn(ArchivePlugIn.class).loadArchives();
 
 			gltfExporter.setGlTFExportMonitor(new GlTFExportMonitor() {
 				@Override
 				public void requestTextures(String textureId, ResourceBundle resourceBundle) {
-					// TODO Auto-generated method stub
+					final SearchResult r = find(vaults, textureId);
+					if (r == null) {
+						return;
+					}
 
+					final VaultReader archive = r.archive;
+					final IdxFileLink textureFile = r.fileLink;
+
+					try {
+						final TextureReader textureReader = TextureReader.buildDefault();
+						final TextureObject textureObject = textureReader.read(archive.getData(textureFile));
+						final TextureImage origin = textureObject.getImage(0);
+
+						final List<TextureImage> images = new ArrayList<>();
+
+						if (textureObject.hasImageMultipleComponents()) {
+							images.addAll(textureObject.splitImageIntoComponents(origin));
+						} else {
+							images.add(origin);
+						}
+
+						final Path dst = dstFolder.resolve(modelName + "_textures"); // TODO for now
+						Files.createDirectories(dst);
+
+						for (int i = 0; i < images.size(); i++) {
+							final TextureImage image = images.get(i);
+							final String newfileName = String.format("%s.%d.png", textureFile.getNameWithoutFileEnding(), i);
+							final BufferedImage bufferedImage = image.convertToBufferedImage();
+
+							final Path texDst = dst.resolve(Paths.get(newfileName));
+							try (OutputStream writer = Files.newOutputStream(texDst, StandardOpenOption.CREATE, StandardOpenOption.WRITE,
+									StandardOpenOption.TRUNCATE_EXISTING)) {
+								ImageIO.write(bufferedImage, "PNG", writer);
+							}
+
+							resourceBundle.addTextureResource(new PathTextureResource(texDst));
+						}
+					} catch (final IOException e) {
+						throw new IllegalStateException(e);
+					} catch (final IdxEntryNotFound e2) {
+						// ignore
+					}
 				}
 
 				@Override
@@ -177,7 +263,6 @@ final class ModelExporter implements Exporter {
 				}
 			});
 
-			final String modelName = fileLink.getName().substring(0, fileLink.getName().lastIndexOf('.'));
 			gltfExporter.exportModel(dstFolder, modelName, model);
 		}
 	}
@@ -208,7 +293,7 @@ final class ModelExporter implements Exporter {
 			final ModelDebugger debuger = ModelDebugger.createDefaultModelDebugger();
 			final Table table = debuger.debugModel(model);
 			final String modelName = fileLink.getName().substring(0, fileLink.getName().lastIndexOf('.'));
-			dstFolder = dstFolder.resolve(modelName);
+			dstFolder = dstFolder.resolve(modelName + "_debug");
 			Files.createDirectories(dstFolder);
 			writeTable2CSV(modelName, table, dstFolder);
 		}
