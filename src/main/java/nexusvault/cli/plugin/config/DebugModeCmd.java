@@ -43,7 +43,8 @@ final class DebugModeCmd implements Command {
 
 	@Override
 	public void onHelp(CommandArguments args) {
-		// TODO Auto-generated method stub
+		App.getInstance().getConsole().println(Level.CONSOLE,
+				() -> "Sets the debug mode. If no argument is supplied, the debug mode will be toggled to 'on' if it was 'off' or 'off' if it was 'on'. The debug mode can be directly set with one of the arguments 'on'/'off'.");
 	}
 
 }

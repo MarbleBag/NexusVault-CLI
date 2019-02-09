@@ -156,7 +156,6 @@ public final class App {
 		commandManager.registerCommand(new ExitCmd((args) -> this.requestShutDown()));
 		commandManager.registerCommand(new HelpCmd((args) -> this.cliSystem.printHelp()));
 		commandManager.registerCommand(new HeadlessModeCmd());
-		commandManager.registerCommand(new DebugCmd());
 	}
 
 	@Deprecated
