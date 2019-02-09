@@ -65,9 +65,9 @@ public final class ArchivePlugIn extends AbstPlugIn {
 
 	private static final class ArchiveModel {
 		private static enum Key implements PropertyKey<Key> {
-			ARCHIVE_PATHS(new PropertyOption<>("archive.paths", true, Set.class, new ConstantProvider<>(Collections.emptySet()))),
-			INNER_PATH(new PropertyOption<>("archive.pointer", false, ArchivePath.class, new ConstantProvider<>(new ArchivePath()))),
-			ARCHIVES(new PropertyOption<>("archive.vaults", false, List.class, new ConstantProvider<>(Collections.emptyList())));
+			ARCHIVE_PATHS(new PropertyOption<Key>("archive.paths", true, Set.class, new ConstantProvider<>(Collections.emptySet()))),
+			INNER_PATH(new PropertyOption<Key>("archive.pointer", false, ArchivePath.class, new ConstantProvider<>(new ArchivePath()))),
+			ARCHIVES(new PropertyOption<Key>("archive.vaults", false, List.class, new ConstantProvider<>(Collections.emptyList())));
 
 			private final PropertyOption<Key> opt;
 

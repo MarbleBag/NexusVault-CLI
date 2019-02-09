@@ -53,13 +53,13 @@ public final class AppConfigModel {
 	}
 
 	private static enum Key implements PropertyKey<Key> {
-		APP_PATH(new PropertyOption<>("app.path", false, Path.class)),
-		OUTPUT_PATH(new PropertyOption<>("out.path", true, Path.class)),
-		CONFIG_PATH(new PropertyOption<>("config.path", true, Path.class)),
-		REPORT_PATH(new PropertyOption<>("report.path", false, Path.class)),
-		HEADLESS_MODE(new PropertyOption<>("app.headless", false, Boolean.class, new BoolProvider<>(false))),
-		DEBUG_MODE(new PropertyOption<>("app.debug", false, Boolean.class, new BoolProvider<>(false))),
-		DONT_SAVE_CONFIG(new PropertyOption<>("config.save.deactivate", false, Boolean.class, new BoolProvider<>(false)));
+		APP_PATH(new PropertyOption<Key>("app.path", false, Path.class)),
+		OUTPUT_PATH(new PropertyOption<Key>("out.path", true, Path.class)),
+		CONFIG_PATH(new PropertyOption<Key>("config.path", true, Path.class)),
+		REPORT_PATH(new PropertyOption<Key>("report.path", false, Path.class)),
+		HEADLESS_MODE(new PropertyOption<Key>("app.headless", false, Boolean.class, new BoolProvider<>(false))),
+		DEBUG_MODE(new PropertyOption<Key>("app.debug", false, Boolean.class, new BoolProvider<>(false))),
+		DONT_SAVE_CONFIG(new PropertyOption<Key>("config.save.deactivate", false, Boolean.class, new BoolProvider<>(false)));
 
 		private final PropertyOption<Key> opt;
 
