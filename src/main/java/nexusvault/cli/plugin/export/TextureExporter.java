@@ -73,7 +73,7 @@ final class TextureExporter implements Exporter {
 
 	@Override
 	public void initialize() {
-		reader = new TextureReader();
+		reader = TextureReader.buildDefault();
 	}
 
 	@Override
