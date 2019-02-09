@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com)
 
 ## [Unreleased] 
+### Added
+- Project can be build with 'mvn clean package' and produces and executable version
 
 ## [0.1.1] - 2019-02-09
 ### Added

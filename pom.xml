@@ -10,6 +10,8 @@
 		<project.java.version>1.8</project.java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<project.application.exe.name>NexusvaultCLI</project.application.exe.name>
+		<project.application.jar.name>nexusvault-cli</project.application.jar.name>
 	</properties>
 
 	<repositories>
@@ -21,7 +23,7 @@
 	</repositories>
 
 	<build>
-		<finalName>nexusvault-cli</finalName>
+		<finalName>${project.application.jar.name}</finalName>
 
 		<plugins>
 			<plugin>
@@ -75,9 +77,40 @@
 				</executions>
 			</plugin>
 
+			<plugin>
+				<groupId>com.akathist.maven.plugins.launch4j</groupId>
+				<artifactId>launch4j-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>l4j-clui</id>
+						<phase>package</phase>
+						<goals>
+							<goal>launch4j</goal>
+						</goals>
+						<configuration>
+							<headerType>console</headerType>
+							<jar>${project.application.jar.name}.jar</jar>
+							<dontWrapJar>true</dontWrapJar>
+							<outfile>${project.build.directory}\${project.application.exe.name}.exe</outfile>
+							<downloadUrl>http://java.com/download</downloadUrl>
+							<priority>normal</priority>
+							<cmdLine />
+							<jre>
+								<path>jre</path>
+								<bundledJre64Bit>true</bundledJre64Bit>
+								<bundledJreAsFallback>false</bundledJreAsFallback>
+								<minVersion>1.8.0</minVersion>
+								<jdkPreference>preferJre</jdkPreference>
+								<runtimeBits>64/32</runtimeBits>
+							</jre>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
-
+	
 	<dependencies>
 		<dependency>
 			<groupId>com.google.guava</groupId>
