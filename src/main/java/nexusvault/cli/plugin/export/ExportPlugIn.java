@@ -113,6 +113,18 @@ public final class ExportPlugIn extends AbstPlugIn {
 		final Map<SourcedVaultReader, Set<IdxFileLink>> exportFiles = prepareExport(bla, vaults);
 		final List<ExportError> exportErrors = new LinkedList<>();
 		export(exportFiles, exportErrors);
+
+		if (!exportErrors.isEmpty()) {
+			sendMsg(() -> String.format("Unable to export %d files", exportErrors.size()));
+			sendMsg(() -> {
+				final StringBuilder b = new StringBuilder();
+				for (final ExportError error : exportErrors) {
+					b.append(error.error.getClass()).append(" in ").append(error.link.fullName()).append("\n");
+					b.append("Msg: ").append(error.error.getMessage()).append("\n");
+				}
+				return b.toString();
+			});
+		}
 		// TODO error handling
 	}
 
@@ -132,7 +144,7 @@ public final class ExportPlugIn extends AbstPlugIn {
 	private void export(final Map<SourcedVaultReader, Set<IdxFileLink>> exportFiles, final List<ExportError> exportError) {
 
 		final int numberOfFilesToUnpack = exportFiles.values().stream().mapToInt(set -> set.size()).sum();
-		final int reportAfterNFiles = Math.max(1, Math.min(500, numberOfFilesToUnpack / 20));
+		final int reportAfterNFiles = Math.max(1, Math.min(1000, numberOfFilesToUnpack / 20));
 
 		sendMsg(() -> "Start exporting to: " + getOutputFolder());
 		int seenFiles = 0;
@@ -176,7 +188,7 @@ public final class ExportPlugIn extends AbstPlugIn {
 			final long exportStart = System.currentTimeMillis();
 			exporter.extract(fileLink, data);
 			final long exportEnd = System.currentTimeMillis();
-			sendMsg(() -> String.format("Unpacking of %s in %.2fs", fileLink.fullName(), (exportEnd - exportStart) / 1000f));
+			sendDebug(() -> String.format("Unpacking of %s in %.2fs", fileLink.fullName(), (exportEnd - exportStart) / 1000f));
 		} catch (final Exception e) {
 			exportError.add(new ExportError(fileLink.fullName(), e));
 		}
