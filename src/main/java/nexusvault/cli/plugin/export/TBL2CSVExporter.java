@@ -22,8 +22,8 @@ import nexusvault.format.tbl.TableRecord;
 
 final class TBL2CSVExporter implements Exporter {
 
-	private final TableReader tableReader = new TableReader();
-	private final String elementDelimiter = ";";
+	private static final String elementDelimiter = ";";
+	private TableReader tableReader;
 
 	@Override
 	public void extract(IdxFileLink file, ByteBuffer data) throws IOException {
@@ -70,12 +70,12 @@ final class TBL2CSVExporter implements Exporter {
 
 	@Override
 	public void initialize() {
-
+		tableReader = new TableReader();
 	}
 
 	@Override
 	public void deinitialize() {
-
+		tableReader = null;
 	}
 
 }
