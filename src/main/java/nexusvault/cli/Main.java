@@ -2,7 +2,7 @@ package nexusvault.cli;
 
 import java.io.IOException;
 
-public class Main {
+public final class Main {
 
 	public static void main(String[] args) throws IOException {
 		final String triggerWord = HeadlessModeCmd.CLI_SYNTAX;

@@ -16,11 +16,13 @@
 		<repository>
 			<id>integrated.maven.repo</id>
 			<name>imavo</name>
-			<url>file:${project.basedir}\..\maven-repo</url>
+			<url>file:${project.basedir}\libs</url>
 		</repository>
 	</repositories>
 
 	<build>
+		<finalName>nexusvault-cli</finalName>
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -32,6 +34,7 @@
 					<encoding>${project.build.sourceEncoding}</encoding>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -40,13 +43,38 @@
 						<addMavenDescriptor>false</addMavenDescriptor>
 						<manifest>
 							<addClasspath>true</addClasspath>
+							<classpathPrefix>libs/</classpathPrefix>
+							<mainClass>
+								nexusvault.cli.Main
+							</mainClass>
 						</manifest>
+
 						<manifestEntries>
 							<Built-By>${project.author.name}</Built-By>
 						</manifestEntries>
 					</archive>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>
+								${project.build.directory}/libs
+							</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 
@@ -65,6 +93,11 @@
 			<groupId>com.eclipsesource.minimal-json</groupId>
 			<artifactId>minimal-json</artifactId>
 			<version>0.9.5</version>
+		</dependency>
+		<dependency>
+			<groupId>kreed</groupId>
+			<artifactId>kreed.util.property</artifactId>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>nexusvault</groupId>
