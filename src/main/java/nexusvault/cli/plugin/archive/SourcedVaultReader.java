@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import nexusvault.archive.VaultReader;
-import nexusvault.cli.exception.ArchiveCanNotBeLoadedException;
 import nexusvault.cli.exception.FileNotFoundException;
 import nexusvault.cli.exception.FileNotReadableException;
 
