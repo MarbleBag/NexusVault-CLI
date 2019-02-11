@@ -6,7 +6,6 @@ public interface ConsoleSystem {
 	public static enum Level {
 		CONSOLE,
 		DEBUG,
-		ERROR
 	}
 
 	boolean accepts(Level level);

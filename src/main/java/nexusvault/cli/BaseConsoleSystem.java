@@ -35,8 +35,6 @@ final class BaseConsoleSystem implements ConsoleSystem {
 	@Override
 	public boolean accepts(Level level) {
 		switch (level) {
-			case ERROR:
-				return true;
 			case CONSOLE:
 				return !headlessMode;
 			case DEBUG:
