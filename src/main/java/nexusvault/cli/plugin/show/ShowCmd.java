@@ -1,12 +1,11 @@
 package nexusvault.cli.plugin.show;
 
 import nexusvault.cli.App;
-import nexusvault.cli.Command;
 import nexusvault.cli.CommandArguments;
 import nexusvault.cli.CommandInfo;
-import nexusvault.cli.ConsoleSystem.Level;
+import nexusvault.cli.plugin.AbstCommand;
 
-public final class ShowCmd implements Command {
+final class ShowCmd extends AbstCommand {
 
 	@Override
 	public CommandInfo getCommandInfo() {
@@ -25,7 +24,7 @@ public final class ShowCmd implements Command {
 	@Override
 	public void onCommand(CommandArguments args) {
 		if (args.getNumberOfArguments() != 1) {
-			App.getInstance().getConsole().println(Level.CONSOLE, "Use '?' to recieve a list of possible arguments");
+			sendMsg("Use '?' to recieve a list of possible arguments");
 			return;
 		}
 		final String arg0 = args.getArg(0).trim().toLowerCase();

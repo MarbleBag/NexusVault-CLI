@@ -4,14 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import nexusvault.cli.App;
-import nexusvault.cli.Command;
 import nexusvault.cli.CommandArguments;
 import nexusvault.cli.CommandInfo;
-import nexusvault.cli.ConsoleSystem.Level;
+import nexusvault.cli.plugin.AbstCommand;
 import nexusvault.cli.plugin.export.ExportPlugIn.ExportRequest;
-import nexusvault.cli.plugin.search.SearchPlugIn;
 
-final class ExportCmd implements Command {
+final class ExportCmd extends AbstCommand {
 
 	@Override
 	public CommandInfo getCommandInfo() {
@@ -35,10 +33,13 @@ final class ExportCmd implements Command {
 		if (args.getNumberOfArguments() != 0) {
 			if ("as-binary".equalsIgnoreCase(args.getArg(0))) {
 				exportRequest.exportAsBinary(true);
+			} else {
+				sendMsg(() -> String.format("Unknown argument %s. Use '?' to get more informations.", args.getArg(0)));
+				return;
 			}
 		}
 
-		App.getInstance().getPlugIn(SearchPlugIn.class).getLastSearchResults();
+		// App.getInstance().getPlugIn(SearchPlugIn.class).getLastSearchResults();
 
 		App.getInstance().getPlugIn(ExportPlugIn.class).export(exportRequest);
 	}
@@ -65,10 +66,6 @@ final class ExportCmd implements Command {
 			supportedFileTypes.addAll(exporter.getAcceptedFileEndings());
 		}
 		sendMsg("File types with converter: " + String.join(", ", supportedFileTypes));
-	}
-
-	private void sendMsg(String msg) {
-		App.getInstance().getConsole().println(Level.CONSOLE, msg);
 	}
 
 }

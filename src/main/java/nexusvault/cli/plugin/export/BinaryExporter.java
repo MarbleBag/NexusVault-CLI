@@ -35,7 +35,7 @@ class BinaryExporter implements Exporter {
 	}
 
 	@Override
-	public void extract(IdxFileLink file, ByteBuffer data) throws IOException {
+	public void export(IdxFileLink file, ByteBuffer data) throws IOException {
 		final Path filePath = Paths.get(file.fullName());
 		final Path outputFolder = App.getInstance().getPlugIn(ExportPlugIn.class).getOutputFolder();
 
