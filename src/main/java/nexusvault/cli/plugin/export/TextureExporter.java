@@ -36,7 +36,7 @@ final class TextureExporter implements Exporter {
 	}
 
 	@Override
-	public void extract(IdxFileLink fileLink, ByteBuffer data) throws IOException {
+	public void export(IdxFileLink fileLink, ByteBuffer data) throws IOException {
 		final TextureObject texture = reader.read(data);
 		final TextureImage textureImage = texture.getImage(0);
 		if (textureImage == null) {

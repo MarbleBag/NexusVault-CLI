@@ -166,7 +166,7 @@ final class ModelExporter implements Exporter {
 	}
 
 	@Override
-	public void extract(IdxFileLink fileLink, ByteBuffer data) throws IOException {
+	public void export(IdxFileLink fileLink, ByteBuffer data) throws IOException {
 		final Model model = modelReader.read(data);
 
 		final Path outputFolder = App.getInstance().getAppConfig().getOutputPath();

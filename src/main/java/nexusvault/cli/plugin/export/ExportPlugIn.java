@@ -1,5 +1,6 @@
 package nexusvault.cli.plugin.export;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -10,6 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import kreed.io.util.ByteBufferBinaryReader;
 import nexusvault.archive.IdxFileLink;
@@ -22,6 +26,8 @@ import nexusvault.cli.plugin.archive.SourcedVaultReader;
 import nexusvault.cli.plugin.search.SearchPlugIn;
 
 public final class ExportPlugIn extends AbstPlugIn {
+
+	private static final Logger logger = LogManager.getLogger(ExportPlugIn.class);
 
 	private static final class ExportError {
 		public final String path;
@@ -52,9 +58,14 @@ public final class ExportPlugIn extends AbstPlugIn {
 
 	public static final class ExportRequest {
 
-		public void exportAsBinary(boolean b) {
-			// TODO Auto-generated method stub
+		private boolean exportAsBinary;
 
+		public void exportAsBinary(boolean value) {
+			exportAsBinary = value;
+		}
+
+		public boolean isExportAsBinaryChecked() {
+			return exportAsBinary;
 		}
 
 	}
@@ -108,23 +119,33 @@ public final class ExportPlugIn extends AbstPlugIn {
 			return;
 		}
 
+		// TODO not final
 		final Map<Path, Set<IdxFileLink>> bla = App.getInstance().getPlugIn(SearchPlugIn.class).getLastSearchResults();
 
 		final Map<SourcedVaultReader, Set<IdxFileLink>> exportFiles = prepareExport(bla, vaults);
 		final List<ExportError> exportErrors = new LinkedList<>();
-		export(exportFiles, exportErrors);
+		export(request, exportFiles, exportErrors);
 
 		if (!exportErrors.isEmpty()) {
-			sendMsg(() -> String.format("Unable to export %d files", exportErrors.size()));
 			sendMsg(() -> {
-				final StringBuilder b = new StringBuilder();
+				final StringBuilder msg = new StringBuilder();
+				msg.append(String.format("Unable to export %d file(s)\n", exportErrors.size()));
+				msg.append("Error(s)\n");
 				for (final ExportError error : exportErrors) {
-					b.append(error.error.getClass()).append(" in ").append(error.link.fullName()).append("\n");
-					b.append("Msg: ").append(error.error.getMessage()).append("\n");
+					msg.append(error.getTarget()).append("\n");
+					msg.append("->").append(error.error.getClass());
+					msg.append(" : ").append(error.error.getMessage());
+					msg.append("\n");
 				}
-				return b.toString();
+				return msg.toString();
 			});
+
+			logger.error(String.format("Unable to export %d file(s)\n", exportErrors.size()));
+			for (final ExportError error : exportErrors) {
+				logger.error(error.getTarget(), error.error);
+			}
 		}
+
 		// TODO error handling
 	}
 
@@ -141,10 +162,12 @@ public final class ExportPlugIn extends AbstPlugIn {
 		return exportFiles;
 	}
 
-	private void export(final Map<SourcedVaultReader, Set<IdxFileLink>> exportFiles, final List<ExportError> exportError) {
+	private void export(ExportRequest request, final Map<SourcedVaultReader, Set<IdxFileLink>> exportFiles, final List<ExportError> exportError) {
 
 		final int numberOfFilesToUnpack = exportFiles.values().stream().mapToInt(set -> set.size()).sum();
 		final int reportAfterNFiles = Math.max(1, Math.min(1000, numberOfFilesToUnpack / 20));
+
+		final BinaryExporter binaryExporter = new BinaryExporter(Collections.emptyList());
 
 		sendMsg(() -> "Start exporting to: " + getOutputFolder());
 		int seenFiles = 0;
@@ -157,8 +180,20 @@ public final class ExportPlugIn extends AbstPlugIn {
 
 			final SourcedVaultReader vault = entry.getKey();
 			for (final IdxFileLink fileLink : entry.getValue()) {
+				try {
+					final ByteBuffer data = vault.getReader().getData(fileLink);
 
-				export(vault, fileLink, exportError);
+					Exporter exporter;
+					if (request.isExportAsBinaryChecked()) {
+						exporter = binaryExporter;
+					} else {
+						exporter = findExporter(fileLink, data);
+					}
+
+					export(fileLink, data, exporter);
+				} catch (final Exception e) {
+					exportError.add(new ExportError(fileLink.fullName(), e));
+				}
 
 				seenFiles += 1;
 				reportIn += 1;
@@ -175,23 +210,24 @@ public final class ExportPlugIn extends AbstPlugIn {
 		sendMsg(() -> String.format("Exporting done in %.2fs", (exportAllEnd - exportAllStart) / 1000f));
 	}
 
-	private void export(final SourcedVaultReader vault, final IdxFileLink fileLink, final List<ExportError> exportError) {
+	private void export(final IdxFileLink fileLink, final ByteBuffer data, final Exporter exporter) throws IOException {
+		final long exportStart = System.currentTimeMillis();
 		try {
-			final ByteBuffer data = vault.getReader().getData(fileLink);
-
-			final DataHeader dataHeader = new DataHeader(new ByteBufferBinaryReader(data));
-			final Exporter exporter = findExporter(fileLink, dataHeader);
-			if (exporter == null) {
-				throw new UnsupportedOperationException("File type '" + fileLink.getFileEnding() + "' not supported.");
-			}
-
-			final long exportStart = System.currentTimeMillis();
-			exporter.extract(fileLink, data);
-			final long exportEnd = System.currentTimeMillis();
-			sendDebug(() -> String.format("Unpacking of %s in %.2fs", fileLink.fullName(), (exportEnd - exportStart) / 1000f));
-		} catch (final Exception e) {
-			exportError.add(new ExportError(fileLink.fullName(), e));
+			exporter.export(fileLink, data);
+		} catch (final Throwable e) {
+			throw new ExportException("Error in " + exporter, e);
 		}
+		final long exportEnd = System.currentTimeMillis();
+		sendDebug(() -> String.format("Unpacking of %s in %.2fs", fileLink.fullName(), (exportEnd - exportStart) / 1000f));
+	}
+
+	private Exporter findExporter(IdxFileLink fileLink, ByteBuffer data) {
+		final DataHeader dataHeader = new DataHeader(new ByteBufferBinaryReader(data));
+		final Exporter exporter = findExporter(fileLink, dataHeader);
+		if (exporter == null) {
+			throw new NoExporterFoundException("File type '" + fileLink.getFileEnding() + "' not supported.");
+		}
+		return exporter;
 	}
 
 	private Exporter findExporter(IdxFileLink fileLink, final DataHeader dataHeader) {

@@ -26,7 +26,7 @@ final class TBL2CSVExporter implements Exporter {
 	private TableReader tableReader;
 
 	@Override
-	public void extract(IdxFileLink file, ByteBuffer data) throws IOException {
+	public void export(IdxFileLink file, ByteBuffer data) throws IOException {
 		final RawTable table = tableReader.read(new ByteBufferBinaryReader(data));
 
 		final List<String> toOut = new LinkedList<>();

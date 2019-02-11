@@ -23,6 +23,6 @@ interface Exporter {
 
 	boolean accepts(DataHeader header);
 
-	void extract(IdxFileLink file, ByteBuffer data) throws IOException;
+	void export(IdxFileLink file, ByteBuffer data) throws IOException;
 
 }

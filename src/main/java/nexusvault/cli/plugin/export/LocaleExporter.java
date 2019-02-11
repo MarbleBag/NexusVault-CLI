@@ -40,7 +40,7 @@ final class LocaleExporter implements Exporter {
 	}
 
 	@Override
-	public void extract(IdxFileLink file, ByteBuffer data) throws IOException {
+	public void export(IdxFileLink file, ByteBuffer data) throws IOException {
 		final LanguageDictionary dictionary = languageReader.read(data);
 		final Path outputFile = App.getInstance().getPlugIn(ExportPlugIn.class).getOutputFolder().resolve(file.fullName() + ".csv");
 		Files.createDirectories(outputFile.getParent());

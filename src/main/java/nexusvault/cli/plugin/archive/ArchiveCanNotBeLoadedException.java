@@ -1,4 +1,4 @@
-package nexusvault.cli.exception;
+package nexusvault.cli.plugin.archive;
 
 import nexusvault.cli.NexusvaultCLIBaseException;
 
