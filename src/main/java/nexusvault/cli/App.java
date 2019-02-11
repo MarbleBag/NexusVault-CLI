@@ -14,6 +14,21 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.appender.RollingFileAppender;
+import org.apache.logging.log4j.core.appender.rolling.RollingFileManager;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.LoggerConfig;
+import org.apache.logging.log4j.core.config.builder.api.AppenderComponentBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ComponentBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
+import org.apache.logging.log4j.core.config.builder.api.LayoutComponentBuilder;
+import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
+
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.eventbus.SubscriberExceptionContext;
@@ -25,6 +40,7 @@ import com.google.common.reflect.Reflection;
 import nexusvault.cli.ConsoleSystem.Level;
 import nexusvault.cli.model.ModelPropertyChangedEvent;
 import nexusvault.cli.plugin.config.AppConfigModel;
+import nexusvault.cli.plugin.config.AppConfigModel.AppConfigAppPathChangedEvent;
 import nexusvault.cli.plugin.config.AppConfigModel.AppConfigDebugModeChangedEvent;
 
 public final class App {
@@ -37,6 +53,8 @@ public final class App {
 			throw new IllegalStateException(e);
 		}
 	}
+
+	private final static Logger logger = LogManager.getLogger(App.class);
 
 	private static App app;
 
@@ -94,8 +112,10 @@ public final class App {
 	}
 
 	public void initializeApp(boolean headlessMode) throws IOException {
-		initializeConsole(headlessMode);
 		initializeModel(headlessMode);
+		// initializeLogging();
+		// updateLogger();
+		initializeConsole(headlessMode);
 		initializeEventSystem();
 		initializeCLI();
 
@@ -106,6 +126,98 @@ public final class App {
 		if (!headlessMode) {
 			getConsole().println(Level.CONSOLE, "Console mode: Enter 'help' to get a list of available commands."); // TODO
 		}
+	}
+
+	private void updateLogger() {
+		final String appenderName = "RollingFile";
+		final String appenderRef = appenderName;// "rolling";
+		final String packageRef = "nexusvault.cli";
+
+		final LoggerContext context = (LoggerContext) LogManager.getContext(false);
+		final Configuration configuration = context.getConfiguration();
+		final RollingFileAppender oldAppender = configuration.getAppender(appenderName);
+		final RollingFileManager oldManager = oldAppender.getManager();
+
+		oldAppender.stop();
+		configuration.removeLogger(packageRef);
+
+		final String logName = getAppConfig().getReportFolder().resolve("app.log").toString();
+		final String logPattern = getAppConfig().getReportFolder().resolve("app-%i.log.gz").toString();
+
+		// final TriggeringPolicy triggerOnStartUp = OnStartupTriggeringPolicy.createPolicy(1);
+		// final TriggeringPolicy trigerOnSize = SizeBasedTriggeringPolicy.createPolicy("1 KB");
+		// final TriggeringPolicy triggeringPolicy = CompositeTriggeringPolicy.createPolicy(triggerOnStartUp,trigerOnSize);
+		//
+		// final RolloverStrategy rolloverStrategy = DefaultRolloverStrategy.newBuilder()
+		// .withCompressionLevelStr(String.valueOf(Deflater.DEFAULT_COMPRESSION))
+		// .withMin("1")
+		// .withMax("5")
+		// .withFileIndex("min")
+		// .withConfig(configuration)
+		// .build();
+
+		// @formatter:off
+		final RollingFileAppender newAppender = RollingFileAppender.newBuilder()
+				.withFileName(logName)
+				.withFilePattern(logPattern)
+				.withAppend(oldManager.isAppend())
+				.setName(oldAppender.getName())
+				.setLayout(oldAppender.getLayout())
+				.withBufferedIo(oldManager.getBufferSize() > 0)
+				.withBufferSize(oldManager.getBufferSize())
+				.withCreateOnDemand(oldManager.isCreateOnDemand())
+				.withImmediateFlush(oldAppender.getImmediateFlush())
+				.withPolicy( oldManager.getTriggeringPolicy())
+				.withStrategy(oldManager.getRolloverStrategy())
+				.setFilter(oldAppender.getFilter())
+				.setIgnoreExceptions(oldAppender.ignoreExceptions())
+				.withAdvertise(false)
+				.setConfiguration(configuration)
+				.build();
+		// @formatter:on
+
+		// create new appender/logger
+		final LoggerConfig loggerConfig = new LoggerConfig(packageRef, org.apache.logging.log4j.Level.DEBUG, false);
+
+		newAppender.start();
+		loggerConfig.addAppender(newAppender, org.apache.logging.log4j.Level.DEBUG, null);
+		configuration.addLogger(packageRef, loggerConfig);
+
+		context.updateLoggers();
+	}
+
+	private void initializeLogging() {
+		// log4j
+		final ConfigurationBuilder<BuiltConfiguration> builder = ConfigurationBuilderFactory.newConfigurationBuilder();
+
+		final LayoutComponentBuilder layoutBuilder = builder.newLayout("PatternLayout").addAttribute("pattern", "%d %p %C{1.} [%t] %m%n");
+
+		final ComponentBuilder<?> triggeringPolicy = builder.newComponent("Policies");
+		triggeringPolicy.addComponent(builder.newComponent("OnStartupTriggeringPolicy"));
+		triggeringPolicy.addComponent(builder.newComponent("SizeBasedTriggeringPolicy").addAttribute("size", "1 MB"));
+
+		final ComponentBuilder<?> rolloverStrategy = builder.newComponent("DefaultRolloverStrategy");
+		rolloverStrategy.addAttribute("fileIndex", "min");
+		rolloverStrategy.addAttribute("min", 1);
+		rolloverStrategy.addAttribute("max", 5);
+
+		final String logName = getAppConfig().getReportFolder().resolve("app.log").toString();
+		final String logPattern = getAppConfig().getReportFolder().resolve("app-%i.log").toString();
+
+		final AppenderComponentBuilder appenderBuilder = builder.newAppender("rolling", "RollingFile");
+		appenderBuilder.addAttribute("fileName", logName);
+		appenderBuilder.addAttribute("filePattern", logPattern);
+		appenderBuilder.add(layoutBuilder);
+		appenderBuilder.addComponent(triggeringPolicy);
+		appenderBuilder.addComponent(rolloverStrategy);
+
+		builder.add(appenderBuilder);
+		builder.add(builder.newRootLogger(org.apache.logging.log4j.Level.ALL).add(builder.newAppenderRef("rolling")).addAttribute("additivity", false)
+				.addAttribute("name", "nexusvault.cli"));
+
+		final Configuration config = builder.build();
+
+		Configurator.initialize(config);
 	}
 
 	private void initializeConsole(boolean headlessMode) {
@@ -121,6 +233,8 @@ public final class App {
 		final BaseConsoleSystem console = new BaseConsoleSystem(handle);
 		console.setHeadlessMode(headlessMode);
 		this.console = console;
+
+		LogManager.getLogger(App.class);
 	}
 
 	private void initializeCLI() {
@@ -186,11 +300,20 @@ public final class App {
 	private final class AppConfigObserver {
 		@Subscribe
 		public void onAppConfigChangedEvent(ModelPropertyChangedEvent<?> event) {
-			// TODO
-			App.this.console.println(Level.CONSOLE, "Set " + event);
+			App.this.console.println(Level.CONSOLE, () -> {
+				if ((event.getOldValue() == null) && (event.getNewValue() == null)) {
+					return String.format("Property %s changed", event.getEventName());
+				} else if (event.getOldValue() == null) {
+					return String.format("Set %s to: '%s'", event.getEventName(), event.getNewValue());
+				} else {
+					return String.format("Change %s\nfrom: '%s'\nto: '%s'", event.getEventName(), event.getOldValue(), event.getNewValue());
+				}
+			});
 
 			if (event instanceof AppConfigDebugModeChangedEvent) {
 				App.this.console.setDebugMode((Boolean) event.getNewValue());
+			} else if (event instanceof AppConfigAppPathChangedEvent) {
+				App.this.updateLogger();
 			}
 		}
 	}
@@ -279,6 +402,7 @@ public final class App {
 		String line = null;
 
 		processConsole = true; // TODO
+		String[] arguments = null;
 		while (processConsole) {
 			try {
 				line = reader.readLine();
@@ -293,19 +417,30 @@ public final class App {
 					}
 				}
 
-				final String[] arguments = commandManager.parseArguments(line);
+				arguments = commandManager.parseArguments(line);
 				commandManager.runArguments(arguments);
 
 			} catch (final CommandFormatException e1) {
-				console.println(Level.ERROR, e1 + ":" + e1.getMessage());
-				// if (appProperties.isDebugMode()) { //TODO
-				// e1.printStackTrace();
-				// }
+				logger.error(String.format("Error at cmd(s): %s", Arrays.toString(arguments)), e1);
+				console.println(Level.CONSOLE, () -> {
+					final StringBuilder msg = new StringBuilder();
+					msg.append("Command not executable\n");
+					msg.append(e1.getMessage()).append("\n");
+					return msg.toString();
+				});
 			} catch (final Exception e2) {
-				console.println(Level.ERROR, e2 + ":" + e2.getMessage());
-				// if (appProperties.isDebugMode()) { //TODO
-				// e2.printStackTrace();
-				// }
+				logger.error(String.format("Error at cmd(s): %s", Arrays.toString(arguments)), e2);
+				console.println(Level.CONSOLE, () -> {
+					final StringBuilder msg = new StringBuilder();
+					msg.append("An error occured: (The error log contains more detailed informations)\n");
+					msg.append(e2.getClass().toString()).append(" : ").append(e2.getMessage()).append("\n");
+					Throwable t = e2.getCause();
+					while (t != null) {
+						msg.append(t.toString()).append("\n");
+						t = t.getCause();
+					}
+					return msg.toString();
+				});
 			}
 		}
 

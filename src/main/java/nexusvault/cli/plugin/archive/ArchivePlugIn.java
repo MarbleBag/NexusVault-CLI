@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.google.common.eventbus.Subscribe;
 
 import kreed.util.property.PropertyChangedEvent;
@@ -30,7 +33,6 @@ import nexusvault.cli.App;
 import nexusvault.cli.Command;
 import nexusvault.cli.ConsoleSystem.Level;
 import nexusvault.cli.EventSystem;
-import nexusvault.cli.exception.ArchiveCanNotBeLoadedException;
 import nexusvault.cli.model.ModelPropertyChangedEvent;
 import nexusvault.cli.model.ModelSet;
 import nexusvault.cli.model.PropertyKey;
@@ -38,6 +40,8 @@ import nexusvault.cli.model.PropertyOption;
 import nexusvault.cli.plugin.AbstPlugIn;
 
 public final class ArchivePlugIn extends AbstPlugIn {
+
+	private final static Logger logger = LogManager.getLogger(ArchivePlugIn.class);
 
 	public static abstract class ArchiveModelChangedEvent<T> extends ModelPropertyChangedEvent<T> {
 		private ArchiveModelChangedEvent(String eventName, T oldValue, T newValue) {
@@ -300,11 +304,12 @@ public final class ArchivePlugIn extends AbstPlugIn {
 				readers.add(vault);
 				App.getInstance().getConsole().println(Level.CONSOLE, () -> String.format("Archive '%s' loaded", path));
 			} catch (final ArchiveCanNotBeLoadedException e) {
-				if (e.getCause() != null) {
-					App.getInstance().getConsole().println(Level.ERROR, () -> e.getLocalizedMessage() + " : " + e.getCause().getLocalizedMessage());
-				} else {
-					App.getInstance().getConsole().println(Level.ERROR, () -> e.getLocalizedMessage());
-				}
+				throw e;
+				// if (e.getCause() != null) {
+				// App.getInstance().getConsole().println(Level.ERROR, () -> e.getLocalizedMessage() + " : " + e.getCause().getLocalizedMessage());
+				// } else {
+				// App.getInstance().getConsole().println(Level.ERROR, () -> e.getLocalizedMessage());
+				// }
 			}
 		}
 
@@ -385,7 +390,8 @@ public final class ArchivePlugIn extends AbstPlugIn {
 
 			});
 		} catch (final IOException e) {
-			App.getInstance().getConsole().println(Level.ERROR, () -> e.getLocalizedMessage());
+			logger.error(String.format("Scanned path %s", path), e);
+			// App.getInstance().getConsole().println(Level.ERROR, () -> e.getLocalizedMessage());
 		}
 		return archivePaths;
 	}
