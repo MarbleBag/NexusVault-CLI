@@ -3,8 +3,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com)
 
 ## [Unreleased] 
+
+## [0.1.2] - 2019-02-11
 ### Added
-- Project can be build with 'mvn clean package' and produces and executable version
+- Project can be build with 'mvn clean package' and produces an executable version
 - Error logging with log4j2
 
 ## [0.1.1] - 2019-02-09
