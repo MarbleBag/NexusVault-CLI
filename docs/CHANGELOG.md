@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com)
 ## [Unreleased] 
 ### Added
 - Project can be build with 'mvn clean package' and produces and executable version
+- Error logging with log4j2
 
 ## [0.1.1] - 2019-02-09
 ### Added
