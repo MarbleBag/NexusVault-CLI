@@ -1,15 +1,16 @@
 package nexusvault.cli.plugin.search;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import nexusvault.cli.App;
-import nexusvault.cli.Command;
 import nexusvault.cli.CommandArguments;
 import nexusvault.cli.CommandInfo;
+import nexusvault.cli.plugin.AbstCommand;
 
-final class NavigatorSearchArchiveCmd implements Command {
+final class NavigatorSearchArchiveCmd extends AbstCommand {
 
 	@Override
 	public CommandInfo getCommandInfo() {
@@ -55,7 +56,29 @@ final class NavigatorSearchArchiveCmd implements Command {
 
 	@Override
 	public void onHelp(CommandArguments args) {
-		// TODO Auto-generated method stub
+		sendMsg(() -> {
+			final String sep = File.separator.equals("\\") ? "\\\\" : File.separator;
+
+			final StringBuilder msg = new StringBuilder();
+			msg.append("Accepts one or multiple regular expressions using java pattern. The space character is used as a seperator for multiple arguments.\n");
+			msg.append("This means, to use a space within a regular expression, the expression needs be surrounded by double quotes (\").\n");
+			msg.append("File seperator are OS dependend. This system uses ");
+			msg.append(File.separator);
+			msg.append(
+					"as a seperator. In case the seperator is equal to '\\' and should be included into the regular expression, it needs to be escaped with an additional '\\' -> '\\\\'\n");
+
+			msg.append("General examples:\n");
+			msg.append("Finding all textures which are located within art/character/aurin:\n");
+			msg.append("art").append(sep).append("character").append(sep).append("aurin").append(".*.tex\n");
+
+			msg.append("Finding all m3 models that end with aurin_f:\n");
+			msg.append("aurin_f.m3\n");
+
+			msg.append("Finding only m3 models that are named aurin_f:\n");
+			msg.append(sep).append("aurin_f.m3\n");
+
+			return msg.toString();
+		});
 	}
 
 }
