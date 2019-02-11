@@ -36,10 +36,13 @@ public final class ShowPlugIn extends AbstPlugIn {
 				final StringBuilder b = new StringBuilder();
 				for (final Entry<Path, Set<IdxFileLink>> entry : searchResults.entrySet()) {
 					b.append("Archive: ").append(entry.getKey()).append("\n");
-					for (final IdxFileLink fileLink : entry.getValue()) {
-						b.append(fileLink.fullName()).append("\n");
+					if (entry.getValue().isEmpty()) {
+						b.append("No search entries\n");
+					} else {
+						for (final IdxFileLink fileLink : entry.getValue()) {
+							b.append(fileLink.fullName()).append("\n");
+						}
 					}
-					b.append("\n");
 				}
 				return b.toString();
 			});
