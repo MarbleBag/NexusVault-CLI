@@ -332,11 +332,11 @@ public final class ArchivePlugIn extends AbstPlugIn {
 			if (Files.isDirectory(path)) {
 				archivePaths.addAll(scanForArchives(path));
 			} else if (Files.isRegularFile(path)) {
-				if (!(path.endsWith(".index") || path.endsWith(".archive"))) {
+				String fileName = path.getFileName().toString();
+				if (!(fileName.endsWith(".index") || fileName.endsWith(".archive"))) {
 					App.getInstance().getConsole().println(Level.CONSOLE, () -> String.format("Path %s does not end with '.index' or '.archive'.", path));
 					continue;
 				}
-				String fileName = path.getFileName().toString();
 				if (path.endsWith(".index")) {
 					fileName = fileName.substring(0, fileName.lastIndexOf(".index")) + ".archive";
 					archivePaths.add(path.resolveSibling(fileName));
