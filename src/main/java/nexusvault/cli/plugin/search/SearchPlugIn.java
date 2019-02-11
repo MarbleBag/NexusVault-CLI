@@ -3,6 +3,7 @@ package nexusvault.cli.plugin.search;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
@@ -25,8 +26,8 @@ import nexusvault.archive.IdxEntryNotFound;
 import nexusvault.archive.IdxFileLink;
 import nexusvault.archive.util.ArchivePath;
 import nexusvault.archive.util.IdxDirectoryTraverser;
-import nexusvault.archive.util.ReportingIdxFileCollector;
 import nexusvault.archive.util.IdxEntryVisitor.EntryFilterResult;
+import nexusvault.archive.util.ReportingIdxFileCollector;
 import nexusvault.cli.App;
 import nexusvault.cli.Command;
 import nexusvault.cli.plugin.AbstPlugIn;
@@ -48,6 +49,7 @@ public final class SearchPlugIn extends AbstPlugIn {
 
 	public Map<Path, Set<IdxFileLink>> getLastSearchResults() {
 		if (loadFromFile) {
+			sendMsg("No active search found. Load previous search from " + REPORT_FILE);
 			return rebuildReportReferences();
 		}
 		return Collections.unmodifiableMap(searchResults);
@@ -124,9 +126,14 @@ public final class SearchPlugIn extends AbstPlugIn {
 		List<String> reportSearchResults = null;
 		try {
 			reportSearchResults = loadReport();
-		} catch (final IOException e) {
+		} catch (final NoSuchFileException e1) {
+			sendMsg("No previous executed search found at");
+			sendMsg(e1.getMessage());
+			return Collections.emptyMap();
+		} catch (final IOException e0) {
 			sendMsg("An error occured while loading search results from report file:");
-			sendMsg(e.getMessage());
+			sendMsg(e0.getClass().toString());
+			sendMsg(e0.getMessage());
 			return Collections.emptyMap();
 		}
 
