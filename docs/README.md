@@ -7,7 +7,7 @@ In its current form it mainly provides a way to traverse the content of .archive
 ### Getting started
 
 Check out the [latest release](https://github.com/MarbleBag/NexusVault-CLI/releases/latest).
-The release comes prepacked with all needed dependencies (except Java) and a launch4j launcher, which supports to run the application without a Java installation, as long as it can find a valid JRE besides it. 
+The release comes prepacked with all needed dependencies (except Java) and a launch4j launcher, which supports to run the application without a Java installation, as long as it can find a valid JRE beside it. 
 
 ```Bash
 ├── NexusVaultCLI
@@ -19,10 +19,6 @@ The release comes prepacked with all needed dependencies (except Java) and a lau
 
 Is no local Java version provide, the launcher will look up Java installations that are available on the system.
 If no appropriate Java version can't be found, the launcher will open a Java download page.
-
-#### Why is the release not packed with Java?
-GitHub has a strict limit of files exceeding 100 MB in size
-Moreover the current Java RE is roughly ~200 MB in size, while this application is ~8MB, not only would it unnecessary bloat the size of the release up, it would also make the download more time-consuming. While the application may be updated frequently to include new features, the JRE will probably not change.
 
 ### Run the application
 Before anything can be done, the application needs to know which archives should be read, to do so either start the application with the flag `-a "path to folder"` or write `archive "path to folder"` after starting it. The application will immediately search for any archives there. It is also possible to load a specific archive by passing the direct file path to the application.
