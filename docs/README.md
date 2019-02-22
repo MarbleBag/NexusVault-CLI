@@ -7,7 +7,7 @@ In its current form it mainly provides a way to traverse the content of .archive
 ### Getting started
 
 Check out the [latest release](https://github.com/MarbleBag/NexusVault-CLI/releases/latest).
-The release comes prepacked with all needed dependencies (except Java) and a launch4j launcher, which supports to run the application without a Java installation, as long as it can find a valid JRE beside it. 
+The release comes prepacked ([7zip](https://www.7-zip.org/)) with all needed dependencies (except Java) and a launch4j launcher, which supports to run the application without a Java installation, as long as it can find a valid JRE beside it. 
 
 ```Bash
 ├── NexusVaultCLI
@@ -26,6 +26,25 @@ For example:
 * `-a "C:\Games\WildStar"`
 * `archive "C:\Games\Wildstar"`
 * `-a "C:\Games\WildStar\Patch\ClientData.archive" "C:\Games\WildStar\Patch\ClientDataEN.archive"`
+
+### How to find something to export
+The export mechanism works in 2-steps.
+* Step 1 is identifying what to export. 
+
+To do so use the build-in `search` command, which relies on Java's [regular expression pattern](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html)
+The archive is similar to a folder, which contains other folders and files. The expression for the search command looks at the full path for each file and determines if the path fulfills the expression or not. 
+
+As an example, the model for the female aurin is located under `Art\Character\Aurin\Female\aurin_f.m3`.
+To find exactly this file, and no other, a possible `search`command could be `search art\\character\\aurin\\female\\aurin_f.m3` The search is case-insensitive and note the `\\`instead of `\` as folder separator. 
+Another possible command is `search \\aurin_f.m3`, this works because there is no other file with the name `aurin_f.m3`.
+Whereas `search aurin_f.m3` will find over 1000 models, which all end in `aurin_f.m3`. The difference is, that `\\` in front of the file name tells the search command to look for files that start with the given name.
+
+To check the results either take a look into the `report\search_result.txt` that is created by the tool or use `show search`,  though, depending on the size of the console this may be confusing.
+
+* Step 2 export all the things
+
+This is as simple as typing `export`
+The tool will now export all files that were found with the last `search` or, in case no search was done, it can find in `report\search_result.txt`
 
 ## Dependencies
 
