@@ -2,17 +2,23 @@ package nexusvault.cli.plugin.show;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import nexusvault.archive.IdxFileLink;
+import nexusvault.archive.IdxPath;
+import nexusvault.archive.NexusArchiveReader;
 import nexusvault.cli.App;
 import nexusvault.cli.Command;
 import nexusvault.cli.ConsoleSystem.Level;
 import nexusvault.cli.plugin.AbstPlugIn;
+import nexusvault.cli.plugin.archive.ArchivePlugIn;
+import nexusvault.cli.plugin.archive.NexusArchiveWrapper;
 import nexusvault.cli.plugin.search.SearchPlugIn;
 
 public final class ShowPlugIn extends AbstPlugIn {
@@ -32,16 +38,42 @@ public final class ShowPlugIn extends AbstPlugIn {
 		@Override
 		public void show() {
 			App.getInstance().getConsole().println(Level.CONSOLE, () -> {
-				final Map<Path, Set<IdxFileLink>> searchResults = App.getInstance().getPlugIn(SearchPlugIn.class).getLastSearchResults();
+				final List<NexusArchiveWrapper> wrappers = App.getInstance().getPlugIn(ArchivePlugIn.class).getArchives();
+				final Map<Path, Set<IdxPath>> mapping = new HashMap<>();
+				wrappers.stream().forEach(wrapper -> mapping.put(wrapper.getArchive().getSource().getArchiveFile(), new HashSet<>()));
+
+				final List<IdxPath> unresolved = new LinkedList<>();
+				final List<IdxPath> searchResults = App.getInstance().getPlugIn(SearchPlugIn.class).getLastSearchResults();
+				for (final IdxPath path : searchResults) {
+					boolean found = false;
+					for (final NexusArchiveWrapper wrapper : wrappers) {
+						final NexusArchiveReader archive = wrapper.getArchive();
+						if (path.isResolvable(archive.getRootDirectory())) {
+							mapping.get(archive.getSource().getArchiveFile()).add(path);
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						unresolved.add(path);
+					}
+				}
+
 				final StringBuilder b = new StringBuilder();
-				for (final Entry<Path, Set<IdxFileLink>> entry : searchResults.entrySet()) {
+				for (final Entry<Path, Set<IdxPath>> entry : mapping.entrySet()) {
 					b.append("Archive: ").append(entry.getKey()).append("\n");
 					if (entry.getValue().isEmpty()) {
-						b.append("No search entries\n");
+						b.append("\tNo search entries\n");
 					} else {
-						for (final IdxFileLink fileLink : entry.getValue()) {
-							b.append(fileLink.fullName()).append("\n");
+						for (final IdxPath idxPath : entry.getValue()) {
+							b.append("\t").append(idxPath.getFullName()).append("\n");
 						}
+					}
+				}
+				if (!unresolved.isEmpty()) {
+					b.append("Paths not part of an archive:\n");
+					for (final IdxPath path : unresolved) {
+						b.append(path.getFullName()).append("\n");
 					}
 				}
 				return b.toString();

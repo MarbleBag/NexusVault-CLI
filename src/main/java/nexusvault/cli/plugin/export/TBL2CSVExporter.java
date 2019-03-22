@@ -13,9 +13,8 @@ import java.util.List;
 import java.util.Set;
 
 import kreed.io.util.ByteBufferBinaryReader;
-import nexusvault.archive.IdxFileLink;
+import nexusvault.archive.IdxPath;
 import nexusvault.archive.util.DataHeader;
-import nexusvault.cli.App;
 import nexusvault.format.tbl.RawTable;
 import nexusvault.format.tbl.TableReader;
 import nexusvault.format.tbl.TableRecord;
@@ -26,7 +25,7 @@ final class TBL2CSVExporter implements Exporter {
 	private TableReader tableReader;
 
 	@Override
-	public void export(IdxFileLink file, ByteBuffer data) throws IOException {
+	public void export(Path outputFolder, ByteBuffer data, IdxPath dataName) throws IOException {
 		final RawTable table = tableReader.read(new ByteBufferBinaryReader(data));
 
 		final List<String> toOut = new LinkedList<>();
@@ -52,8 +51,7 @@ final class TBL2CSVExporter implements Exporter {
 			builder.setLength(0);
 		}
 
-		final Path outputFolder = App.getInstance().getPlugIn(ExportPlugIn.class).getOutputFolder();
-		final Path dstPath = outputFolder.resolve(Paths.get(file.fullName() + ".csv"));
+		final Path dstPath = outputFolder.resolve(Paths.get(PathUtil.getFullName(dataName) + ".csv"));
 		Files.createDirectories(dstPath.getParent());
 		Files.write(dstPath, toOut, Charset.forName("UTF8"), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
 	}

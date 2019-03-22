@@ -21,37 +21,6 @@ final class NavigatorChangeDirectoryCmd implements Command {
 		//@formatter:on
 	}
 
-	// @Override
-	// public void onCmd(CmdArgContainer args) {
-	// final ArchiveReader archive = resources.getArchive();
-	// if (archive == null) {
-	// throw new ArchiveNotSetException("Archive not set. Use 'help' to determine how to set the wildstar archive.");
-	// }
-	//
-	// final ArchivePath archivePath = resources.getInnerArchivePath();
-	//
-	// final String target = args.getArg(0);
-	// if (File.separator.equals(target)) {
-	// archivePath.toRoot();
-	// }
-	//
-	// final ArchivePath newArchivePath = archivePath.copy();
-	//
-	// final String[] steps = target.split(Pattern.quote(File.separator));
-	// try {
-	// for (final String s : steps) {
-	// newArchivePath.resolve(s).resolve(archive.getRootFolder());
-	// archivePath.setTo(newArchivePath);
-	// }
-	// } catch (final IdxEntryNotFound e) {
-	// throw new InvalidFilePathException(String.format("Entry '%s' not found.", e.getMessage()));
-	// }
-	// if (!archive.getRootFolder().isDir()) {
-	// throw new InvalidFilePathException("Path within the archive does not point to a directory");
-	// }
-	// sendMsg("Set path to " + archivePath);
-	// }
-
 	@Override
 	public void onCommand(CommandArguments args) {
 		final String target = args.getArg(0);

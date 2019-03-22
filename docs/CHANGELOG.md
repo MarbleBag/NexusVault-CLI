@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com)
 
 ## [Unreleased] 
+## [0.1.3]
+### Added
+- Convert command. Allows to directly convert exported or otherwise acquired binary data. Currently, only the direction 'Wildstar -> others' is available 
+
+### Changed
+- Search command. Will now write its results directly to file. The file will be loaded, if the search results are requested.
+- Switch from Java 8 to Java 11
 
 ## [0.1.2] - 2019-02-11
 ### Added

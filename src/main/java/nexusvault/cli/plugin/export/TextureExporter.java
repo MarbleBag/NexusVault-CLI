@@ -14,9 +14,8 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 
-import nexusvault.archive.IdxFileLink;
+import nexusvault.archive.IdxPath;
 import nexusvault.archive.util.DataHeader;
-import nexusvault.cli.App;
 import nexusvault.format.tex.TextureImage;
 import nexusvault.format.tex.TextureObject;
 import nexusvault.format.tex.TextureReader;
@@ -36,18 +35,17 @@ final class TextureExporter implements Exporter {
 	}
 
 	@Override
-	public void export(IdxFileLink fileLink, ByteBuffer data) throws IOException {
+	public void export(Path outputFolder, ByteBuffer data, IdxPath dataName) throws IOException {
 		final TextureObject texture = reader.read(data);
 		final TextureImage textureImage = texture.getImage(0);
 		if (textureImage == null) {
-			throw new IllegalStateException("No Image was created: " + fileLink.fullName());
+			throw new IllegalStateException("No Image was created: " + PathUtil.getFullName(dataName));
 		}
 
-		final Path outputFolder = App.getInstance().getAppConfig().getOutputPath();
-		final Path destination = outputFolder.resolve(fileLink.fullName()).getParent();
+		final Path destination = outputFolder.resolve(PathUtil.getFolder(dataName));
 		Files.createDirectories(destination);
 
-		final String imageName = fileLink.getName().substring(0, fileLink.getName().lastIndexOf('.'));
+		final String imageName = PathUtil.getNameWithoutExtension(dataName);
 
 		saveImage(textureImage, destination, String.format("%s.png", imageName));
 

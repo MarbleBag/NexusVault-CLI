@@ -2,9 +2,10 @@ package nexusvault.cli.plugin.export;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.util.Set;
 
-import nexusvault.archive.IdxFileLink;
+import nexusvault.archive.IdxPath;
 import nexusvault.archive.util.DataHeader;
 
 interface Exporter {
@@ -23,6 +24,6 @@ interface Exporter {
 
 	boolean accepts(DataHeader header);
 
-	void export(IdxFileLink file, ByteBuffer data) throws IOException;
+	void export(Path outputFolder, ByteBuffer data, IdxPath dataLocation) throws IOException;
 
 }

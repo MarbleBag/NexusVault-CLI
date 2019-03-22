@@ -1,13 +1,16 @@
 package nexusvault.cli.plugin.export;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import nexusvault.archive.IdxPath;
 import nexusvault.cli.App;
 import nexusvault.cli.CommandArguments;
 import nexusvault.cli.CommandInfo;
 import nexusvault.cli.plugin.AbstCommand;
-import nexusvault.cli.plugin.export.ExportPlugIn.ExportRequest;
+import nexusvault.cli.plugin.export.ExportPlugIn.ExportConfig;
+import nexusvault.cli.plugin.search.SearchPlugIn;
 
 final class ExportCmd extends AbstCommand {
 
@@ -28,20 +31,19 @@ final class ExportCmd extends AbstCommand {
 
 	@Override
 	public void onCommand(CommandArguments args) {
-		final ExportRequest exportRequest = new ExportRequest();
+		final ExportConfig exportConfig = new ExportConfig();
 
 		if (args.getNumberOfArguments() != 0) {
 			if ("as-binary".equalsIgnoreCase(args.getArg(0))) {
-				exportRequest.exportAsBinary(true);
+				exportConfig.exportAsBinary(true);
 			} else {
 				sendMsg(() -> String.format("Unknown argument %s. Use '?' to get more informations.", args.getArg(0)));
 				return;
 			}
 		}
 
-		// App.getInstance().getPlugIn(SearchPlugIn.class).getLastSearchResults();
-
-		App.getInstance().getPlugIn(ExportPlugIn.class).export(exportRequest);
+		final List<IdxPath> searchResults = App.getInstance().getPlugIn(SearchPlugIn.class).getLastSearchResults();
+		App.getInstance().getPlugIn(ExportPlugIn.class).exportIdxPath(searchResults, exportConfig);
 	}
 
 	@Override
