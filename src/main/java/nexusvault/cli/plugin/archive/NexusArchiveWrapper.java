@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import nexusvault.archive.NexusArchiveReader;
+import nexusvault.archive.NexusArchive;
 import nexusvault.cli.App;
 import nexusvault.cli.ConsoleSystem.Level;
 import nexusvault.cli.exception.FileNotFoundException;
@@ -15,7 +15,7 @@ import nexusvault.cli.plugin.archive.ArchivePlugIn.ArchiveLoadedEvent;
 public final class NexusArchiveWrapper {
 
 	private final Path archivePath;
-	private NexusArchiveReader archive;
+	private NexusArchive archive;
 
 	public NexusArchiveWrapper(Path archivePath) {
 		if (archivePath == null) {
@@ -40,7 +40,7 @@ public final class NexusArchiveWrapper {
 				throw new FileNotReadableException(String.format("Archive at %s not readable", archivePath));
 			}
 
-			archive = NexusArchiveReader.loadArchive(archivePath);
+			archive = NexusArchive.loadArchive(archivePath);
 			App.getInstance().getConsole().println(Level.CONSOLE, () -> String.format("Load archive: %s", archivePath)); // TODO
 			App.getInstance().getEventSystem().postEvent(new ArchiveLoadedEvent(archivePath));
 		} catch (final IOException e) {
@@ -60,7 +60,7 @@ public final class NexusArchiveWrapper {
 		load();
 	}
 
-	public NexusArchiveReader getArchive() {
+	public NexusArchive getArchive() {
 		if ((archive == null) || archive.isDisposed()) {
 			load();
 		}

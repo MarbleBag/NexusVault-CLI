@@ -3,8 +3,10 @@ package nexusvault.cli.plugin.export;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import nexusvault.cli.App;
 import nexusvault.cli.CommandArguments;
@@ -22,7 +24,7 @@ final class ExportFileCmd extends AbstCommand {
 				.setRequired(false)
 				.setArguments(true)
 				.setNumberOfArgumentsUnlimited()
-				.setNamesOfArguments("file ...")
+				.setNamesOfArguments("files ...")
 				.build();
 		//@formatter:on
 	}
@@ -57,7 +59,11 @@ final class ExportFileCmd extends AbstCommand {
 
 	@Override
 	public void onHelp(CommandArguments args) {
-		// TODO Auto-generated method stub
-
+		sendMsg("Converts a Wildstar specific file type into a more readable format");
+		final Set<String> supportedFileTypes = new HashSet<>();
+		for (final Exporter exporter : App.getInstance().getPlugIn(ExportPlugIn.class).getExporters()) {
+			supportedFileTypes.addAll(exporter.getAcceptedFileEndings());
+		}
+		sendMsg("File types with converter: " + String.join(", ", supportedFileTypes));
 	}
 }

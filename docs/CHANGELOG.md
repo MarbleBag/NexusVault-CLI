@@ -5,7 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com)
 ## [Unreleased] 
 ## [0.1.3]
 ### Added
-- Convert command. Allows to directly convert exported or otherwise acquired binary data. Currently, only the direction 'Wildstar -> others' is available 
+- Convert command 'convert-file'. Allows to directly convert exported or otherwise acquired binary data from Wildstar.
 
 ### Changed
 - Search command. Will now write its results directly to file. The file will be loaded, if the search results are requested.

@@ -21,7 +21,7 @@ import org.apache.logging.log4j.Logger;
 import kreed.io.util.ByteBufferBinaryReader;
 import nexusvault.archive.IdxFileLink;
 import nexusvault.archive.IdxPath;
-import nexusvault.archive.NexusArchiveReader;
+import nexusvault.archive.NexusArchive;
 import nexusvault.archive.util.DataHeader;
 import nexusvault.cli.App;
 import nexusvault.cli.Command;
@@ -319,7 +319,7 @@ public final class ExportPlugIn extends AbstPlugIn {
 		final List<IdxFileLink> fileToExport = new ArrayList<>(paths.size());
 		for (final IdxPath path : paths) {
 			for (final NexusArchiveWrapper wrapper : wrappers) {
-				final NexusArchiveReader archive = wrapper.getArchive();
+				final NexusArchive archive = wrapper.getArchive();
 				if (path.isResolvable(archive.getRootDirectory())) {
 					fileToExport.add(path.resolve(archive.getRootDirectory()).asFile());
 					break;

@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import nexusvault.archive.IdxPath;
-import nexusvault.archive.NexusArchiveReader;
+import nexusvault.archive.NexusArchive;
 import nexusvault.cli.App;
 import nexusvault.cli.Command;
 import nexusvault.cli.ConsoleSystem.Level;
@@ -47,7 +47,7 @@ public final class ShowPlugIn extends AbstPlugIn {
 				for (final IdxPath path : searchResults) {
 					boolean found = false;
 					for (final NexusArchiveWrapper wrapper : wrappers) {
-						final NexusArchiveReader archive = wrapper.getArchive();
+						final NexusArchive archive = wrapper.getArchive();
 						if (path.isResolvable(archive.getRootDirectory())) {
 							mapping.get(archive.getSource().getArchiveFile()).add(path);
 							found = true;
