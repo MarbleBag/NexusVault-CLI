@@ -1,10 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>nexusvault</groupId>
 	<artifactId>nexusvault.cli</artifactId>
-	<version>0.1.3</version>
+	<version>0.1.4</version>
 
 	<properties>
 		<project.java.version>11</project.java.version>
@@ -106,11 +107,21 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			
 		</plugins>
 	</build>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.11.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.11.2</version>
+		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
@@ -138,17 +149,17 @@
 		</dependency>
 		<dependency>
 			<groupId>nexusvault</groupId>
-			<artifactId>nexusvault.format.tbl</artifactId>
-			<version>[1,2)</version>
-		</dependency>
-		<dependency>
-			<groupId>nexusvault</groupId>
 			<artifactId>nexusvault.format.bin</artifactId>
 			<version>[1,2)</version>
 		</dependency>
 		<dependency>
 			<groupId>nexusvault</groupId>
 			<artifactId>nexusvault.format.tex</artifactId>
+			<version>[1,2)</version>
+		</dependency>
+		<dependency>
+			<groupId>nexusvault</groupId>
+			<artifactId>nexusvault.format.tbl</artifactId>
 			<version>[1,2)</version>
 		</dependency>
 		<dependency>
@@ -162,14 +173,9 @@
 			<version>[0,2)</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId>
-			<version>2.11.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-core</artifactId>
-			<version>2.11.2</version>
+			<groupId>nexusvault</groupId>
+			<artifactId>nexusvault.format.m3.export.obj</artifactId>
+			<version>[0,2)</version>
 		</dependency>
 	</dependencies>
 </project>

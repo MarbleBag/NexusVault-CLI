@@ -40,6 +40,7 @@ import nexusvault.format.m3.export.gltf.GlTFExportMonitor;
 import nexusvault.format.m3.export.gltf.GlTFExporter;
 import nexusvault.format.m3.export.gltf.PathTextureResource;
 import nexusvault.format.m3.export.gltf.ResourceBundle;
+import nexusvault.format.m3.export.obj.ObjExporter;
 import nexusvault.format.m3.v100.ModelReader;
 import nexusvault.format.m3.v100.debug.ModelDebugger;
 import nexusvault.format.m3.v100.debug.Table;
@@ -53,6 +54,7 @@ final class ModelExporter implements Exporter {
 	public static enum ExporterType {
 		DEBUG,
 		GLTF,
+		OBJ,
 	}
 
 	private static final class ModelExporterCmd implements Command {
@@ -140,6 +142,8 @@ final class ModelExporter implements Exporter {
 				return new DebugInternalModelExporter();
 			case GLTF:
 				return new GlTFInternalModelExporter();
+			case OBJ:
+				return new ObjInternalModelExporter();
 			default:
 				throw new IllegalStateException("Exporter not available: " + exporterType);
 		}
@@ -149,9 +153,8 @@ final class ModelExporter implements Exporter {
 		final ExporterType oldValue = this.exporterType;
 		this.exporterType = exporterType;
 
-		App.getInstance().getEventSystem()
-				.postEvent(new ModelPropertyChangedEvent<String>("m3-type", String.valueOf(oldValue), String.valueOf(this.exporterType)) {
-				});
+		App.getInstance().getEventSystem().postEvent(new ModelPropertyChangedEvent<>("m3-type", String.valueOf(oldValue), String.valueOf(this.exporterType)) {
+		});
 	}
 
 	@Override
@@ -171,6 +174,17 @@ final class ModelExporter implements Exporter {
 		final Path modelFolder = outputFolder.resolve(PathUtil.getFolder(dataName));
 		Files.createDirectories(modelFolder);
 		getExporter().export(model, modelFolder, dataName);
+	}
+
+	private static final class ObjInternalModelExporter implements InternalModelExporter {
+
+		@Override
+		public void export(Model model, Path dstFolder, IdxPath filePath) throws IOException {
+			final ObjExporter objExporter = new nexusvault.format.m3.export.obj.ObjExporter();
+			final String modelName = PathUtil.getNameWithoutExtension(filePath);
+			objExporter.exportModel(dstFolder, modelName, model);
+		}
+
 	}
 
 	private static final class GlTFInternalModelExporter implements InternalModelExporter {

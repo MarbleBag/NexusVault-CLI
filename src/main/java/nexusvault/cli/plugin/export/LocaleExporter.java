@@ -12,8 +12,8 @@ import java.util.Set;
 import nexusvault.archive.IdxPath;
 import nexusvault.archive.util.DataHeader;
 import nexusvault.format.bin.LanguageDictionary;
+import nexusvault.format.bin.LanguageEntry;
 import nexusvault.format.bin.LanguageReader;
-import nexusvault.format.bin.LanguageReader.LanguageEntry;
 
 final class LocaleExporter implements Exporter {
 	private LanguageReader languageReader;
