@@ -1,5 +1,5 @@
 # NexusVault CLI
-Version 0.1.2
+Version 0.1.4 (Beta)
 
 A CLI application which incorporates the [NexusVault library](https://github.com/MarbleBag/NexusVault/tree/java)
 In its current form it mainly provides a way to traverse the content of .archive files and export its content, either in its original form or converted to a more known format.
@@ -18,11 +18,6 @@ The release comes prepacked with all needed dependencies (except Java) and a lau
 ```
 
 Is no local Java version provide, the launcher will look up Java installations that are available on the system.
-If no appropriate Java version can't be found, the launcher will open a Java download page.
-
-#### Why is the release not packed with Java?
-GitHub has a strict limit of files exceeding 100 MB in size
-Moreover the current Java RE is roughly ~200 MB in size, while this application is ~8MB, not only would it unnecessary bloat the size of the release up, it would also make the download more time-consuming. While the application may be updated frequently to include new features, the JRE will probably not change.
 
 ### Run the application
 Before anything can be done, the application needs to know which archives should be read, to do so either start the application with the flag `-a "path to folder"` or write `archive "path to folder"` after starting it. The application will immediately search for any archives there. It is also possible to load a specific archive by passing the direct file path to the application.
@@ -33,9 +28,18 @@ For example:
 
 ## Dependencies
 
-* JDK 1.8
+* JDK 11
 * [NexusVault library](https://github.com/MarbleBag/NexusVault/tree/java)
 
+### Java module dependencies
+The application can also run on a JRE 11 which contains the listed modules:
+
+- java.desktop
+- java.logging
+- java.management
+
+JLink can be used to create a minimal JRE with all requirements:
+* jlink --no-header-files --no-man-pages --compress=2 --strip-debug --add-modules java.desktop,java.logging,java.management
 
 ## Built With
 
