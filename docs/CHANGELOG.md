@@ -5,6 +5,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com)
 ## [Unreleased] 
 ### Added
 - Support for m3 to wavefront obj export
+- Command 'export-m3-texture': By default on. If set to off, m3 exporter will not export textures which are referenced by the model (The model will still any UV map)
 
 ## [0.1.3]
 ### Added

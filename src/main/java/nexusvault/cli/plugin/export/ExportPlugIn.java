@@ -28,6 +28,7 @@ import nexusvault.cli.Command;
 import nexusvault.cli.plugin.AbstPlugIn;
 import nexusvault.cli.plugin.archive.ArchivePlugIn;
 import nexusvault.cli.plugin.archive.NexusArchiveWrapper;
+import nexusvault.cli.plugin.export.model.ModelExporter;
 
 public final class ExportPlugIn extends AbstPlugIn {
 

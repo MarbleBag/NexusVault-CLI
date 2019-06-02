@@ -28,6 +28,7 @@ final class DebugModeCmd implements Command {
 
 		if (args.getNumberOfArguments() == 0) {
 			configPlugin.setDebugMode(!configPlugin.getDebugMode());
+			return;
 		}
 
 		final String arg0 = args.getArg(0).trim().toLowerCase();

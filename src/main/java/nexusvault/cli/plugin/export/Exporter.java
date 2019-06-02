@@ -8,7 +8,7 @@ import java.util.Set;
 import nexusvault.archive.IdxPath;
 import nexusvault.archive.util.DataHeader;
 
-interface Exporter {
+public interface Exporter {
 
 	/**
 	 * Called once, when {@link ExportPlugIn} loads this {@link Exporter}. Use this function to register necessary resources
