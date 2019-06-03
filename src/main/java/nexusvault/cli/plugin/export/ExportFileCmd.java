@@ -32,7 +32,7 @@ final class ExportFileCmd extends AbstCommand {
 	@Override
 	public void onCommand(CommandArguments args) {
 		if (args.getNumberOfArguments() == 0) {
-			sendMsg(() -> String.format("Unknown argument %s. Use '?' to get more informations.", args.getArg(0)));
+			sendMsg(() -> String.format("At least one file path is required"));
 			return;
 		}
 

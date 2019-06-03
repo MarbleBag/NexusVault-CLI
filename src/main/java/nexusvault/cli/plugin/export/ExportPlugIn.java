@@ -132,10 +132,27 @@ public final class ExportPlugIn extends AbstPlugIn {
 		public ByteBuffer getData() throws IOException {
 			try (SeekableByteChannel channel = Files.newByteChannel(path, StandardOpenOption.READ)) {
 				final ByteBuffer data = ByteBuffer.allocate((int) channel.size()).order(ByteOrder.LITTLE_ENDIAN);
-				while (-1 != channel.read(data)) {
 
-				}
-				return data;
+				int numberOfReadbytes = 0;
+				int counter = 0;
+				do {
+					numberOfReadbytes = channel.read(data);
+					if (numberOfReadbytes == -1) {
+						break;
+					} else if ((numberOfReadbytes == 0)) {
+						if (!data.hasRemaining()) {
+							break;
+						} else {
+							counter += 1;
+							if (counter > 100) {
+								break; // we will have to work with what we got - for now
+							}
+						}
+					} else {
+						counter = 0;
+					}
+				} while (true);
+				return data.flip();
 			}
 		}
 
