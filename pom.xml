@@ -5,7 +5,7 @@
 
 	<groupId>nexusvault</groupId>
 	<artifactId>nexusvault.cli</artifactId>
-	<version>0.1.4</version>
+	<version>0.1.5</version>
 
 	<properties>
 		<project.java.version>11</project.java.version>

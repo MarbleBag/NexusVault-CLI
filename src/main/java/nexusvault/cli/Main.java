@@ -8,7 +8,7 @@ public final class Main {
 		final String triggerWord = HeadlessModeCmd.CLI_SYNTAX;
 		boolean isHeadlessMode = false;
 		for (final String arg : args) {
-			if (triggerWord.equalsIgnoreCase(arg)) {
+			if ((arg != null) && arg.toLowerCase().endsWith(triggerWord)) {
 				isHeadlessMode = true;
 				break;
 			}

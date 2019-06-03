@@ -369,7 +369,13 @@ public final class App {
 	public void startApp(String[] startUpArgs) {
 		commandManager.runArguments(startUpArgs);
 		// TODO
+		if (getAppConfig().getHeadlessMode()) {
+			return;
+		}
+
 		processConsole();
+
+		console.println(Level.CONSOLE, "Closing app");
 	}
 
 	public void closeApp() {
@@ -443,8 +449,6 @@ public final class App {
 				});
 			}
 		}
-
-		console.println(Level.CONSOLE, "Closing app");
 	}
 
 	public void requestShutDown() {
