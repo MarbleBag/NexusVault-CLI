@@ -257,18 +257,18 @@ public final class App {
 				final String header = "Tool to extract data from the wildstar game archive. Some commands are only available in console-mode and can be entered without '--'. To close the app in console-mode enter 'exit'. A command followed by '?' will, if available, show a command specific help.";
 				context.setHeader(header);
 
-				final String footer = "footer";
+				final String footer = "";
 				context.setFooter(footer);
 
-				context.setWidth(120);
+				// context.setWidth(80);
 
 				// TODO
 				commandManager.printHelp(context);
 			}
 		};
 
-		commandManager.registerCommand(new ExitCmd((args) -> this.requestShutDown()));
-		commandManager.registerCommand(new HelpCmd((args) -> this.cliSystem.printHelp()));
+		commandManager.registerCommand(new ExitCmd((args) -> requestShutDown()));
+		commandManager.registerCommand(new HelpCmd((args) -> cliSystem.printHelp()));
 		commandManager.registerCommand(new HeadlessModeCmd());
 	}
 
@@ -300,7 +300,7 @@ public final class App {
 	private final class AppConfigObserver {
 		@Subscribe
 		public void onAppConfigChangedEvent(ModelPropertyChangedEvent<?> event) {
-			App.this.console.println(Level.CONSOLE, () -> {
+			console.println(Level.CONSOLE, () -> {
 				if ((event.getOldValue() == null) && (event.getNewValue() == null)) {
 					return String.format("Property %s changed", event.getEventName());
 				} else if (event.getOldValue() == null) {
@@ -311,9 +311,9 @@ public final class App {
 			});
 
 			if (event instanceof AppConfigDebugModeChangedEvent) {
-				App.this.console.setDebugMode((Boolean) event.getNewValue());
+				console.setDebugMode((Boolean) event.getNewValue());
 			} else if (event instanceof AppConfigAppPathChangedEvent) {
-				App.this.updateLogger();
+				updateLogger();
 			}
 		}
 	}
@@ -377,13 +377,13 @@ public final class App {
 		saveAppConfig();
 		savePlugInConfigs();
 
-		this.console = null;
-		this.modelSystem = null;
-		this.eventSystem = null;
-		this.commandManager = null;
-		this.cliSystem = null;
-		this.plugInSystem = null;
-		this.appConfig = null;
+		console = null;
+		modelSystem = null;
+		eventSystem = null;
+		commandManager = null;
+		cliSystem = null;
+		plugInSystem = null;
+		appConfig = null;
 		// TODO
 	}
 
