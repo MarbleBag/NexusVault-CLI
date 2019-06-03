@@ -20,7 +20,7 @@ final class ExportFileCmd extends AbstCommand {
 		// @formatter:off
 		return CommandInfo.newInfo()
 				.setName("convert-file")
-				.setDescription("")
+				.setDescription("Reads and converts files, which were previously extracted from an archive, but not converted yet")
 				.setRequired(false)
 				.setArguments(true)
 				.setNumberOfArgumentsUnlimited()
