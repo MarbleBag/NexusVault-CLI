@@ -107,8 +107,15 @@
 					</execution>
 				</executions>
 			</plugin>
-			
 		</plugins>
+
+		<resources>
+			<resource>
+				<directory>docs</directory>
+				<targetPath>doc</targetPath>
+				<filtering>false</filtering>
+			</resource>
+		</resources>
 	</build>
 
 	<dependencies>
@@ -155,7 +162,7 @@
 		<dependency>
 			<groupId>nexusvault</groupId>
 			<artifactId>nexusvault.format.tex</artifactId>
-			<version>[1,2)</version>
+			<version>[2,3)</version>
 		</dependency>
 		<dependency>
 			<groupId>nexusvault</groupId>
