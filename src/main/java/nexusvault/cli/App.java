@@ -31,8 +31,6 @@ import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.Subscribe;
-import com.google.common.eventbus.SubscriberExceptionContext;
-import com.google.common.eventbus.SubscriberExceptionHandler;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 import com.google.common.reflect.Reflection;
@@ -82,33 +80,33 @@ public final class App {
 	}
 
 	public EventSystem getEventSystem() {
-		return eventSystem;
+		return this.eventSystem;
 	}
 
 	public AppConfigModel getAppConfig() {
-		return appConfig;
+		return this.appConfig;
 	}
 
 	public CLISystem getCLI() {
-		return cliSystem;
+		return this.cliSystem;
 	}
 
 	public PlugInSystem getPlugInSystem() {
-		return plugInSystem;
+		return this.plugInSystem;
 	}
 
 	public ConsoleSystem getConsole() {
-		return console;
+		return this.console;
 	}
 
 	@Deprecated
 	public ModelSystem getModelSystem() {
-		return modelSystem;
+		return this.modelSystem;
 	}
 
 	// shortcut
 	public <T extends PlugIn> T getPlugIn(Class<T> plugInClass) {
-		return plugInSystem.getPlugIn(plugInClass);
+		return this.plugInSystem.getPlugIn(plugInClass);
 	}
 
 	public void initializeApp(boolean headlessMode) throws IOException {
@@ -199,7 +197,7 @@ public final class App {
 		final ComponentBuilder<?> rolloverStrategy = builder.newComponent("DefaultRolloverStrategy");
 		rolloverStrategy.addAttribute("fileIndex", "min");
 		rolloverStrategy.addAttribute("min", 1);
-		rolloverStrategy.addAttribute("max", 5);
+		rolloverStrategy.addAttribute("max", 4);
 
 		final String logName = getAppConfig().getReportFolder().resolve("app.log").toString();
 		final String logPattern = getAppConfig().getReportFolder().resolve("app-%i.log").toString();
@@ -238,16 +236,16 @@ public final class App {
 	}
 
 	private void initializeCLI() {
-		commandManager = new CommandManager();
-		cliSystem = new CLISystem() {
+		this.commandManager = new CommandManager();
+		this.cliSystem = new CLISystem() {
 			@Override
 			public void registerCommand(Command cmd) {
-				commandManager.registerCommand(cmd);
+				App.this.commandManager.registerCommand(cmd);
 			}
 
 			@Override
 			public void unregisterCommand(Command cmd) {
-				commandManager.unregisterCommand(cmd);
+				App.this.commandManager.unregisterCommand(cmd);
 			}
 
 			@Override
@@ -263,55 +261,52 @@ public final class App {
 				// context.setWidth(80);
 
 				// TODO
-				commandManager.printHelp(context);
+				App.this.commandManager.printHelp(context);
 			}
 		};
 
-		commandManager.registerCommand(new ExitCmd((args) -> requestShutDown()));
-		commandManager.registerCommand(new HelpCmd((args) -> cliSystem.printHelp()));
-		commandManager.registerCommand(new HeadlessModeCmd());
+		this.commandManager.registerCommand(new ExitCmd((args) -> requestShutDown()));
+		this.commandManager.registerCommand(new HelpCmd((args) -> this.cliSystem.printHelp()));
+		this.commandManager.registerCommand(new HeadlessModeCmd());
 	}
 
 	@Deprecated
 	private void initializeModel(boolean headlessMode) {
-		modelSystem = new BaseModelSystem();
+		this.modelSystem = new BaseModelSystem();
 
-		appConfig = new AppConfigModel();
-		appConfig.setApplicationPath(getProjectLocation());
-		appConfig.setDebugMode(false);
-		appConfig.setHeadlessMode(headlessMode);
+		this.appConfig = new AppConfigModel();
+		this.appConfig.setApplicationPath(getProjectLocation());
+		this.appConfig.setDebugMode(false);
+		this.appConfig.setHeadlessMode(headlessMode);
 
-		modelSystem.registerModel(AppConfigModel.class, appConfig);
+		this.modelSystem.registerModel(AppConfigModel.class, this.appConfig);
 	}
 
 	private void initializeEventSystem() {
 		// TODO
-		eventSystem = new EventBusSystem(new SubscriberExceptionHandler() {
-			@Override
-			public void handleException(Throwable exception, SubscriberExceptionContext context) {
-				// TODO Auto-generated method stub
-				throw new RuntimeException(exception);
-			}
+		this.eventSystem = new EventBusSystem((exception, context) -> {
+			// TODO Auto-generated method stub
+			throw new RuntimeException(exception);
 		});
 
-		eventSystem.registerEventHandler(new AppConfigObserver()); // TODO
+		this.eventSystem.registerEventHandler(new AppConfigObserver()); // TODO
 	}
 
 	private final class AppConfigObserver {
 		@Subscribe
 		public void onAppConfigChangedEvent(ModelPropertyChangedEvent<?> event) {
-			console.println(Level.CONSOLE, () -> {
-				if ((event.getOldValue() == null) && (event.getNewValue() == null)) {
-					return String.format("Property %s changed", event.getEventName());
+			App.this.console.println(Level.CONSOLE, () -> {
+				if (event.getOldValue() == null && event.getNewValue() == null) {
+					return String.format("Property '%s' changed", event.getEventName());
 				} else if (event.getOldValue() == null) {
-					return String.format("Set %s to: '%s'", event.getEventName(), event.getNewValue());
+					return String.format("Set '%s' to: '%s'", event.getEventName(), event.getNewValue());
 				} else {
-					return String.format("Change %s\nfrom: '%s'\nto: '%s'", event.getEventName(), event.getOldValue(), event.getNewValue());
+					return String.format("Change '%s'\nfrom: '%s'\nto: '%s'", event.getEventName(), event.getOldValue(), event.getNewValue());
 				}
 			});
 
 			if (event instanceof AppConfigDebugModeChangedEvent) {
-				console.setDebugMode((Boolean) event.getNewValue());
+				App.this.console.setDebugMode((Boolean) event.getNewValue());
 			} else if (event instanceof AppConfigAppPathChangedEvent) {
 				updateLogger();
 			}
@@ -319,18 +314,18 @@ public final class App {
 	}
 
 	private void initializePlugIns() throws IOException {
-		plugInSystem = new BasePlugInProvider();
+		this.plugInSystem = new BasePlugInProvider();
 
 		final List<PlugIn> objs = initializeComponents("nexusvault.cli.plugin", PlugIn.class);
 		for (final PlugIn obj : objs) {
-			plugInSystem.registerPlugIn(obj.getClass(), obj);
+			this.plugInSystem.registerPlugIn(obj.getClass(), obj);
 		}
 
 		for (final PlugIn obj : objs) {
 			obj.initialize();
 		}
 
-		console.println(Level.DEBUG, "Plugin: " + objs.size() + " plugin(s) found.");
+		this.console.println(Level.DEBUG, "Plugin: " + objs.size() + " plugin(s) found.");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -367,7 +362,7 @@ public final class App {
 	}
 
 	public void startApp(String[] startUpArgs) {
-		commandManager.runArguments(startUpArgs);
+		this.commandManager.runArguments(startUpArgs);
 		// TODO
 		if (getAppConfig().getHeadlessMode()) {
 			return;
@@ -375,7 +370,7 @@ public final class App {
 
 		processConsole();
 
-		console.println(Level.CONSOLE, "Closing app");
+		this.console.println(Level.CONSOLE, "Closing app");
 	}
 
 	public void closeApp() {
@@ -383,13 +378,13 @@ public final class App {
 		saveAppConfig();
 		savePlugInConfigs();
 
-		console = null;
-		modelSystem = null;
-		eventSystem = null;
-		commandManager = null;
-		cliSystem = null;
-		plugInSystem = null;
-		appConfig = null;
+		this.console = null;
+		this.modelSystem = null;
+		this.eventSystem = null;
+		this.commandManager = null;
+		this.cliSystem = null;
+		this.plugInSystem = null;
+		this.appConfig = null;
 		// TODO
 	}
 
@@ -407,9 +402,9 @@ public final class App {
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		String line = null;
 
-		processConsole = true; // TODO
+		this.processConsole = true; // TODO
 		String[] arguments = null;
-		while (processConsole) {
+		while (this.processConsole) {
 			try {
 				line = reader.readLine();
 				if (line == null) {
@@ -423,12 +418,12 @@ public final class App {
 					}
 				}
 
-				arguments = commandManager.parseArguments(line);
-				commandManager.runArguments(arguments);
+				arguments = this.commandManager.parseArguments(line);
+				this.commandManager.runArguments(arguments);
 
 			} catch (final CommandFormatException e1) {
 				logger.error(String.format("Error at cmd(s): %s", Arrays.toString(arguments)), e1);
-				console.println(Level.CONSOLE, () -> {
+				this.console.println(Level.CONSOLE, () -> {
 					final StringBuilder msg = new StringBuilder();
 					msg.append("Command not executable\n");
 					msg.append(e1.getMessage()).append("\n");
@@ -436,7 +431,7 @@ public final class App {
 				});
 			} catch (final Exception e2) {
 				logger.error(String.format("Error at cmd(s): %s", Arrays.toString(arguments)), e2);
-				console.println(Level.CONSOLE, () -> {
+				this.console.println(Level.CONSOLE, () -> {
 					final StringBuilder msg = new StringBuilder();
 					msg.append("An error occured: (The error log contains more detailed informations)\n");
 					msg.append(e2.getClass().toString()).append(" : ").append(e2.getMessage()).append("\n");
@@ -452,7 +447,7 @@ public final class App {
 	}
 
 	public void requestShutDown() {
-		processConsole = false;
+		this.processConsole = false;
 	}
 
 }
