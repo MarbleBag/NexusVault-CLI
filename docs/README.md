@@ -1,5 +1,5 @@
 # NexusVault CLI
-Version 0.1.4 (Beta)
+Version 0.2.0
 
 A CLI application which incorporates the [NexusVault library](https://github.com/MarbleBag/NexusVault/tree/java)
 In its current form it mainly provides a way to traverse the content of .archive files and export its content, either in its original form or converted to a more known format.
@@ -8,6 +8,8 @@ In its current form it mainly provides a way to traverse the content of .archive
 
 Check out the [latest release](https://github.com/MarbleBag/NexusVault-CLI/releases/latest).
 The release comes prepacked with all needed dependencies (except Java) and a launch4j launcher, which supports to run the application without a Java installation, as long as it can find a valid JRE besides it. 
+
+A Windows compatible Java version can be downloaded [here](https://github.com/MarbleBag/NexusVault-CLI/releases/tag/v0.1.5.beta), packed as JRE_11_small_WIN64.zip
 
 ```Bash
 ├── NexusVaultCLI
@@ -21,7 +23,7 @@ Is no local Java version provide, the launcher will look up Java installations t
 
 ### Run the application
 Before anything can be done, the application needs to know which archives should be read, to do so either start the application with the flag `-a "path to folder"` or write `archive "path to folder"` after starting it. The application will immediately search for any archives there. It is also possible to load a specific archive by passing the direct file path to the application.
-For example:
+Console examples:
 * `-a "C:\Games\WildStar"`
 * `archive "C:\Games\Wildstar"`
 * `-a "C:\Games\WildStar\Patch\ClientData.archive" "C:\Games\WildStar\Patch\ClientDataEN.archive"`
@@ -32,7 +34,7 @@ For example:
 * [NexusVault library](https://github.com/MarbleBag/NexusVault/tree/java)
 
 ### Java module dependencies
-The application can also run on a JRE 11 which contains the listed modules:
+The application runs on a JRE 11 which contains the listed modules:
 
 - java.desktop
 - java.logging
