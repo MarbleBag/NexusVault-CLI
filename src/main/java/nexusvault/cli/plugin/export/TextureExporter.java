@@ -19,6 +19,7 @@ import nexusvault.archive.util.DataHeader;
 import nexusvault.format.tex.TextureImage;
 import nexusvault.format.tex.TextureObject;
 import nexusvault.format.tex.TextureReader;
+import nexusvault.format.tex.util.TextureImageAwtConverter;
 
 final class TextureExporter implements Exporter {
 
@@ -31,12 +32,12 @@ final class TextureExporter implements Exporter {
 
 	@Override
 	public boolean accepts(DataHeader header) {
-		return reader.acceptFileSignature(header.getSignature()) && reader.acceptFileVersion(header.getVersion());
+		return this.reader.acceptFileSignature(header.getSignature()) && this.reader.acceptFileVersion(header.getVersion());
 	}
 
 	@Override
 	public void export(Path outputFolder, ByteBuffer data, IdxPath dataName) throws IOException {
-		final TextureObject texture = reader.read(data);
+		final TextureObject texture = this.reader.read(data);
 		final TextureImage textureImage = texture.getImage(0);
 		if (textureImage == null) {
 			throw new IllegalStateException("No Image was created: " + PathUtil.getFullName(dataName));
@@ -49,15 +50,17 @@ final class TextureExporter implements Exporter {
 
 		saveImage(textureImage, destination, String.format("%s.png", imageName));
 
-		final List<TextureImage> textureComponents = texture.splitImageIntoComponents(textureImage);
-
-		for (int i = 0; i < textureComponents.size(); ++i) {
-			saveImage(textureComponents.get(i), destination, String.format("%s.%d.png", imageName, i));
+		final var textureSplitter = new nexusvault.format.tex.TextureImageSplitter();
+		if (textureSplitter.isSplitable(texture.getTextureDataType())) {
+			final List<TextureImage> textureComponents = textureSplitter.split(textureImage, texture.getTextureDataType());
+			for (int i = 0; i < textureComponents.size(); ++i) {
+				saveImage(textureComponents.get(i), destination, String.format("%s.%d.png", imageName, i));
+			}
 		}
 	}
 
 	private void saveImage(TextureImage textureImage, Path destination, String fileName) throws IOException {
-		final BufferedImage image = textureImage.convertToBufferedImage();
+		final BufferedImage image = TextureImageAwtConverter.convertToBufferedImage(textureImage);
 		destination = destination.resolve(Paths.get(fileName));
 		saveImage(image, destination);
 	}
@@ -71,12 +74,12 @@ final class TextureExporter implements Exporter {
 
 	@Override
 	public void initialize() {
-		reader = TextureReader.buildDefault();
+		this.reader = TextureReader.buildDefault();
 	}
 
 	@Override
 	public void deinitialize() {
-		reader = null;
+		this.reader = null;
 	}
 
 }

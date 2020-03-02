@@ -29,13 +29,14 @@ import nexusvault.format.m3.export.gltf.ResourceBundle;
 import nexusvault.format.tex.TextureImage;
 import nexusvault.format.tex.TextureObject;
 import nexusvault.format.tex.TextureReader;
+import nexusvault.format.tex.util.TextureImageAwtConverter;
 
 final class GlTFInternalModelExporter implements InternalModelExporter {
 
 	private final ModelConfigModel config;
 
 	public GlTFInternalModelExporter(ModelExporter modelExporter) {
-		config = modelExporter.getConfig();
+		this.config = modelExporter.getConfig();
 	}
 
 	private IdxFileLink find(List<NexusArchiveWrapper> wrappers, String textureId) {
@@ -56,7 +57,7 @@ final class GlTFInternalModelExporter implements InternalModelExporter {
 		final String modelName = PathUtil.getNameWithoutExtension(filePath);
 
 		final List<NexusArchiveWrapper> wrappers = App.getInstance().getPlugIn(ArchivePlugIn.class).getArchives();
-		final boolean searchTexture = config.isIncludeTexture();
+		final boolean searchTexture = this.config.isIncludeTexture();
 
 		gltfExporter.setGlTFExportMonitor(new GlTFExportMonitor() {
 			@Override
@@ -80,8 +81,10 @@ final class GlTFInternalModelExporter implements InternalModelExporter {
 
 					final List<TextureImage> images = new ArrayList<>();
 
-					if (textureObject.hasImageMultipleComponents()) {
-						images.addAll(textureObject.splitImageIntoComponents(origin));
+					final var textureSplitter = new nexusvault.format.tex.TextureImageSplitter();
+
+					if (textureSplitter.isSplitable(textureObject)) {
+						images.addAll(textureSplitter.split(origin, textureObject.getTextureDataType()));
 					} else {
 						images.add(origin);
 					}
@@ -92,7 +95,7 @@ final class GlTFInternalModelExporter implements InternalModelExporter {
 					for (int i = 0; i < images.size(); i++) {
 						final TextureImage image = images.get(i);
 						final String newfileName = String.format("%s.%d.png", textureLink.getNameWithoutFileExtension(), i);
-						final BufferedImage bufferedImage = image.convertToBufferedImage();
+						final BufferedImage bufferedImage = TextureImageAwtConverter.convertToBufferedImage(image);
 
 						final Path texDst = dst.resolve(Paths.get(newfileName));
 						try (OutputStream writer = Files.newOutputStream(texDst, StandardOpenOption.CREATE, StandardOpenOption.WRITE,
