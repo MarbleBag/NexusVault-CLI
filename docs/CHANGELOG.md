@@ -2,10 +2,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com)
 
-## [0.1.5 Unreleased] 
+## [0.2.0] -  Unreleased
 ### Added
 - Support for m3 to wavefront obj export
-- Command 'export-m3-texture': By default on. If set to off, m3 exporters will no longer export textures, which are references by the model. (UV maps are still included)
+- Command 'export-m3-texture': By default on. If set to off, m3 exporters will no longer export textures, which are referenced by the model. (UV maps are still included)
+- Command 'show', new sub-command available to show file meta data
 
 ### Fixed
 - 'no-console' is now working
