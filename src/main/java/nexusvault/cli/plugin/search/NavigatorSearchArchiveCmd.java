@@ -29,6 +29,11 @@ final class NavigatorSearchArchiveCmd extends AbstCommand {
 
 	@Override
 	public void onCommand(CommandArguments args) {
+		if (args.getNumberOfArguments() == 0) {
+			sendMsg("Needs at least one argument. Use '?' to get more informations.");
+			return;
+		}
+
 		int maxSearchResults = Integer.MAX_VALUE;
 		boolean lastArgIsInteger = false;
 		final String lastArg = args.getArg(args.getNumberOfArguments() - 1);
