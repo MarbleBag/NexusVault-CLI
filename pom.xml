@@ -162,7 +162,7 @@
 		<dependency>
 			<groupId>nexusvault</groupId>
 			<artifactId>nexusvault.format.tex</artifactId>
-			<version>[3,4)</version>
+			<version>[3.1,4)</version>
 		</dependency>
 		<dependency>
 			<groupId>nexusvault</groupId>

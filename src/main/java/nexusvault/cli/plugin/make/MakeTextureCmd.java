@@ -1,17 +1,25 @@
 package nexusvault.cli.plugin.make;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import nexusvault.cli.App;
 import nexusvault.cli.core.cmd.ArgumentDescription;
 import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
+import nexusvault.cli.core.cmd.CommandFormatException;
 import nexusvault.cli.plugin.AbstractCommandHandler;
-import nexusvault.cli.plugin.export.PathUtil;
+import nexusvault.format.tex.TexType;
 import nexusvault.format.tex.TextureImage;
+import nexusvault.format.tex.TextureImageFormat;
+import nexusvault.format.tex.util.TextureImageAwtConverter;
 import nexusvault.format.tex.util.TextureMipMapGenerator;
 
 final class MakeTextureCmd extends AbstractCommandHandler {
@@ -20,7 +28,7 @@ final class MakeTextureCmd extends AbstractCommandHandler {
 	public CommandDescription getCommandDescription() {
 		// @formatter:off
 		return CommandDescription.newInfo()
-				.setCommandName("make-tex")
+				.setCommandName("make-texture")
 				.setDescription("Creates a ws compatible texture file")
 				.addNamedArgument(
 							ArgumentDescription.newInfo()
@@ -53,33 +61,16 @@ final class MakeTextureCmd extends AbstractCommandHandler {
 
 	@Override
 	public void onCommand(Arguments args) {
-		if (args.getUnnamedArgumentSize() < 2) {
-			throw new IllegalArgumentException(); // TODO
-		}
 
-		final var texType = getTexType(args.getUnnamedArgs()[0]);
-		final var fileName = args.isNamedArgumentSet("filename") ? args.getArgumentByName("filename").getValue() : null;
+		final var texType = getTexType(args);
+		final var imagePaths = getImageFiles(args);
+		final var fileName = getFileName(args, imagePaths);
+		final var mipmaps = getMipMaps(args);
 
-		for (int i = 2; i < args.getNumberOfArguments(); ++i) {
-			if (isValidPath(args.getArg(i))) {
-				if (i + 1 < args.getNumberOfArguments() && isValidChannelSelection(args.getArg(i + 1))) {
-					// TODO
-					i += 1;
-				} else {
-					// TODO
-				}
-			}
-		}
+		final var images = buildImages(imagePaths);
 
-		int numberOfMipMaps = 0;
-		if (isValidNumber(args.getArg(args.getNumberOfArguments() - 1))) {
-			numberOfMipMaps = parseNumber(args.getArg(args.getNumberOfArguments() - 1));
-		}
-
-		final var images = new ArrayList<TextureImage>();
-
-		if (numberOfMipMaps > 0) {
-			final var newImages = TextureMipMapGenerator.buildMipMaps(images.get(0), numberOfMipMaps);
+		if (mipmaps > 0) {
+			final var newImages = TextureMipMapGenerator.buildMipMaps(images.get(0), mipmaps);
 			images.clear();
 			for (final var image : newImages) {
 				images.add(image);
@@ -90,43 +81,97 @@ final class MakeTextureCmd extends AbstractCommandHandler {
 		final var textureBinary = textureWriter.write(texType, images.toArray((n) -> new TextureImage[n]));
 
 		final var outputFolder = getOutputFolder();
-		Files.createDirectories(outputFolder);
 		final var outputFile = outputFolder.resolve(fileName + ".tex");
 
-		try (var writer = Files.newByteChannel(outputFile, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
-			writer.write(textureBinary);
+		try {
+			Files.createDirectories(outputFolder);
+			try (var writer = Files.newByteChannel(outputFile, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
+				writer.write(textureBinary);
+			}
+		} catch (final IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private List<TextureImage> buildImages(List<Path> paths) {
+		final var result = new ArrayList<TextureImage>();
+		for (final var path : paths) {
+			// TODO
+			result.add(getTextureImage(path));
+		}
+		return result;
+	}
+
+	private TextureImage getTextureImage(Path path) {
+		final var bufferedImage = getBufferedImage(path);
+		// TODO TextureImageFormat may not work for all textures.
+		return TextureImageAwtConverter.convertToTextureImage(TextureImageFormat.ARGB, bufferedImage);
+	}
+
+	private BufferedImage getBufferedImage(Path path) {
+		try (var stream = Files.newInputStream(path, StandardOpenOption.READ)) {
+			final var img = ImageIO.read(stream);
+
+			BufferedImage result;
+			if (img.getColorModel().hasAlpha()) {
+				result = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
+			} else {
+				result = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+			}
+
+			final var g2d = result.createGraphics();
+			g2d.drawImage(img, 0, 0, img.getWidth(), img.getHeight(), null);
+			g2d.dispose();
+
+			return result;
+		} catch (final IOException e) {
+			throw new CommandFormatException(e);
+		}
+	}
+
+	private int getMipMaps(Arguments args) {
+		if (!args.isNamedArgumentSet("mipmaps")) {
+			return 0;
+		}
+		final var str = args.getArgumentByName("mipmaps").getValue();
+		return Integer.parseInt(str);
+	}
+
+	private TexType getTexType(Arguments args) {
+		return getTexType(args.getArgumentByName("type").getValue());
+	}
+
+	private List<Path> getImageFiles(Arguments args) {
+		final var files = new ArrayList<String>();
+		if (args.isNamedArgumentSet("texture-1")) {
+			files.add(args.getArgumentByName("texture-1").getValue());
 		}
 
-		final String imageName = PathUtil.getNameWithoutExtension(dataName);
+		final var paths = new ArrayList<Path>();
+		for (final var textureValue : files) {
+			// TODO validate
+			paths.add(Path.of(textureValue));
+		}
 
-		// textureWriter.write(texType, null)
+		return paths;
+	}
 
-		// TODO Auto-generated method stub
+	private String getFileName(Arguments args, List<Path> imagePaths) {
+		if (args.isNamedArgumentSet("filename")) {
+			return args.getArgumentByName("filename").getValue();
+		}
 
+		var fileName = imagePaths.get(0).getFileName().toString();
+		final var fileExt = fileName.lastIndexOf('.');
+		if (fileExt >= 0) {
+			fileName = fileName.substring(0, fileExt);
+		}
+		return fileName;
 	}
 
 	public Path getOutputFolder() {
 		return App.getInstance().getAppConfig().getOutputPath().resolve("make");
-	}
-
-	private int parseNumber(String arg) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	private boolean isValidNumber(String arg) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	private boolean isValidPath(String arg) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	private boolean isValidChannelSelection(String arg) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	private nexusvault.format.tex.TexType getTexType(String argument) {
