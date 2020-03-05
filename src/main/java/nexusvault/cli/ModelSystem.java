@@ -1,5 +1,7 @@
 package nexusvault.cli;
 
+import nexusvault.cli.core.exception.NexusvaultCLIBaseException;
+
 @Deprecated
 public interface ModelSystem {
 

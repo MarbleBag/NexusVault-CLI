@@ -1,8 +1,8 @@
-package nexusvault.cli;
+package nexusvault.cli.core.cmd;
 
-public class CommandFormatException extends NexusvaultCLIBaseException {
+public final class CommandFormatException extends CLIHandlerException {
 
-	private static final long serialVersionUID = -1581053665535946345L;
+	private static final long serialVersionUID = 1L;
 
 	public CommandFormatException() {
 		super();

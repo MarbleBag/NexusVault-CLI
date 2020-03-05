@@ -9,37 +9,35 @@ import java.util.List;
 import java.util.Set;
 
 import nexusvault.cli.App;
-import nexusvault.cli.CommandArguments;
-import nexusvault.cli.CommandInfo;
-import nexusvault.cli.plugin.AbstCommand;
+import nexusvault.cli.core.cmd.Arguments;
+import nexusvault.cli.core.cmd.CommandDescription;
+import nexusvault.cli.plugin.AbstractCommandHandler;
 import nexusvault.cli.plugin.export.ExportPlugIn.ExportConfig;
 
-final class ExportFileCmd extends AbstCommand {
+final class ExportFileCmd extends AbstractCommandHandler {
 	@Override
-	public CommandInfo getCommandInfo() {
+	public CommandDescription getCommandDescription() {
 		// @formatter:off
-		return CommandInfo.newInfo()
-				.setName("convert-file")
+		return CommandDescription.newInfo()
+				.setCommandName("convert-file")
 				.setDescription("Reads and converts files, which were previously extracted from an archive, but not converted yet")
-				.setRequired(false)
-				.setArguments(true)
-				.setNumberOfArgumentsUnlimited()
-				.setNamesOfArguments("files ...")
+				.setNoNamedArguments()
 				.build();
 		//@formatter:on
 	}
 
 	@Override
-	public void onCommand(CommandArguments args) {
-		if (args.getNumberOfArguments() == 0) {
+	public void onCommand(Arguments args) {
+		if (args.getUnnamedArgumentSize() == 0) {
 			sendMsg(() -> String.format("At least one file path is required"));
 			return;
 		}
 
 		final List<Path> targets = new LinkedList<>();
 		boolean allFilesFound = true;
-		for (int i = 0; i < args.getNumberOfArguments(); ++i) {
-			final Path p = Paths.get(args.getArg(0));
+		final var nArgs = args.getUnnamedArgs();
+		for (final String nArg : nArgs) {
+			final Path p = Paths.get(nArg);
 			if (Files.exists(p)) {
 				targets.add(p);
 			} else {
@@ -58,12 +56,14 @@ final class ExportFileCmd extends AbstCommand {
 	}
 
 	@Override
-	public void onHelp(CommandArguments args) {
-		sendMsg("Converts a Wildstar specific file type into a more readable format");
+	public String onHelp(Arguments args) {
 		final Set<String> supportedFileTypes = new HashSet<>();
 		for (final Exporter exporter : App.getInstance().getPlugIn(ExportPlugIn.class).getExporters()) {
 			supportedFileTypes.addAll(exporter.getAcceptedFileEndings());
 		}
-		sendMsg("File types with converter: " + String.join(", ", supportedFileTypes));
+
+		final var builder = new StringBuilder();
+		builder.append("Supported file types: ").append(String.join(", ", supportedFileTypes));
+		return builder.toString();
 	}
 }

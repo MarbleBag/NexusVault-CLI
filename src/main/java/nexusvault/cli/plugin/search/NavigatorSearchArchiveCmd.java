@@ -2,54 +2,62 @@ package nexusvault.cli.plugin.search;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import nexusvault.cli.App;
-import nexusvault.cli.CommandArguments;
-import nexusvault.cli.CommandInfo;
-import nexusvault.cli.plugin.AbstCommand;
+import nexusvault.cli.core.cmd.ArgumentDescription;
+import nexusvault.cli.core.cmd.Arguments;
+import nexusvault.cli.core.cmd.CommandDescription;
+import nexusvault.cli.plugin.AbstractCommandHandler;
 
-final class NavigatorSearchArchiveCmd extends AbstCommand {
+final class NavigatorSearchArchiveHandler extends AbstractCommandHandler {
 
 	@Override
-	public CommandInfo getCommandInfo() {
+	public CommandDescription getCommandDescription() {
 		// @formatter:off
-		return CommandInfo.newInfo()
-				.setName("search")
-				.setNameShort("s")
-				.setDescription("regex expression to match against full file names. Multiple expressions are seperated by a single white space. If the last argument is an integer, it will be interpreted as the maximal number of results to find, before the procedure stops.")
-				.setRequired(false)
-				.setArguments(true)
-				.setNumberOfArgumentsUnlimited()
-				.setNamesOfArguments("regex, ..., maxResults")
+		return CommandDescription.newInfo()
+				.setCommandName("search")
+				.setDescription("regex expression to match against full file names. Multiple expressions are seperated by a single white space.")
+				.addNamedArgument(
+						ArgumentDescription.newInfo()
+							.setName("maxResults")
+							.setNameShort("max")
+							.setDescription("Maximal numbers of results which should be returned. By default this is not limited. A value of -1 will be handled as default.")
+							.setRequired(false)
+							.setArguments(false)
+							.setNumberOfArguments(1)
+							.setNamesOfArguments("number")
+							.build()
+						)
+				.ignoreUnnamedArguments()
+				.namedArgumentsDone()
 			    .build();
 		//@formatter:on
 	}
 
 	@Override
-	public void onCommand(CommandArguments args) {
-		if (args.getNumberOfArguments() == 0) {
+	public void onCommand(Arguments args) {
+		if (args.getUnnamedArgumentSize() == 0) {
 			sendMsg("Needs at least one argument. Use '?' to get more informations.");
 			return;
 		}
 
 		int maxSearchResults = Integer.MAX_VALUE;
-		boolean lastArgIsInteger = false;
-		final String lastArg = args.getArg(args.getNumberOfArguments() - 1);
-		try {
-			final int result = Integer.valueOf(lastArg);
-			maxSearchResults = Math.max(1, result);
-			lastArgIsInteger = true;
-		} catch (final NumberFormatException e) {
-			// ignore
+
+		if (args.hasUnnamedArgValue("max")) {
+			final var argMaxResults = args.getArgumentByName("max");
+			try {
+				final int result = Integer.valueOf(argMaxResults.getValue());
+				maxSearchResults = Math.max(1, result);
+			} catch (final NumberFormatException e) {
+				// ignore
+			}
 		}
 
-		final int numberOfPattern = lastArgIsInteger ? args.getNumberOfArguments() - 1 : args.getNumberOfArguments();
-		final List<Pattern> regex = new ArrayList<>(numberOfPattern);
-		for (int i = 0; i < numberOfPattern; ++i) {
-			final String s = args.getArg(i);
-			regex.add(Pattern.compile(s, Pattern.CASE_INSENSITIVE));
+		final var unnamedArgs = args.getUnnamedArgs();
+		final var regex = new ArrayList<Pattern>(unnamedArgs.length);
+		for (final String unnamedArg : unnamedArgs) {
+			regex.add(Pattern.compile(unnamedArg, Pattern.CASE_INSENSITIVE));
 		}
 
 		final SearchRequest request = new SearchRequest();
@@ -60,7 +68,7 @@ final class NavigatorSearchArchiveCmd extends AbstCommand {
 	}
 
 	@Override
-	public void onHelp(CommandArguments args) {
+	public String onHelp(Arguments args) {
 		sendMsg(() -> {
 			final String sep = File.separator.equals("\\") ? "\\\\" : File.separator;
 
@@ -84,6 +92,8 @@ final class NavigatorSearchArchiveCmd extends AbstCommand {
 
 			return msg.toString();
 		});
+
+		return null;
 	}
 
 }

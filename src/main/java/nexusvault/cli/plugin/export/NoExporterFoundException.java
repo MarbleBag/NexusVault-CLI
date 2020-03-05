@@ -1,6 +1,6 @@
 package nexusvault.cli.plugin.export;
 
-import nexusvault.cli.NexusvaultCLIBaseException;
+import nexusvault.cli.core.exception.NexusvaultCLIBaseException;
 
 public class NoExporterFoundException extends NexusvaultCLIBaseException {
 

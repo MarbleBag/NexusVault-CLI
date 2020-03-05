@@ -1,6 +1,6 @@
 package nexusvault.cli.unused;
 
-import nexusvault.cli.NexusvaultCLIBaseException;
+import nexusvault.cli.core.exception.NexusvaultCLIBaseException;
 
 class ArchiveCanNotBeReadException extends NexusvaultCLIBaseException {
 

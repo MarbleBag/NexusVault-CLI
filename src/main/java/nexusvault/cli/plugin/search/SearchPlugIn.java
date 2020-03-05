@@ -27,19 +27,22 @@ import nexusvault.archive.util.IdxDirectoryTraverser;
 import nexusvault.archive.util.IdxEntryVisitor.EntryFilterResult;
 import nexusvault.archive.util.ReportingIdxFileCollector;
 import nexusvault.cli.App;
-import nexusvault.cli.Command;
-import nexusvault.cli.plugin.AbstPlugIn;
+import nexusvault.cli.plugin.AbstractPlugIn;
 import nexusvault.cli.plugin.archive.ArchivePlugIn;
 import nexusvault.cli.plugin.archive.NexusArchiveWrapper;
 
-public final class SearchPlugIn extends AbstPlugIn {
+public final class SearchPlugIn extends AbstractPlugIn {
 
 	private final static String REPORT_FILE = "search_result.txt";
 
 	public SearchPlugIn() {
-		final List<Command> cmds = new ArrayList<>();
-		cmds.add(new NavigatorSearchArchiveCmd());
-		setCommands(cmds);
+		// final List<CommandHandler> cmds = new ArrayList<>();
+		// cmds.add(new NavigatorSearchArchiveCmd());
+		// setCommands(cmds);
+
+		setCommands(//
+				new NavigatorSearchArchiveHandler());
+		setArguments();
 	}
 
 	public List<IdxPath> getLastSearchResults() {
@@ -156,13 +159,14 @@ public final class SearchPlugIn extends AbstPlugIn {
 
 			@Override
 			public void visitedFile(IdxFileLink file, boolean predicateTest, EntryFilterResult visitorResult) {
-				seenFiles += 1;
-				reportIn += 1;
-				foundFiles += predicateTest ? 1 : 0;
-				if (reportIn >= reportAfterNFiles) {
-					final float percentage = (seenFiles / (numberOfFiles + 0f)) * 100;
-					final String msg = String.format("Processed files %d of %d (%.2f%%). Found: %d", seenFiles, numberOfFiles, percentage, foundFiles);
-					reportIn = 0;
+				this.seenFiles += 1;
+				this.reportIn += 1;
+				this.foundFiles += predicateTest ? 1 : 0;
+				if (this.reportIn >= this.reportAfterNFiles) {
+					final float percentage = this.seenFiles / (numberOfFiles + 0f) * 100;
+					final String msg = String.format("Processed files %d of %d (%.2f%%). Found: %d", this.seenFiles, numberOfFiles, percentage,
+							this.foundFiles);
+					this.reportIn = 0;
 					sendMsg(msg);
 				}
 			}

@@ -6,40 +6,40 @@ import java.util.Set;
 
 import nexusvault.archive.IdxPath;
 import nexusvault.cli.App;
-import nexusvault.cli.CommandArguments;
-import nexusvault.cli.CommandInfo;
-import nexusvault.cli.plugin.AbstCommand;
+import nexusvault.cli.core.cmd.ArgumentDescription;
+import nexusvault.cli.core.cmd.Arguments;
+import nexusvault.cli.core.cmd.CommandDescription;
+import nexusvault.cli.plugin.AbstractCommandHandler;
 import nexusvault.cli.plugin.export.ExportPlugIn.ExportConfig;
 import nexusvault.cli.plugin.search.SearchPlugIn;
 
-final class ExportCmd extends AbstCommand {
+final class ExportCmd extends AbstractCommandHandler {
 
 	@Override
-	public CommandInfo getCommandInfo() {
+	public CommandDescription getCommandDescription() {
 		// @formatter:off
-		return CommandInfo.newInfo()
-				.setName("export")
-				.setNameShort("e")
+		return CommandDescription.newInfo()
+				.setCommandName("export")
 				.setDescription("Export the last searched entries from the archive. Use '?' to get more informations.")
-				.setRequired(false)
-				.setArguments(true)
-				.setNumberOfArguments(1)
-				.setNamesOfArguments("flags")
+				.addNamedArgument(
+							ArgumentDescription.newInfo()
+							.setName("binary")
+							.setDescription("exports files unprocessed")
+							.setRequired(false)
+							.setNoArguments()
+							.build()
+						)
+				.namedArgumentsDone()
 				.build();
 		//@formatter:on
 	}
 
 	@Override
-	public void onCommand(CommandArguments args) {
+	public void onCommand(Arguments args) {
 		final ExportConfig exportConfig = new ExportConfig();
 
-		if (args.getNumberOfArguments() != 0) {
-			if ("as-binary".equalsIgnoreCase(args.getArg(0))) {
-				exportConfig.exportAsBinary(true);
-			} else {
-				sendMsg(() -> String.format("Unknown argument %s. Use '?' to get more informations.", args.getArg(0)));
-				return;
-			}
+		if (args.isNamedArgumentSet("binary")) {
+			exportConfig.exportAsBinary(true);
 		}
 
 		final List<IdxPath> searchResults = App.getInstance().getPlugIn(SearchPlugIn.class).getLastSearchResults();
@@ -47,7 +47,7 @@ final class ExportCmd extends AbstCommand {
 	}
 
 	@Override
-	public void onHelp(CommandArguments args) {
+	public String onHelp(Arguments args) {
 		// sendMsg("Reads the entries of the '" + FILE
 		// + "' file in the report folder and tries to extract one after another from the game archive. If the first argument of this cmd is '"
 		// + CMD_AS_BINARY
@@ -67,7 +67,10 @@ final class ExportCmd extends AbstCommand {
 		for (final Exporter exporter : App.getInstance().getPlugIn(ExportPlugIn.class).getExporters()) {
 			supportedFileTypes.addAll(exporter.getAcceptedFileEndings());
 		}
-		sendMsg("File types with converter: " + String.join(", ", supportedFileTypes));
+
+		final var builder = new StringBuilder();
+		builder.append("Supported file types: ").append(String.join(", ", supportedFileTypes));
+		return builder.toString();
 	}
 
 }

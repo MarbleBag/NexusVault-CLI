@@ -1,6 +1,4 @@
-package nexusvault.cli.exception;
-
-import nexusvault.cli.NexusvaultCLIBaseException;
+package nexusvault.cli.core.exception;
 
 public class FilePathNotSetException extends NexusvaultCLIBaseException {
 

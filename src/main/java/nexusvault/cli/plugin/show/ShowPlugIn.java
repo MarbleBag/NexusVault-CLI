@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import nexusvault.cli.App;
-import nexusvault.cli.Command;
-import nexusvault.cli.plugin.AbstPlugIn;
+import nexusvault.cli.plugin.AbstractPlugIn;
 
-public final class ShowPlugIn extends AbstPlugIn {
+public final class ShowPlugIn extends AbstractPlugIn {
 
 	static interface ShowAble {
 		String getTrigger();
@@ -19,22 +17,19 @@ public final class ShowPlugIn extends AbstPlugIn {
 	private List<ShowAble> showables;
 
 	public ShowPlugIn() {
-		final List<Command> cmds = new ArrayList<>();
 
-		if (!App.getInstance().getAppConfig().getHeadlessMode()) {
-			cmds.add(new ShowCmd());
-		}
-
-		setCommands(cmds);
 	}
 
 	@Override
 	public void initialize() {
-		super.initialize();
-		this.showables = new ArrayList<>();
+		setCommands(new ShowCmd());
+		setArguments();
 
+		this.showables = new ArrayList<>();
 		this.showables.add(new ShowSearchResults());
 		this.showables.add(new ShowFileProperties());
+
+		super.initialize();
 	}
 
 	@Override

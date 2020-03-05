@@ -6,11 +6,11 @@ import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
 import nexusvault.cli.core.cmd.CommandHandler;
 
-final class ExitCmd implements CommandHandler {
+final class SetCmd implements CommandHandler {
 
 	private final Consumer<Arguments> onCall;
 
-	public ExitCmd(Consumer<Arguments> onCmd) {
+	public SetCmd(Consumer<Arguments> onCmd) {
 		if (onCmd == null) {
 			throw new IllegalArgumentException("'onCall' must not b enull");
 		}
@@ -21,9 +21,22 @@ final class ExitCmd implements CommandHandler {
 	public CommandDescription getCommandDescription() {
 		// @formatter:off
 		return CommandDescription.newInfo()
-				.setCommandName("exit")
-				.setDescription("Instructs the application to finish all running tasks and close it on complition")
+				.setCommandName("set")
+				.setDescription("")
 				.setNoNamedArguments()
+//				.addArgument(
+//						ArgumentDescription.newInfo()
+//						.setName("options")
+//						.setNameShort("o")
+//						.setDescription("options to set")
+//						.setRequired(true)
+//						.setArguments(false)
+//						.setNumberOfArgumentsUnlimited()
+//						.setNamesOfArguments("<option, ...>")
+//						.build()
+//						)
+//				.ignoreNoOptions()
+//				.setArgumentsDone()
 				.build();
 		//@formatter:on
 	}
@@ -37,4 +50,5 @@ final class ExitCmd implements CommandHandler {
 	public String onHelp(Arguments args) {
 		return null;
 	}
+
 }

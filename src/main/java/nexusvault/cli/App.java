@@ -36,6 +36,13 @@ import com.google.common.reflect.ClassPath.ClassInfo;
 import com.google.common.reflect.Reflection;
 
 import nexusvault.cli.ConsoleSystem.Level;
+import nexusvault.cli.core.cmd.ArgumentHandler;
+import nexusvault.cli.core.cmd.ArgumentManager;
+import nexusvault.cli.core.cmd.ArgumentParser;
+import nexusvault.cli.core.cmd.Arguments;
+import nexusvault.cli.core.cmd.CommandFormatException;
+import nexusvault.cli.core.cmd.CommandHandler;
+import nexusvault.cli.core.cmd.CommandManager;
 import nexusvault.cli.model.ModelPropertyChangedEvent;
 import nexusvault.cli.plugin.config.AppConfigModel;
 import nexusvault.cli.plugin.config.AppConfigModel.AppConfigAppPathChangedEvent;
@@ -65,9 +72,11 @@ public final class App {
 	private PlugInSystem plugInSystem;
 	private CLISystem cliSystem;
 	private BaseConsoleSystem console;
+
 	@Deprecated
 	private ModelSystem modelSystem;
 
+	private ArgumentManager argumentManager;
 	private CommandManager commandManager;
 
 	private boolean processConsole;
@@ -109,11 +118,11 @@ public final class App {
 		return this.plugInSystem.getPlugIn(plugInClass);
 	}
 
-	public void initializeApp(boolean headlessMode) throws IOException {
-		initializeModel(headlessMode);
+	public void initializeApp() throws IOException {
+		initializeModel();
 		// initializeLogging();
 		// updateLogger();
-		initializeConsole(headlessMode);
+		initializeConsole();
 		initializeEventSystem();
 		initializeCLI();
 
@@ -121,9 +130,11 @@ public final class App {
 
 		// loadConfig();
 
-		if (!headlessMode) {
-			getConsole().println(Level.CONSOLE, "Console mode: Enter 'help' to get a list of available commands."); // TODO
-		}
+	}
+
+	protected void setHeadlessMode() {
+		this.console.setHeadlessMode(true);
+		this.appConfig.setHeadlessMode(true);
 	}
 
 	private void updateLogger() {
@@ -218,7 +229,7 @@ public final class App {
 		Configurator.initialize(config);
 	}
 
-	private void initializeConsole(boolean headlessMode) {
+	private void initializeConsole() {
 		final PrintWriter reportTo = new PrintWriter(System.out);
 		final BaseConsoleSystem.MsgHandle handle = (msg) -> {
 			if (msg.lineEnd) {
@@ -229,55 +240,59 @@ public final class App {
 			reportTo.flush();
 		};
 		final BaseConsoleSystem console = new BaseConsoleSystem(handle);
-		console.setHeadlessMode(headlessMode);
 		this.console = console;
 
 		LogManager.getLogger(App.class);
 	}
 
 	private void initializeCLI() {
+		this.argumentManager = new ArgumentManager();
 		this.commandManager = new CommandManager();
+
 		this.cliSystem = new CLISystem() {
 			@Override
-			public void registerCommand(Command cmd) {
+			public void registerCommand(CommandHandler cmd) {
 				App.this.commandManager.registerCommand(cmd);
 			}
 
 			@Override
-			public void unregisterCommand(Command cmd) {
+			public void unregisterCommand(CommandHandler cmd) {
 				App.this.commandManager.unregisterCommand(cmd);
 			}
 
 			@Override
-			public void printHelp() {
-				final PrintHelpContext context = new PrintHelpContext("nexusvault", new PrintWriter(System.out));
-
-				final String header = "Tool to extract data from the wildstar game archive. Some commands are only available in console-mode and can be entered without '--'. To close the app in console-mode enter 'exit'. A command followed by '?' will, if available, show a command specific help.";
-				context.setHeader(header);
-
-				final String footer = "";
-				context.setFooter(footer);
-
-				// context.setWidth(80);
-
-				// TODO
-				App.this.commandManager.printHelp(context);
+			public void registerStartArgumentHandler(ArgumentHandler handler) {
+				App.this.argumentManager.registerArgumentHandler(handler);
 			}
+
 		};
 
+		this.argumentManager.registerArgumentHandler(new HeadlessModeArgument());
 		this.commandManager.registerCommand(new ExitCmd((args) -> requestShutDown()));
-		this.commandManager.registerCommand(new HelpCmd((args) -> this.cliSystem.printHelp()));
-		this.commandManager.registerCommand(new HeadlessModeCmd());
+		this.commandManager.registerCommand(new SetCmd((args) -> setArguments(args.getUnnamedArgs())));
+		this.commandManager.registerCommand(new HelpCmd((args) -> printHelp(args)));
+	}
+
+	private void printHelp(Arguments args) {
+		final var output = new PrintWriter(System.out);
+		if (args.isNamedArgumentSet("cmd")) {
+			App.this.commandManager.printHelp(output);
+		} else if (args.isNamedArgumentSet("args")) {
+			App.this.argumentManager.printHelp(output);
+		} else {
+			App.this.argumentManager.printHelp(output);
+			App.this.commandManager.printHelp(output);
+		}
 	}
 
 	@Deprecated
-	private void initializeModel(boolean headlessMode) {
+	private void initializeModel() {
 		this.modelSystem = new BaseModelSystem();
 
 		this.appConfig = new AppConfigModel();
 		this.appConfig.setApplicationPath(getProjectLocation());
 		this.appConfig.setDebugMode(false);
-		this.appConfig.setHeadlessMode(headlessMode);
+		// this.appConfig.setHeadlessMode(headlessMode);
 
 		this.modelSystem.registerModel(AppConfigModel.class, this.appConfig);
 	}
@@ -361,16 +376,18 @@ public final class App {
 		}
 	}
 
-	public void startApp(String[] startUpArgs) {
-		this.commandManager.runArguments(startUpArgs);
-		// TODO
-		if (getAppConfig().getHeadlessMode()) {
-			return;
-		}
+	public void startApp(String[] args) {
+		setArguments(args);
+
+		getConsole().println(Level.CONSOLE, "Console mode: Enter 'help' to get a list of available commands."); // TODO
 
 		processConsole();
 
 		this.console.println(Level.CONSOLE, "Closing app");
+	}
+
+	protected void setArguments(String[] args) {
+		this.argumentManager.runArguments(args);
 	}
 
 	public void closeApp() {
@@ -412,14 +429,14 @@ public final class App {
 				}
 				line = line.trim();
 
-				if (line.length() > 0) {
-					if (!line.startsWith("-") && !line.startsWith("--")) {
-						line = "--" + line;
-					}
-				}
+				// if (line.length() > 0) {
+				// if (!line.startsWith("-") && !line.startsWith("--")) {
+				// line = "--" + line;
+				// }
+				// }
 
-				arguments = this.commandManager.parseArguments(line);
-				this.commandManager.runArguments(arguments);
+				arguments = ArgumentParser.parseArguments(line);
+				this.commandManager.executeCommand(arguments);
 
 			} catch (final CommandFormatException e1) {
 				logger.error(String.format("Error at cmd(s): %s", Arrays.toString(arguments)), e1);

@@ -1,17 +1,17 @@
 package nexusvault.cli.plugin.config;
 
 import nexusvault.cli.App;
-import nexusvault.cli.Command;
-import nexusvault.cli.CommandArguments;
-import nexusvault.cli.CommandInfo;
 import nexusvault.cli.ConsoleSystem.Level;
+import nexusvault.cli.core.cmd.Argument;
+import nexusvault.cli.core.cmd.ArgumentDescription;
+import nexusvault.cli.core.cmd.ArgumentHandler;
 
-final class ConfigNoSaveCmd implements Command {
+final class ConfigNoSaveCmd implements ArgumentHandler {
 
 	@Override
-	public CommandInfo getCommandInfo() {
+	public ArgumentDescription getArgumentDescription() {
 		// @formatter:off
-		return CommandInfo.newInfo()
+		return ArgumentDescription.newInfo()
 				.setName("config-no-save")
 				.setDescription("If set, the config will not be saved at program exit. Can be set directly to 'on' or 'off'")
 				.setRequired(false)
@@ -23,14 +23,14 @@ final class ConfigNoSaveCmd implements Command {
 	}
 
 	@Override
-	public void onCommand(CommandArguments args) {
+	public void execute(Argument arg) {
 		final AppBasePlugIn configPlugin = App.getInstance().getPlugInSystem().getPlugIn(AppBasePlugIn.class);
 
-		if (args.getNumberOfArguments() == 0) {
+		if (arg.getValue() == null) {
 			configPlugin.setConfigNotSaveable(true);
 		}
 
-		final String arg0 = args.getArg(0).trim().toLowerCase();
+		final String arg0 = arg.getValue().trim().toLowerCase();
 		if ("off".equals(arg0)) {
 			configPlugin.setConfigNotSaveable(false);
 		} else if ("on".equals(arg0)) {
@@ -39,11 +39,6 @@ final class ConfigNoSaveCmd implements Command {
 			App.getInstance().getConsole().println(Level.CONSOLE,
 					() -> String.format("Command 'config-no-save' does not accept '%s' as an argument. Use 'off' or 'on'.", arg0));
 		}
-	}
-
-	@Override
-	public void onHelp(CommandArguments args) {
-		// TODO Auto-generated method stub
 	}
 
 }

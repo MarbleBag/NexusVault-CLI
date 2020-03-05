@@ -1,4 +1,4 @@
-package nexusvault.cli;
+package nexusvault.cli.core.exception;
 
 public abstract class NexusvaultCLIBaseException extends RuntimeException {
 

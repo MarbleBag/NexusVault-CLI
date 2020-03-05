@@ -1,27 +1,27 @@
 package nexusvault.cli.plugin.export;
 
-import nexusvault.cli.CommandArguments;
-import nexusvault.cli.CommandInfo;
-import nexusvault.cli.plugin.AbstCommand;
+import nexusvault.cli.core.cmd.Arguments;
+import nexusvault.cli.core.cmd.CommandDescription;
+import nexusvault.cli.plugin.AbstractCommandHandler;
 
-final class ExportDirCmd extends AbstCommand {
+final class ExportDirCmd extends AbstractCommandHandler {
 
 	@Override
-	public CommandInfo getCommandInfo() {
+	public CommandDescription getCommandDescription() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void onCommand(CommandArguments args) {
+	public void onCommand(Arguments args) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void onHelp(CommandArguments args) {
+	public String onHelp(Arguments args) {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
 
 }

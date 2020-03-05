@@ -3,12 +3,12 @@ package nexusvault.cli.plugin.export.model;
 import java.util.Arrays;
 
 import nexusvault.cli.App;
-import nexusvault.cli.Command;
-import nexusvault.cli.CommandArguments;
-import nexusvault.cli.CommandInfo;
 import nexusvault.cli.ConsoleSystem.Level;
+import nexusvault.cli.core.cmd.Arguments;
+import nexusvault.cli.core.cmd.CommandDescription;
+import nexusvault.cli.core.cmd.CommandHandler;
 
-final class ModelExportTypeCmd implements Command {
+final class ModelExportTypeCmd implements CommandHandler {
 
 	private final ModelExporter modelExporter;
 
@@ -17,27 +17,24 @@ final class ModelExportTypeCmd implements Command {
 	}
 
 	@Override
-	public CommandInfo getCommandInfo() {
+	public CommandDescription getCommandDescription() {
 		// @formatter:off
-		return CommandInfo.newInfo()
-				.setName("export-m3-type")
+		return CommandDescription.newInfo()
+				.setCommandName("export-m3-type")
 				.setDescription("Sets the exporter type. Use '?' to get more informations.")
-				.setRequired(false)
-				.setArguments(true)
-				.setNumberOfArguments(1)
-				.setNamesOfArguments("type")
+				.setNoNamedArguments()
 				.build();
 		//@formatter:on
 	}
 
 	@Override
-	public void onCommand(CommandArguments args) {
-		if (args.getNumberOfArguments() != 1) {
+	public void onCommand(Arguments args) {
+		if (args.getUnnamedArgumentSize() != 1) {
 			App.getInstance().getConsole().println(Level.CONSOLE, "Use '?' to get more informations.");
 			return;
 		}
 
-		final String arg0 = args.getArg(0);
+		final String arg0 = args.getUnnamedArgs()[0];
 
 		ExporterType selectedType = null;
 		for (final ExporterType type : ExporterType.values()) {
@@ -52,12 +49,12 @@ final class ModelExportTypeCmd implements Command {
 			return;
 		}
 
-		modelExporter.setExportType(selectedType);
+		this.modelExporter.setExportType(selectedType);
 	}
 
 	@Override
-	public void onHelp(CommandArguments args) {
+	public String onHelp(Arguments args) {
 		final String msg = "Available m3 exporter types: " + Arrays.toString(ExporterType.values());
-		App.getInstance().getConsole().println(Level.CONSOLE, msg);
+		return msg;
 	}
 }

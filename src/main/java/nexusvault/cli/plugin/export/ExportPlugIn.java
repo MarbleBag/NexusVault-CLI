@@ -24,13 +24,12 @@ import nexusvault.archive.IdxPath;
 import nexusvault.archive.NexusArchive;
 import nexusvault.archive.util.DataHeader;
 import nexusvault.cli.App;
-import nexusvault.cli.Command;
-import nexusvault.cli.plugin.AbstPlugIn;
+import nexusvault.cli.plugin.AbstractPlugIn;
 import nexusvault.cli.plugin.archive.ArchivePlugIn;
 import nexusvault.cli.plugin.archive.NexusArchiveWrapper;
 import nexusvault.cli.plugin.export.model.ModelExporter;
 
-public final class ExportPlugIn extends AbstPlugIn {
+public final class ExportPlugIn extends AbstractPlugIn {
 
 	private static final Logger logger = LogManager.getLogger(ExportPlugIn.class);
 
@@ -48,7 +47,7 @@ public final class ExportPlugIn extends AbstPlugIn {
 		}
 
 		public final String getSourceName() {
-			return dataLocator.getDataLocation().getFullName();
+			return this.dataLocator.getDataLocation().getFullName();
 		}
 	}
 
@@ -60,14 +59,14 @@ public final class ExportPlugIn extends AbstPlugIn {
 		@Override
 		public void export(ExportConfig config) throws IOException {
 			final Path outputFolder = getOutputFolder();
-			final ByteBuffer data = dataLocator.getData();
+			final ByteBuffer data = this.dataLocator.getData();
 			final Exporter exporter = findExporter(data, getFileEnding());
-			final IdxPath dataPath = dataLocator.getDataLocation();
+			final IdxPath dataPath = this.dataLocator.getDataLocation();
 			exporter.export(outputFolder, data, dataPath);
 		}
 
 		private String getFileEnding() {
-			final IdxPath path = dataLocator.getDataLocation();
+			final IdxPath path = this.dataLocator.getDataLocation();
 			final String lastElement = path.getLastName();
 			final int idx = lastElement.lastIndexOf(".");
 			if (idx > 0) {
@@ -90,9 +89,9 @@ public final class ExportPlugIn extends AbstPlugIn {
 		@Override
 		public void export(ExportConfig config) throws IOException {
 			final Path outputFolder = getOutputFolder();
-			final ByteBuffer data = dataLocator.getData();
-			final IdxPath dataPath = dataLocator.getDataLocation();
-			exporter.export(outputFolder, data, dataPath);
+			final ByteBuffer data = this.dataLocator.getData();
+			final IdxPath dataPath = this.dataLocator.getDataLocation();
+			this.exporter.export(outputFolder, data, dataPath);
 		}
 	}
 
@@ -111,12 +110,12 @@ public final class ExportPlugIn extends AbstPlugIn {
 
 		@Override
 		public ByteBuffer getData() throws IOException {
-			return fileLink.getData();
+			return this.fileLink.getData();
 		}
 
 		@Override
 		public IdxPath getDataLocation() {
-			return fileLink.getPath();
+			return this.fileLink.getPath();
 		}
 
 	}
@@ -130,7 +129,7 @@ public final class ExportPlugIn extends AbstPlugIn {
 
 		@Override
 		public ByteBuffer getData() throws IOException {
-			try (SeekableByteChannel channel = Files.newByteChannel(path, StandardOpenOption.READ)) {
+			try (SeekableByteChannel channel = Files.newByteChannel(this.path, StandardOpenOption.READ)) {
 				final ByteBuffer data = ByteBuffer.allocate((int) channel.size()).order(ByteOrder.LITTLE_ENDIAN);
 
 				int numberOfReadbytes = 0;
@@ -139,7 +138,7 @@ public final class ExportPlugIn extends AbstPlugIn {
 					numberOfReadbytes = channel.read(data);
 					if (numberOfReadbytes == -1) {
 						break;
-					} else if ((numberOfReadbytes == 0)) {
+					} else if (numberOfReadbytes == 0) {
 						if (!data.hasRemaining()) {
 							break;
 						} else {
@@ -158,7 +157,7 @@ public final class ExportPlugIn extends AbstPlugIn {
 
 		@Override
 		public IdxPath getDataLocation() {
-			return IdxPath.createPath(path.getFileName().toString());
+			return IdxPath.createPath(this.path.getFileName().toString());
 		}
 	}
 
@@ -167,11 +166,11 @@ public final class ExportPlugIn extends AbstPlugIn {
 		private boolean exportAsBinary;
 
 		public void exportAsBinary(boolean value) {
-			exportAsBinary = value;
+			this.exportAsBinary = value;
 		}
 
 		public boolean isExportAsBinaryChecked() {
-			return exportAsBinary;
+			return this.exportAsBinary;
 		}
 
 	}
@@ -183,7 +182,7 @@ public final class ExportPlugIn extends AbstPlugIn {
 
 		public ExportError(IdxFileLink link, Exception error) {
 			super();
-			path = null;
+			this.path = null;
 			this.link = link;
 			this.error = error;
 		}
@@ -191,36 +190,36 @@ public final class ExportPlugIn extends AbstPlugIn {
 		public ExportError(String path, Exception error) {
 			super();
 			this.path = path;
-			link = null;
+			this.link = null;
 			this.error = error;
 		}
 
 		public String getTarget() {
-			if (link == null) {
-				return path;
+			if (this.link == null) {
+				return this.path;
 			}
-			return link.getFullName();
+			return this.link.getFullName();
 		}
 	}
 
 	private List<Exporter> exporters;
 
-	public ExportPlugIn() {
-		final List<Command> cmds = new ArrayList<>();
-		cmds.add(new ExportCmd());
-		cmds.add(new ExportFileCmd());
-		// cmds.add(new ExportDirCmd());
-		setCommands(cmds);
+	public ExportPlugIn() { // TODO
+		setCommands(//
+				new ExportCmd(), //
+				new ExportFileCmd() //
+		);
+		setArguments();
 	}
 
 	@Override
 	public void initialize() {
 		super.initialize();
-		if (exporters == null) {
-			exporters = new ArrayList<>();
-			loadExporters(exporters);
-			exporters = Collections.unmodifiableList(exporters);
-			for (final Exporter exporter : exporters) {
+		if (this.exporters == null) {
+			this.exporters = new ArrayList<>();
+			loadExporters(this.exporters);
+			this.exporters = Collections.unmodifiableList(this.exporters);
+			for (final Exporter exporter : this.exporters) {
 				exporter.initialize();
 			}
 		}
@@ -229,15 +228,15 @@ public final class ExportPlugIn extends AbstPlugIn {
 	@Override
 	public void deinitialize() {
 		super.deinitialize();
-		if (exporters != null) {
-			for (final Exporter exporter : exporters) {
+		if (this.exporters != null) {
+			for (final Exporter exporter : this.exporters) {
 				exporter.deinitialize();
 			}
 		}
-		exporters = null;
+		this.exporters = null;
 	}
 
-	private void loadExporters(List<Exporter> exporters) {
+	private void loadExporters(List<Exporter> exporters) { // TODO
 		exporters.add(new ModelExporter());
 		exporters.add(new TextureExporter());
 		exporters.add(new TBL2CSVExporter());
@@ -314,7 +313,7 @@ public final class ExportPlugIn extends AbstPlugIn {
 			seenFiles += 1;
 			reportIn += 1;
 			if (reportIn >= reportAfterNFiles) {
-				final float percentage = (seenFiles / (numberOfFilesToUnpack + 0f)) * 100;
+				final float percentage = seenFiles / (numberOfFilesToUnpack + 0f) * 100;
 				final String msg = String.format("Processed files %d of %d (%.2f%%).", seenFiles, numberOfFilesToUnpack, percentage);
 				sendMsg(msg);
 				reportIn = 0;
@@ -390,7 +389,7 @@ public final class ExportPlugIn extends AbstPlugIn {
 	}
 
 	protected List<Exporter> getExporters() {
-		return exporters;
+		return this.exporters;
 	}
 
 	public Path getOutputFolder() {

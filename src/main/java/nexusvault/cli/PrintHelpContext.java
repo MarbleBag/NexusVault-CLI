@@ -2,7 +2,7 @@ package nexusvault.cli;
 
 import java.io.PrintWriter;
 
-final class PrintHelpContext {
+public final class PrintHelpContext {
 
 	private final PrintWriter writer;
 	private String footer;
@@ -24,31 +24,31 @@ final class PrintHelpContext {
 	}
 
 	public PrintWriter getWriter() {
-		return writer;
+		return this.writer;
 	}
 
 	public int getWidth() {
-		return width;
+		return this.width;
 	}
 
 	public int getLeftPadding() {
-		return leftPadding;
+		return this.leftPadding;
 	}
 
 	public int getDescPadding() {
-		return descPadding;
+		return this.descPadding;
 	}
 
 	public String getCommandName() {
-		return cmdName;
+		return this.cmdName;
 	}
 
 	public String getHeader() {
-		return header;
+		return this.header;
 	}
 
 	public String getFooter() {
-		return footer;
+		return this.footer;
 	}
 
 	public void setFooter(String footer) {

@@ -1,8 +1,8 @@
-package nexusvault.cli;
+package nexusvault.cli.core.cmd;
 
-public final class CommandAlreadyDefinedException extends RuntimeException {
+public final class CommandAlreadyDefinedException extends CLIHandlerException {
 
-	private static final long serialVersionUID = 4351511956427260760L;
+	private static final long serialVersionUID = 1L;
 
 	public CommandAlreadyDefinedException() {
 		super();

@@ -1,11 +1,19 @@
 package nexusvault.cli;
 
+import nexusvault.cli.core.cmd.ArgumentHandler;
+import nexusvault.cli.core.cmd.CommandHandler;
+
 public interface CLISystem {
 
-	void registerCommand(Command cmd);
+	void registerCommand(CommandHandler cmd);
 
-	void unregisterCommand(Command cmd);
+	void unregisterCommand(CommandHandler cmd);
 
-	void printHelp();
+	/**
+	 * Will be executed on program start
+	 */
+	void registerStartArgumentHandler(ArgumentHandler handler);
+
+	// void printHelp();
 
 }

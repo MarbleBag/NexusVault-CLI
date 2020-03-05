@@ -8,8 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com)
 - Command 'export-m3-texture': By default on. If set to off, m3 exporters will no longer export textures, which are referenced by the model. (UV maps are still included)
 - Command 'show', new sub-command available to show file meta data
 
+### Changed
+- App does no longer accept commands on start
+
 ### Fixed
-- 'no-console' is now working
 - 'convert-file' will no longer lock the process
 
 ## [0.1.3]

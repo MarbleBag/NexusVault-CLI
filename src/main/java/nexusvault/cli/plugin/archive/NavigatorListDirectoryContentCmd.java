@@ -1,33 +1,31 @@
 package nexusvault.cli.plugin.archive;
 
 import nexusvault.cli.App;
-import nexusvault.cli.Command;
-import nexusvault.cli.CommandArguments;
-import nexusvault.cli.CommandInfo;
+import nexusvault.cli.core.cmd.Arguments;
+import nexusvault.cli.core.cmd.CommandDescription;
+import nexusvault.cli.core.cmd.CommandHandler;
 
-final class NavigatorListDirectoryContentCmd implements Command {
+final class NavigatorListDirectoryContentCmd implements CommandHandler {
 
 	@Override
-	public CommandInfo getCommandInfo() {
+	public CommandDescription getCommandDescription() {
 		// @formatter:off
-		return CommandInfo.newInfo()
-				.setName("ls")
-				.setDescription("list the content of TODO")
-				.setRequired(false)
-				.setNoArguments()
+		return CommandDescription.newInfo()
+				.setCommandName("ls")
+				.setDescription("List the contents of the currently selected folder")
+				.setNoNamedArguments()
 			    .build();
 		//@formatter:on
 	}
 
 	@Override
-	public void onCommand(CommandArguments args) {
+	public void onCommand(Arguments args) {
 		App.getInstance().getPlugIn(ArchivePlugIn.class).listDirectoryContent();
 	}
 
 	@Override
-	public void onHelp(CommandArguments args) {
-		// TODO Auto-generated method stub
-
+	public String onHelp(Arguments args) {
+		return null;
 	}
 
 }

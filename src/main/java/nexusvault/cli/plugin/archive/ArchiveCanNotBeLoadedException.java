@@ -1,6 +1,6 @@
 package nexusvault.cli.plugin.archive;
 
-import nexusvault.cli.NexusvaultCLIBaseException;
+import nexusvault.cli.core.exception.NexusvaultCLIBaseException;
 
 public class ArchiveCanNotBeLoadedException extends NexusvaultCLIBaseException {
 

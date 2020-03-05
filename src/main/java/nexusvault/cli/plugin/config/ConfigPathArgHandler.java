@@ -4,16 +4,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import nexusvault.cli.App;
-import nexusvault.cli.Command;
-import nexusvault.cli.CommandArguments;
-import nexusvault.cli.CommandInfo;
+import nexusvault.cli.core.cmd.Argument;
+import nexusvault.cli.core.cmd.ArgumentDescription;
+import nexusvault.cli.core.cmd.ArgumentHandler;
 
-final class ConfigPathCmd implements Command {
+final class ConfigPathArgHandler implements ArgumentHandler {
 
 	@Override
-	public CommandInfo getCommandInfo() {
+	public ArgumentDescription getArgumentDescription() {
 		// @formatter:off
-		return CommandInfo.newInfo()
+		return ArgumentDescription.newInfo()
 				.setName("config")
 				.setNameShort("c")
 				.setDescription("path to the config-file that should be loaded")
@@ -26,14 +26,9 @@ final class ConfigPathCmd implements Command {
 	}
 
 	@Override
-	public void onCommand(CommandArguments args) {
-		final Path path = Paths.get(args.getArg(0));
+	public void execute(Argument args) {
+		final Path path = Paths.get(args.getValue());
 		App.getInstance().getPlugInSystem().getPlugIn(AppBasePlugIn.class).setConfigPath(path);
-	}
-
-	@Override
-	public void onHelp(CommandArguments args) {
-		// TODO Auto-generated method stub
 	}
 
 }

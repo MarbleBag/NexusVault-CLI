@@ -1,45 +1,45 @@
-package nexusvault.cli;
+package nexusvault.cli.core.cmd;
 
 import java.util.Arrays;
 
-public final class CommandInfo {
+public final class ArgumentDescription {
 
 	public static interface Builder1 {
-		CommandInfo.Builder2 setName(String name);
+		ArgumentDescription.Builder2 setName(String name);
 	}
 
 	public static interface Builder2 {
-		CommandInfo.Builder3 setDescription(String name);
+		ArgumentDescription.Builder3 setDescription(String name);
 
-		CommandInfo.Builder2 setNameShort(String name);
+		ArgumentDescription.Builder2 setNameShort(String name);
 	}
 
 	public static interface Builder3 {
-		CommandInfo.Builder4 setRequired(boolean isCommandRequired);
+		ArgumentDescription.Builder4 setRequired(boolean isCommandRequired);
 	}
 
 	public static interface Builder4 {
-		CommandInfo.Builder5 setArguments(boolean areArgumentsOptional);
+		ArgumentDescription.Builder5 setArguments(boolean areArgumentsOptional);
 
-		CommandInfo.BuilderEnd setNoArguments();
+		ArgumentDescription.BuilderEnd setNoArguments();
 	}
 
 	public static interface Builder5 {
-		CommandInfo.Builder6 setNumberOfArguments(int number);
+		ArgumentDescription.Builder6 setNumberOfArguments(int number);
 
-		CommandInfo.Builder6 setNumberOfArgumentsUnlimited();
+		ArgumentDescription.Builder6 setNumberOfArgumentsUnlimited();
 	}
 
 	public static interface Builder6 {
-		CommandInfo.BuilderEnd setNamesOfArguments(String... names);
+		ArgumentDescription.BuilderEnd setNamesOfArguments(String... names);
 	}
 
 	public static interface BuilderEnd {
-		CommandInfo build();
+		ArgumentDescription build();
 	}
 
-	private static final class Builder implements CommandInfo.Builder1, CommandInfo.Builder2, CommandInfo.Builder3, CommandInfo.Builder4, CommandInfo.Builder5,
-			CommandInfo.Builder6, CommandInfo.BuilderEnd {
+	private static final class Builder implements ArgumentDescription.Builder1, ArgumentDescription.Builder2, ArgumentDescription.Builder3,
+			ArgumentDescription.Builder4, ArgumentDescription.Builder5, ArgumentDescription.Builder6, ArgumentDescription.BuilderEnd {
 
 		private String[] argumentNames;
 		private boolean argumentOptional;
@@ -50,8 +50,8 @@ public final class CommandInfo {
 		private boolean required;
 
 		@Override
-		public CommandInfo build() {
-			return new CommandInfo(this);
+		public ArgumentDescription build() {
+			return new ArgumentDescription(this);
 		}
 
 		@Override
@@ -115,7 +115,7 @@ public final class CommandInfo {
 
 	private static final int NUMBER_OF_ARGUMENTS_UNLIMITED = -1;
 
-	public static CommandInfo.Builder1 newInfo() {
+	public static ArgumentDescription.Builder1 newInfo() {
 		return new Builder();
 	}
 
@@ -133,7 +133,7 @@ public final class CommandInfo {
 
 	private final boolean required;
 
-	private CommandInfo(CommandInfo.Builder builder) {
+	private ArgumentDescription(ArgumentDescription.Builder builder) {
 		this.name = builder.name;
 		this.nameShort = builder.nameShort;
 		this.description = builder.description;
@@ -154,38 +154,38 @@ public final class CommandInfo {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final CommandInfo other = (CommandInfo) obj;
-		if (!Arrays.equals(argumentNames, other.argumentNames)) {
+		final ArgumentDescription other = (ArgumentDescription) obj;
+		if (!Arrays.equals(this.argumentNames, other.argumentNames)) {
 			return false;
 		}
-		if (argumentOptional != other.argumentOptional) {
+		if (this.argumentOptional != other.argumentOptional) {
 			return false;
 		}
-		if (description == null) {
+		if (this.description == null) {
 			if (other.description != null) {
 				return false;
 			}
-		} else if (!description.equals(other.description)) {
+		} else if (!this.description.equals(other.description)) {
 			return false;
 		}
-		if (name == null) {
+		if (this.name == null) {
 			if (other.name != null) {
 				return false;
 			}
-		} else if (!name.equals(other.name)) {
+		} else if (!this.name.equals(other.name)) {
 			return false;
 		}
-		if (nameShort == null) {
+		if (this.nameShort == null) {
 			if (other.nameShort != null) {
 				return false;
 			}
-		} else if (!nameShort.equals(other.nameShort)) {
+		} else if (!this.nameShort.equals(other.nameShort)) {
 			return false;
 		}
-		if (numberOfArgs != other.numberOfArgs) {
+		if (this.numberOfArgs != other.numberOfArgs) {
 			return false;
 		}
-		if (required != other.required) {
+		if (this.required != other.required) {
 			return false;
 		}
 		return true;
@@ -195,28 +195,28 @@ public final class CommandInfo {
 		return this.argumentNames;
 	}
 
-	public String getCommandDescription() {
+	public String getDescription() {
 		return this.description;
 	}
 
-	public boolean hasCommandDescription() {
-		return (this.description != null) && !this.description.isEmpty();
+	public boolean hasDescription() {
+		return this.description != null && !this.description.isEmpty();
 	}
 
-	public String getCommandName() {
+	public String getName() {
 		return this.name;
 	}
 
-	public boolean hasCommandName() {
-		return (this.name != null) && !this.name.isEmpty();
+	public boolean hasName() {
+		return this.name != null && !this.name.isEmpty();
 	}
 
-	public String getCommandNameShort() {
+	public String getNameShort() {
 		return this.nameShort;
 	}
 
-	public boolean hasCommandNameShort() {
-		return (this.nameShort != null) && !this.nameShort.isEmpty();
+	public boolean hasNameShort() {
+		return this.nameShort != null && !this.nameShort.isEmpty();
 	}
 
 	public int getNumberOfArguments() {
@@ -228,20 +228,20 @@ public final class CommandInfo {
 	}
 
 	public boolean hasArguments() {
-		return (this.numberOfArgs > 0) || (this.numberOfArgs == NUMBER_OF_ARGUMENTS_UNLIMITED);
+		return this.numberOfArgs > 0 || this.numberOfArgs == NUMBER_OF_ARGUMENTS_UNLIMITED;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = (prime * result) + Arrays.hashCode(argumentNames);
-		result = (prime * result) + (argumentOptional ? 1231 : 1237);
-		result = (prime * result) + ((description == null) ? 0 : description.hashCode());
-		result = (prime * result) + ((name == null) ? 0 : name.hashCode());
-		result = (prime * result) + ((nameShort == null) ? 0 : nameShort.hashCode());
-		result = (prime * result) + numberOfArgs;
-		result = (prime * result) + (required ? 1231 : 1237);
+		result = prime * result + Arrays.hashCode(this.argumentNames);
+		result = prime * result + (this.argumentOptional ? 1231 : 1237);
+		result = prime * result + (this.description == null ? 0 : this.description.hashCode());
+		result = prime * result + (this.name == null ? 0 : this.name.hashCode());
+		result = prime * result + (this.nameShort == null ? 0 : this.nameShort.hashCode());
+		result = prime * result + this.numberOfArgs;
+		result = prime * result + (this.required ? 1231 : 1237);
 		return result;
 	}
 
@@ -255,19 +255,19 @@ public final class CommandInfo {
 
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder().append("CommandInfo");
-		builder.append("[name=").append(name);
-		builder.append(", nameShort=").append(nameShort);
-		builder.append(", description=").append(description);
-		builder.append(", required=").append(required);
+		final StringBuilder builder = new StringBuilder().append("ArgumentInfo");
+		builder.append("[name=").append(this.name);
+		builder.append(", nameShort=").append(this.nameShort);
+		builder.append(", description=").append(this.description);
+		builder.append(", required=").append(this.required);
 
 		if (hasArguments()) {
 			builder.append(", argumentOptional=");
-			builder.append(argumentOptional);
+			builder.append(this.argumentOptional);
 			builder.append(", numberOfArgs=");
-			builder.append(numberOfArgs);
+			builder.append(this.numberOfArgs);
 			builder.append(", argumentNames=");
-			builder.append(Arrays.toString(argumentNames));
+			builder.append(Arrays.toString(this.argumentNames));
 		}
 
 		builder.append("]");

@@ -3,10 +3,10 @@ package nexusvault.cli.plugin;
 import com.google.common.base.Supplier;
 
 import nexusvault.cli.App;
-import nexusvault.cli.Command;
 import nexusvault.cli.ConsoleSystem.Level;
+import nexusvault.cli.core.cmd.CommandHandler;
 
-public abstract class AbstCommand implements Command {
+public abstract class AbstractCommandHandler implements CommandHandler {
 
 	protected void sendMsg(String msg) {
 		App.getInstance().getConsole().println(Level.CONSOLE, msg);

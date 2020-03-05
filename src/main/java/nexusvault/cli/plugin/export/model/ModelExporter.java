@@ -10,14 +10,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import kreed.util.property.PropertyChangedEvent;
-import kreed.util.property.PropertyListener;
 import kreed.util.property.provider.BoolProvider;
 import nexusvault.archive.IdxPath;
 import nexusvault.archive.util.DataHeader;
 import nexusvault.cli.App;
-import nexusvault.cli.Command;
 import nexusvault.cli.EventSystem;
+import nexusvault.cli.core.cmd.CommandHandler;
 import nexusvault.cli.model.ModelPropertyChangedEvent;
 import nexusvault.cli.model.ModelSet;
 import nexusvault.cli.model.PropertyKey;
@@ -41,36 +39,33 @@ public final class ModelExporter implements Exporter {
 
 			@Override
 			public PropertyOption<Key> getOptions() {
-				return opt;
+				return this.opt;
 			}
 		}
 
 		private final ModelSet<Key> data;
 
 		public ModelConfigModel() {
-			data = new ModelSet<>(Arrays.asList(Key.values()));
+			this.data = new ModelSet<>(Arrays.asList(Key.values()));
 
-			data.setListener(new PropertyListener<Key>() {
-				@Override
-				public void onPropertyChange(PropertyChangedEvent<Key> property) {
-					final EventSystem eventSystem = App.getInstance().getEventSystem();
-					if (eventSystem == null) {
-						return;
-					}
-					final String eventName = String.valueOf(property.key).toLowerCase();
-					App.getInstance().getEventSystem()
-							.postEvent(new ModelPropertyChangedEvent<>(eventName, String.valueOf(property.oldValue), String.valueOf(property.newValue)) {
-							});
+			this.data.setListener(property -> {
+				final EventSystem eventSystem = App.getInstance().getEventSystem();
+				if (eventSystem == null) {
+					return;
 				}
+				final String eventName = String.valueOf(property.key).toLowerCase();
+				App.getInstance().getEventSystem()
+						.postEvent(new ModelPropertyChangedEvent<>(eventName, String.valueOf(property.oldValue), String.valueOf(property.newValue)) {
+						});
 			});
 		}
 
 		public boolean isIncludeTexture() {
-			return data.getProperty(Key.INCLUDE_TEXTURE);
+			return this.data.getProperty(Key.INCLUDE_TEXTURE);
 		}
 
 		public boolean setIncludeTextureh(boolean value) {
-			return data.setProperty(Key.INCLUDE_TEXTURE, value);
+			return this.data.setProperty(Key.INCLUDE_TEXTURE, value);
 		}
 	}
 
@@ -81,34 +76,34 @@ public final class ModelExporter implements Exporter {
 	private ModelReader modelReader;
 	private ExporterType exporterType;
 	private ModelConfigModel configModel;
-	private List<Command> cmds;
+	private List<CommandHandler> cmds;
 
 	@Override
 	public void initialize() {
-		modelReader = new ModelReader();
-		exporterType = ExporterType.GLTF;
-		configModel = new ModelConfigModel();
+		this.modelReader = new ModelReader();
+		this.exporterType = ExporterType.GLTF;
+		this.configModel = new ModelConfigModel();
 
-		cmds = new ArrayList<>();
-		cmds.add(new ModelExportTypeCmd(this));
-		cmds.add(new ModelExportSettingCmd(this));
+		this.cmds = new ArrayList<>();
+		this.cmds.add(new ModelExportTypeCmd(this));
+		this.cmds.add(new ModelExportSettingCmd(this));
 
 		final var cli = App.getInstance().getCLI();
-		cmds.forEach(cli::registerCommand);
+		this.cmds.forEach(cli::registerCommand);
 	}
 
 	@Override
 	public void deinitialize() {
 		final var cli = App.getInstance().getCLI();
-		cmds.forEach(cli::unregisterCommand);
+		this.cmds.forEach(cli::unregisterCommand);
 
-		configModel = null;
-		modelReader = null;
-		cmds = null;
+		this.configModel = null;
+		this.modelReader = null;
+		this.cmds = null;
 	}
 
 	private InternalModelExporter getExporter() {
-		switch (exporterType) {
+		switch (this.exporterType) {
 			case DEBUG:
 				return new DebugInternalModelExporter();
 			case GLTF:
@@ -116,12 +111,12 @@ public final class ModelExporter implements Exporter {
 			case OBJ:
 				return new ObjInternalModelExporter();
 			default:
-				throw new IllegalStateException("Exporter not available: " + exporterType);
+				throw new IllegalStateException("Exporter not available: " + this.exporterType);
 		}
 	}
 
 	public ModelConfigModel getConfig() {
-		return configModel;
+		return this.configModel;
 	}
 
 	public void setExportType(ExporterType exporterType) {
@@ -139,12 +134,12 @@ public final class ModelExporter implements Exporter {
 
 	@Override
 	public boolean accepts(DataHeader header) {
-		return modelReader.acceptFileSignature(header.getSignature()) && modelReader.acceptFileVersion(header.getVersion());
+		return this.modelReader.acceptFileSignature(header.getSignature()) && this.modelReader.acceptFileVersion(header.getVersion());
 	}
 
 	@Override
 	public void export(Path outputFolder, ByteBuffer data, IdxPath dataName) throws IOException {
-		final Model model = modelReader.read(data);
+		final Model model = this.modelReader.read(data);
 
 		final Path modelFolder = outputFolder.resolve(PathUtil.getFolder(dataName));
 		Files.createDirectories(modelFolder);

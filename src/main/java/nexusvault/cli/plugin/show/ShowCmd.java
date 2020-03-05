@@ -1,39 +1,37 @@
 package nexusvault.cli.plugin.show;
 
 import nexusvault.cli.App;
-import nexusvault.cli.CommandArguments;
-import nexusvault.cli.CommandInfo;
-import nexusvault.cli.plugin.AbstCommand;
+import nexusvault.cli.core.cmd.Arguments;
+import nexusvault.cli.core.cmd.CommandDescription;
+import nexusvault.cli.plugin.AbstractCommandHandler;
 
-final class ShowCmd extends AbstCommand {
+final class ShowCmd extends AbstractCommandHandler {
 
 	@Override
-	public CommandInfo getCommandInfo() {
+	public CommandDescription getCommandDescription() {
 		// @formatter:off
-		return CommandInfo.newInfo()
-				.setName("show")
+		return CommandDescription.newInfo()
+				.setCommandName("show")
 				.setDescription("(console mode) Shows data which are associated with the given argument. Use '?' to recieve a list of possible arguments")
-				.setRequired(false)
-				.setArguments(true)
-				.setNumberOfArguments(1)
-				.setNamesOfArguments("arg")
+				.setNoNamedArguments()
 			    .build();
 		//@formatter:on
 	}
 
 	@Override
-	public void onCommand(CommandArguments args) {
-		if (args.getNumberOfArguments() != 1) {
+	public void onCommand(Arguments args) {
+		if (args.getUnnamedArgumentSize() != 1) {
 			sendMsg("Use '?' to recieve a list of possible arguments");
 			return;
 		}
-		final String arg0 = args.getArg(0).trim().toLowerCase();
+		final String arg0 = args.getUnnamedArgs()[0].trim().toLowerCase();
 		App.getInstance().getPlugIn(ShowPlugIn.class).show(arg0);
 	}
 
 	@Override
-	public void onHelp(CommandArguments args) {
+	public String onHelp(Arguments args) {
 		App.getInstance().getPlugIn(ShowPlugIn.class).showHelp();
+		return null;
 	}
 
 }

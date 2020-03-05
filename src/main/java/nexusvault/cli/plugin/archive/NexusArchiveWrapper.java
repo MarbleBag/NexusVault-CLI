@@ -7,8 +7,8 @@ import java.nio.file.Path;
 import nexusvault.archive.NexusArchive;
 import nexusvault.cli.App;
 import nexusvault.cli.ConsoleSystem.Level;
-import nexusvault.cli.exception.FileNotFoundException;
-import nexusvault.cli.exception.FileNotReadableException;
+import nexusvault.cli.core.exception.FileNotFoundException;
+import nexusvault.cli.core.exception.FileNotReadableException;
 import nexusvault.cli.plugin.archive.ArchivePlugIn.ArchiveDisposedEvent;
 import nexusvault.cli.plugin.archive.ArchivePlugIn.ArchiveLoadedEvent;
 
