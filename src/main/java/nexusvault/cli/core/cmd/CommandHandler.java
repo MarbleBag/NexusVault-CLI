@@ -5,5 +5,5 @@ public interface CommandHandler {
 
 	void onCommand(Arguments args);
 
-	String onHelp(Arguments args);
+	String onHelp();
 }

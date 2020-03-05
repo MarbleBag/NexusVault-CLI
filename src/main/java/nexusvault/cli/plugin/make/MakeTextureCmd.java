@@ -29,9 +29,19 @@ final class MakeTextureCmd extends AbstractCommandHandler {
 						)
 				.addNamedArgument(
 							ArgumentDescription.newInfo()
-							.setName("filename").setDescription("Nname of the created file. If not set, the name of the file will be equal to the name of the first passed image file")
+							.setName("filename").setDescription("Name of the created file. If not set, the name of the file will be equal to the name of the first passed image file")
 							.setRequired(false).setArguments(false).setNumberOfArguments(1).setNamesOfArguments("name").build()
 						)
+				.addNamedArgument(
+							ArgumentDescription.newInfo()
+							.setName("texture-1").setDescription("")
+							.setRequired(true).setArguments(false).setNumberOfArguments(1).setNamesOfArguments("path").build()
+						)
+				.addNamedArgument(
+						ArgumentDescription.newInfo()
+						.setName("mipmaps").setDescription("How many mip maps the texture should contain. Maximal number of mip maps is 13.")
+						.setRequired(false).setArguments(false).setNumberOfArguments(1).setNamesOfArguments("number").build()
+					)
 				.namedArgumentsDone()
 //				.setRequired(false)
 //				.setArguments(false)
@@ -135,9 +145,12 @@ final class MakeTextureCmd extends AbstractCommandHandler {
 	}
 
 	@Override
-	public String onHelp(Arguments args) {
+	public String onHelp() {
+		final var builder = new StringBuilder();
+
 		// TODO
-		return null;
+
+		return builder.toString();
 	}
 
 }

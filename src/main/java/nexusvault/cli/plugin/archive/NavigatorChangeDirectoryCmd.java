@@ -41,7 +41,7 @@ final class NavigatorChangeDirectoryCmd implements CommandHandler {
 	}
 
 	@Override
-	public String onHelp(Arguments args) {
+	public String onHelp() {
 		return "Changes the current directory. Either '/' or '\\' can be used to separate folder names. To move to the parent folder use '..'";
 	}
 

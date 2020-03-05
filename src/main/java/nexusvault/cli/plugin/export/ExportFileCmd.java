@@ -56,7 +56,7 @@ final class ExportFileCmd extends AbstractCommandHandler {
 	}
 
 	@Override
-	public String onHelp(Arguments args) {
+	public String onHelp() {
 		final Set<String> supportedFileTypes = new HashSet<>();
 		for (final Exporter exporter : App.getInstance().getPlugIn(ExportPlugIn.class).getExporters()) {
 			supportedFileTypes.addAll(exporter.getAcceptedFileEndings());

@@ -53,7 +53,7 @@ final class ModelExportTypeCmd implements CommandHandler {
 	}
 
 	@Override
-	public String onHelp(Arguments args) {
+	public String onHelp() {
 		final String msg = "Available m3 exporter types: " + Arrays.toString(ExporterType.values());
 		return msg;
 	}

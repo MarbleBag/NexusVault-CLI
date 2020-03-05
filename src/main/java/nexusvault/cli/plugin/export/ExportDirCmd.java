@@ -19,7 +19,7 @@ final class ExportDirCmd extends AbstractCommandHandler {
 	}
 
 	@Override
-	public String onHelp(Arguments args) {
+	public String onHelp() {
 		// TODO Auto-generated method stub
 		return null;
 	}

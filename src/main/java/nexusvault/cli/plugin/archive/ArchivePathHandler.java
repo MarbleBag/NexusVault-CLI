@@ -84,7 +84,7 @@ final class ArchivePathHandler implements ArgumentHandler, CommandHandler {
 	}
 
 	@Override
-	public String onHelp(Arguments args) {
+	public String onHelp() {
 		return null;
 	}
 

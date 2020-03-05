@@ -47,7 +47,7 @@ final class ExportCmd extends AbstractCommandHandler {
 	}
 
 	@Override
-	public String onHelp(Arguments args) {
+	public String onHelp() {
 		// sendMsg("Reads the entries of the '" + FILE
 		// + "' file in the report folder and tries to extract one after another from the game archive. If the first argument of this cmd is '"
 		// + CMD_AS_BINARY

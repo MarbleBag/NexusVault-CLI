@@ -29,7 +29,7 @@ final class ShowCmd extends AbstractCommandHandler {
 	}
 
 	@Override
-	public String onHelp(Arguments args) {
+	public String onHelp() {
 		App.getInstance().getPlugIn(ShowPlugIn.class).showHelp();
 		return null;
 	}

@@ -68,7 +68,7 @@ final class NavigatorSearchArchiveHandler extends AbstractCommandHandler {
 	}
 
 	@Override
-	public String onHelp(Arguments args) {
+	public String onHelp() {
 		sendMsg(() -> {
 			final String sep = File.separator.equals("\\") ? "\\\\" : File.separator;
 

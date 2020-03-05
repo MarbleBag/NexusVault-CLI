@@ -28,11 +28,6 @@ public final class CommandManager {
 
 		@Override
 		public void run() {
-			if (this.args.isNamedArgumentSet("?") || this.args.isNamedArgumentSet("help") || this.args.hasUnnamedArgValue("?")
-					|| this.args.hasUnnamedArgValue("help")) {
-				printCmdHelp(this.commandContainer, this.args);
-				return;
-			}
 			this.commandContainer.command.onCommand(this.args);
 		}
 	}
@@ -162,8 +157,13 @@ public final class CommandManager {
 			return null;
 		}
 
+		final var commandContainer = cmds.get(0);
+		if (contains(args, "?") || contains(args, "help")) {
+			printCmdHelp(commandContainer);
+			return null;
+		}
+
 		try {
-			final var commandContainer = cmds.get(0);
 			final var ignoreNonOptions = commandContainer.description.ignoreNonOptions() || !commandContainer.description.hasArguments();
 			final var cmdLine = this.parser.parse(commandContainer.options, args, ignoreNonOptions);
 			final var cmdArgs = new Arguments(cmdLine);
@@ -171,6 +171,15 @@ public final class CommandManager {
 		} catch (final ParseException e) {
 			throw new CommandFormatException(e);
 		}
+	}
+
+	private boolean contains(String[] args, String txt) {
+		for (final var arg : args) {
+			if (arg.equalsIgnoreCase(txt)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private String[] getTail(String[] array) {
@@ -205,11 +214,11 @@ public final class CommandManager {
 		return cmd != null ? Collections.singletonList(cmd) : Collections.emptyList();
 	}
 
-	private void printCmdHelp(CommandContainer container, Arguments args) {
+	private void printCmdHelp(CommandContainer container) {
 		final var description = container.description;
 
 		final var cmdDescription = description.getCommandDescription();
-		final var helpText = container.command.onHelp(args);
+		final var helpText = container.command.onHelp();
 
 		final var textBuilder = new StringBuilder();
 		if (cmdDescription != null && !cmdDescription.isBlank()) {

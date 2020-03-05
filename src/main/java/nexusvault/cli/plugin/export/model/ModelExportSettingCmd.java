@@ -45,7 +45,7 @@ final class ModelExportSettingCmd implements CommandHandler {
 	}
 
 	@Override
-	public String onHelp(Arguments args) {
+	public String onHelp() {
 		final String msg = String.format("Usage of textures is set to %s, use 'on' or 'off' to directly set the value",
 				this.modelExporter.getConfig().isIncludeTexture());
 		return msg;

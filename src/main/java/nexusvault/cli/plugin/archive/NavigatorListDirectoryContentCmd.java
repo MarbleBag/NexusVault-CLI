@@ -24,7 +24,7 @@ final class NavigatorListDirectoryContentCmd implements CommandHandler {
 	}
 
 	@Override
-	public String onHelp(Arguments args) {
+	public String onHelp() {
 		return null;
 	}
 
