@@ -28,6 +28,7 @@ import nexusvault.cli.plugin.AbstractPlugIn;
 import nexusvault.cli.plugin.archive.ArchivePlugIn;
 import nexusvault.cli.plugin.archive.NexusArchiveWrapper;
 import nexusvault.cli.plugin.export.model.ModelExporter;
+import nexusvault.cli.plugin.export.tex.TextureExporter;
 
 public final class ExportPlugIn extends AbstractPlugIn {
 

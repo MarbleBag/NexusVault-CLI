@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com)
 ### Added
 - Support for m3 to wavefront obj export
 - Command 'export-m3-texture': By default on. If set to off, m3 exporters will no longer export textures, which are referenced by the model. (UV maps are still included)
-- Command 'show', new sub-command available to show file meta data
+- Command 'export-tex-split': By default on. If set to off, tex exporters will no longer split textures, which contain more than just colors, into sub-images, which containing more specific data.
+- Command 'show': new sub-command available to show file meta data
+
 
 ### Changed
 - App does no longer accept commands on start
