@@ -2,12 +2,12 @@ package nexusvault.cli.plugin.show;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 
 import nexusvault.archive.IdxException;
 import nexusvault.archive.IdxFileLink;
@@ -43,12 +43,16 @@ final class ShowFileProperties implements ShowAble {
 	@Override
 	public void show() {
 		App.getInstance().getConsole().println(Level.CONSOLE, () -> {
-			final var files = getSearchResults();
-			final var propertyMaps = collectProperties(files);
-
 			final StringBuilder b = new StringBuilder();
 
-			for (final var propertyMap : propertyMaps) {
+			final var files = getSearchResults();
+			for (final var file : files) {
+				final var propertyMap = getProperties(file);
+				if (propertyMap.isEmpty()) {
+					continue;
+				}
+
+				b.append("Inspect file: ").append(file.getFullName()).append("\n");
 				for (final var propertyCategory : propertyMap.entrySet()) {
 					b.append(propertyCategory.getKey()).append(":").append('\n');
 					for (final var property : propertyCategory.getValue().entrySet()) {
@@ -66,18 +70,7 @@ final class ShowFileProperties implements ShowAble {
 		final var results = new ArrayList<Map<String, Map<String, String>>>(files.size());
 
 		for (final var file : files) {
-			final var properties = new HashMap<String, Map<String, String>>();
-
-			for (final var propertyCollector : this.propertyCollectors) {
-				if (propertyCollector.accepts(file)) {
-					final var newProperties = propertyCollector.mapProperties(file);
-					if (newProperties == null) {
-						continue;
-					}
-
-					deepMerge(newProperties, properties);
-				}
-			}
+			final var properties = getProperties(file);
 
 			if (properties.size() != 0) {
 				results.add(properties);
@@ -85,6 +78,22 @@ final class ShowFileProperties implements ShowAble {
 		}
 
 		return results;
+	}
+
+	private Map<String, Map<String, String>> getProperties(final IdxFileLink file) {
+		final var properties = new TreeMap<String, Map<String, String>>();
+
+		for (final var propertyCollector : this.propertyCollectors) {
+			if (propertyCollector.accepts(file)) {
+				final var newProperties = propertyCollector.mapProperties(file);
+				if (newProperties == null) {
+					continue;
+				}
+
+				deepMerge(newProperties, properties);
+			}
+		}
+		return properties;
 	}
 
 	private List<IdxFileLink> getSearchResults() {
