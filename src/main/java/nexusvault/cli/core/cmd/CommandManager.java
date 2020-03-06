@@ -15,6 +15,9 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import nexusvault.cli.App;
+import nexusvault.cli.ConsoleSystem.Level;
+
 public final class CommandManager {
 
 	private final class RunnableCommand implements Runnable {
@@ -134,35 +137,38 @@ public final class CommandManager {
 	}
 
 	public void executeCommand(String[] args) throws CommandFormatException {
-		final var command = getExecuteableCommand(args);
-		if (command != null) {
-			command.run();
-		}
-	}
-
-	private RunnableCommand getExecuteableCommand(String[] args) {
 		if (args == null || args.length == 0) {
-			return null;
+			return;
 		}
 
 		final var commandName = args[0].toUpperCase();
 		args = getTail(args);
 
 		final var cmds = getCommands(commandName);
-
-		if (cmds.size() == 0) {
-			return null;
+		if (cmds.isEmpty()) {
+			App.getInstance().getConsole().println(Level.CONSOLE, String.format("No command found with name '%s'", commandName));
+			return;
 		} else if (cmds.size() > 1) {
-			// TODO multiple cmds found, inform user with choice
-			return null;
+			final var cmdNames = cmds.stream().map(c -> c.description.getCommandName()).collect(Collectors.joining(", "));
+			App.getInstance().getConsole().println(Level.CONSOLE, String.format("Multiple matching commands found: %s", cmdNames));
+			return;
 		}
 
-		final var commandContainer = cmds.get(0);
-		if (contains(args, "?") || contains(args, "help")) {
-			printCmdHelp(commandContainer);
-			return null;
+		final var cmdContainer = cmds.get(0);
+		if (contains(args, "?") || contains(args, "help")) { // only display help
+			printCmdHelp(cmdContainer);
+			return;
 		}
 
+		if (!commandName.equalsIgnoreCase(cmdContainer.description.getCommandName())) {
+			App.getInstance().getConsole().println(Level.CONSOLE, String.format("Execute command '%s'", cmdContainer.description.getCommandName()));
+		}
+
+		final var runnable = wrapAsRunnable(args, cmdContainer);
+		runnable.run();
+	}
+
+	private RunnableCommand wrapAsRunnable(String[] args, final CommandContainer commandContainer) {
 		try {
 			final var ignoreNonOptions = commandContainer.description.ignoreNonOptions() || !commandContainer.description.hasArguments();
 			final var cmdLine = this.parser.parse(commandContainer.options, args, ignoreNonOptions);
