@@ -1,32 +1,31 @@
 package nexusvault.cli.plugin.config;
 
 import nexusvault.cli.App;
-import nexusvault.cli.Command;
-import nexusvault.cli.CommandArguments;
-import nexusvault.cli.CommandInfo;
+import nexusvault.cli.core.cmd.Arguments;
+import nexusvault.cli.core.cmd.CommandDescription;
+import nexusvault.cli.core.cmd.CommandHandler;
 
-final class ConfigReloadCmd implements Command {
+final class ConfigReloadCmd implements CommandHandler {
 
 	@Override
-	public CommandInfo getCommandInfo() {
+	public CommandDescription getCommandDescription() {
 		// @formatter:off
-		return CommandInfo.newInfo()
-				.setName("config-reload")
+		return CommandDescription.newInfo()
+				.setCommandName("config-reload")
 				.setDescription("reloads the current config")
-				.setRequired(false)
-				.setNoArguments()
+				.setNoNamedArguments()
 				.build();
 		//@formatter:on
 	}
 
 	@Override
-	public void onCommand(CommandArguments args) {
+	public void onCommand(Arguments args) {
 		App.getInstance().getPlugInSystem().getPlugIn(AppBasePlugIn.class).reloadConfig();
 	}
 
 	@Override
-	public void onHelp(CommandArguments args) {
-		// TODO Auto-generated method stub
+	public String onHelp() {
+		return null;
 	}
 
 }

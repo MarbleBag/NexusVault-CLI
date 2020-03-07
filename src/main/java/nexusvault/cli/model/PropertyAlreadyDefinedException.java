@@ -1,6 +1,6 @@
 package nexusvault.cli.model;
 
-import nexusvault.cli.NexusvaultCLIBaseException;
+import nexusvault.cli.core.exception.NexusvaultCLIBaseException;
 
 public final class PropertyAlreadyDefinedException extends NexusvaultCLIBaseException {
 

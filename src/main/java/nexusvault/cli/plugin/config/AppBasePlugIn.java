@@ -2,26 +2,32 @@ package nexusvault.cli.plugin.config;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 import nexusvault.cli.App;
-import nexusvault.cli.Command;
-import nexusvault.cli.exception.FileNotFoundException;
-import nexusvault.cli.exception.FileNotReadableException;
-import nexusvault.cli.plugin.AbstPlugIn;
+import nexusvault.cli.core.exception.FileNotFoundException;
+import nexusvault.cli.core.exception.FileNotReadableException;
+import nexusvault.cli.plugin.AbstractPlugIn;
 
-public class AppBasePlugIn extends AbstPlugIn {
+public class AppBasePlugIn extends AbstractPlugIn {
 
 	public AppBasePlugIn() {
-		final List<Command> cmds = new ArrayList<>();
-		cmds.add(new AppPathCmd());
-		cmds.add(new ConfigPathCmd());
-		cmds.add(new ConfigReloadCmd());
-		cmds.add(new ConfigNoSaveCmd());
-		cmds.add(new OutputPathCmd());
-		cmds.add(new DebugModeCmd());
-		setCommands(cmds);
+		// final List<Command> cmds = new ArrayList<>();
+		// cmds.add(new ConfigPathCmd());
+		// cmds.add(new ConfigReloadCmd());
+		// cmds.add(new ConfigNoSaveCmd());
+		// cmds.add(new OutputPathCmd());
+		// cmds.add(new DebugModeCmd());
+		// setCommands(cmds);
+
+		setCommands(//
+				new OutputPathHandle()//
+		);
+
+		setArguments( //
+				new AppPathArgHandler(), //
+				new OutputPathHandle(), //
+				new ConfigPathArgHandler()//
+		);
 	}
 
 	public void setApplicationPath(Path value) {

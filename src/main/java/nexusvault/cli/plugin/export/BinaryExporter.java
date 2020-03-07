@@ -12,9 +12,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import nexusvault.archive.IdxFileLink;
+import nexusvault.archive.IdxPath;
 import nexusvault.archive.util.DataHeader;
-import nexusvault.cli.App;
 
 class BinaryExporter implements Exporter {
 
@@ -35,12 +34,10 @@ class BinaryExporter implements Exporter {
 	}
 
 	@Override
-	public void export(IdxFileLink file, ByteBuffer data) throws IOException {
-		final Path filePath = Paths.get(file.fullName());
-		final Path outputFolder = App.getInstance().getPlugIn(ExportPlugIn.class).getOutputFolder();
-
+	public void export(Path outputFolder, ByteBuffer data, IdxPath dataName) throws IOException {
+		final Path filePath = Paths.get(PathUtil.getFullName(dataName));
 		final Path exportPath = outputFolder.resolve(filePath);
-		Files.createDirectories(exportPath);
+		Files.createDirectories(exportPath.getParent());
 		try (SeekableByteChannel channel = Files.newByteChannel(exportPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE,
 				StandardOpenOption.TRUNCATE_EXISTING)) {
 			while (data.hasRemaining()) {

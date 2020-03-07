@@ -2,11 +2,16 @@ package nexusvault.cli;
 
 import java.util.function.Consumer;
 
-final class HelpCmd implements Command {
+import nexusvault.cli.core.cmd.ArgumentDescription;
+import nexusvault.cli.core.cmd.Arguments;
+import nexusvault.cli.core.cmd.CommandDescription;
+import nexusvault.cli.core.cmd.CommandHandler;
 
-	private final Consumer<CommandArguments> onCall;
+final class HelpCmd implements CommandHandler {
 
-	public HelpCmd(Consumer<CommandArguments> onCmd) {
+	private final Consumer<Arguments> onCall;
+
+	public HelpCmd(Consumer<Arguments> onCmd) {
 		if (onCmd == null) {
 			throw new IllegalArgumentException("'onCall' must not b enull");
 		}
@@ -14,26 +19,37 @@ final class HelpCmd implements Command {
 	}
 
 	@Override
-	public CommandInfo getCommandInfo() {
+	public CommandDescription getCommandDescription() {
 		// @formatter:off
-				return CommandInfo.newInfo()
-						.setName("help")
-						.setNameShort("?")
-						.setDescription("displays all available commands and descriptions")
-						.setRequired(false)
-						.setNoArguments()
-						.build();
-				//@formatter:on
+		return CommandDescription.newInfo()
+				.setCommandName("help")
+				.addAlternativeNames("?")
+				.setDescription("displays all available commands and descriptions")
+				.addNamedArgument(
+							ArgumentDescription.newInfo()
+							.setName("cmd").setDescription("show commands only")
+							.setRequired(false).setNoArguments()
+							.build()
+						)
+				.addNamedArgument(
+						ArgumentDescription.newInfo()
+						.setName("args").setDescription("show application arguments only")
+						.setRequired(false).setNoArguments()
+						.build()
+					)
+				.namedArgumentsDone()
+				.build();
+		//@formatter:on
 	}
 
 	@Override
-	public void onCommand(CommandArguments args) {
-		onCall.accept(args);
+	public void onCommand(Arguments args) {
+		this.onCall.accept(args);
 	}
 
 	@Override
-	public void onHelp(CommandArguments args) {
-
+	public String onHelp() {
+		return null;
 	}
 
 }

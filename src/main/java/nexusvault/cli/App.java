@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,13 +32,18 @@ import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.Subscribe;
-import com.google.common.eventbus.SubscriberExceptionContext;
-import com.google.common.eventbus.SubscriberExceptionHandler;
 import com.google.common.reflect.ClassPath;
 import com.google.common.reflect.ClassPath.ClassInfo;
 import com.google.common.reflect.Reflection;
 
 import nexusvault.cli.ConsoleSystem.Level;
+import nexusvault.cli.core.cmd.ArgumentHandler;
+import nexusvault.cli.core.cmd.ArgumentManager;
+import nexusvault.cli.core.cmd.ArgumentParser;
+import nexusvault.cli.core.cmd.Arguments;
+import nexusvault.cli.core.cmd.CommandFormatException;
+import nexusvault.cli.core.cmd.CommandHandler;
+import nexusvault.cli.core.cmd.CommandManager;
 import nexusvault.cli.model.ModelPropertyChangedEvent;
 import nexusvault.cli.plugin.config.AppConfigModel;
 import nexusvault.cli.plugin.config.AppConfigModel.AppConfigAppPathChangedEvent;
@@ -67,9 +73,11 @@ public final class App {
 	private PlugInSystem plugInSystem;
 	private CLISystem cliSystem;
 	private BaseConsoleSystem console;
+
 	@Deprecated
 	private ModelSystem modelSystem;
 
+	private ArgumentManager argumentManager;
 	private CommandManager commandManager;
 
 	private boolean processConsole;
@@ -82,50 +90,52 @@ public final class App {
 	}
 
 	public EventSystem getEventSystem() {
-		return eventSystem;
+		return this.eventSystem;
 	}
 
 	public AppConfigModel getAppConfig() {
-		return appConfig;
+		return this.appConfig;
 	}
 
 	public CLISystem getCLI() {
-		return cliSystem;
+		return this.cliSystem;
 	}
 
 	public PlugInSystem getPlugInSystem() {
-		return plugInSystem;
+		return this.plugInSystem;
 	}
 
 	public ConsoleSystem getConsole() {
-		return console;
+		return this.console;
 	}
 
 	@Deprecated
 	public ModelSystem getModelSystem() {
-		return modelSystem;
+		return this.modelSystem;
 	}
 
 	// shortcut
 	public <T extends PlugIn> T getPlugIn(Class<T> plugInClass) {
-		return plugInSystem.getPlugIn(plugInClass);
+		return this.plugInSystem.getPlugIn(plugInClass);
 	}
 
-	public void initializeApp(boolean headlessMode) throws IOException {
-		initializeModel(headlessMode);
+	public void initializeApp() throws IOException {
+		initializeModel();
+		initializeAppProperties();
 		// initializeLogging();
 		// updateLogger();
-		initializeConsole(headlessMode);
+		initializeConsole();
 		initializeEventSystem();
 		initializeCLI();
 
 		initializePlugIns();
 
 		// loadConfig();
+	}
 
-		if (!headlessMode) {
-			getConsole().println(Level.CONSOLE, "Console mode: Enter 'help' to get a list of available commands."); // TODO
-		}
+	protected void setHeadlessMode() {
+		this.console.setHeadlessMode(true);
+		this.appConfig.setHeadlessMode(true);
 	}
 
 	private void updateLogger() {
@@ -199,7 +209,7 @@ public final class App {
 		final ComponentBuilder<?> rolloverStrategy = builder.newComponent("DefaultRolloverStrategy");
 		rolloverStrategy.addAttribute("fileIndex", "min");
 		rolloverStrategy.addAttribute("min", 1);
-		rolloverStrategy.addAttribute("max", 5);
+		rolloverStrategy.addAttribute("max", 4);
 
 		final String logName = getAppConfig().getReportFolder().resolve("app.log").toString();
 		final String logPattern = getAppConfig().getReportFolder().resolve("app-%i.log").toString();
@@ -220,7 +230,7 @@ public final class App {
 		Configurator.initialize(config);
 	}
 
-	private void initializeConsole(boolean headlessMode) {
+	private void initializeConsole() {
 		final PrintWriter reportTo = new PrintWriter(System.out);
 		final BaseConsoleSystem.MsgHandle handle = (msg) -> {
 			if (msg.lineEnd) {
@@ -231,106 +241,128 @@ public final class App {
 			reportTo.flush();
 		};
 		final BaseConsoleSystem console = new BaseConsoleSystem(handle);
-		console.setHeadlessMode(headlessMode);
 		this.console = console;
 
 		LogManager.getLogger(App.class);
 	}
 
 	private void initializeCLI() {
-		commandManager = new CommandManager();
-		cliSystem = new CLISystem() {
+		this.argumentManager = new ArgumentManager();
+		this.commandManager = new CommandManager();
+
+		this.cliSystem = new CLISystem() {
 			@Override
-			public void registerCommand(Command cmd) {
-				commandManager.registerCommand(cmd);
+			public void registerCommand(CommandHandler cmd) {
+				App.this.commandManager.registerCommand(cmd);
 			}
 
 			@Override
-			public void unregisterCommand(Command cmd) {
-				commandManager.unregisterCommand(cmd);
+			public void unregisterCommand(CommandHandler cmd) {
+				App.this.commandManager.unregisterCommand(cmd);
 			}
 
 			@Override
-			public void printHelp() {
-				final PrintHelpContext context = new PrintHelpContext("nexusvault", new PrintWriter(System.out));
-
-				final String header = "Tool to extract data from the wildstar game archive. Some commands are only available in console-mode and can be entered without '--'. To close the app in console-mode enter 'exit'. A command followed by '?' will, if available, show a command specific help.";
-				context.setHeader(header);
-
-				final String footer = "footer";
-				context.setFooter(footer);
-
-				context.setWidth(120);
-
-				// TODO
-				commandManager.printHelp(context);
+			public void registerStartArgumentHandler(ArgumentHandler handler) {
+				App.this.argumentManager.registerArgumentHandler(handler);
 			}
+
 		};
 
-		commandManager.registerCommand(new ExitCmd((args) -> this.requestShutDown()));
-		commandManager.registerCommand(new HelpCmd((args) -> this.cliSystem.printHelp()));
-		commandManager.registerCommand(new HeadlessModeCmd());
+		this.argumentManager.registerArgumentHandler(new HeadlessModeArgument());
+		this.commandManager.registerCommand(new ExitCmd((args) -> requestShutDown()));
+		this.commandManager.registerCommand(new SetCmd((args) -> setArguments(args.getUnnamedArgs())));
+		this.commandManager.registerCommand(new HelpCmd((args) -> printHelp(args)));
+		this.commandManager.registerCommand(new AboutCmd());
+	}
+
+	private void printHelp(Arguments args) {
+		final var output = new PrintWriter(System.out);
+		if (args.isNamedArgumentSet("cmd")) {
+			App.this.commandManager.printHelp(output);
+		} else if (args.isNamedArgumentSet("args")) {
+			App.this.argumentManager.printHelp(output);
+		} else {
+			App.this.argumentManager.printHelp(output);
+			App.this.commandManager.printHelp(output);
+		}
 	}
 
 	@Deprecated
-	private void initializeModel(boolean headlessMode) {
-		modelSystem = new BaseModelSystem();
+	private void initializeModel() {
+		this.modelSystem = new BaseModelSystem();
 
-		appConfig = new AppConfigModel();
-		appConfig.setApplicationPath(getProjectLocation());
-		appConfig.setDebugMode(false);
-		appConfig.setHeadlessMode(headlessMode);
+		// maybe move this to AppBasePlugIn
+		this.appConfig = new AppConfigModel();
+		this.appConfig.setApplicationPath(getProjectLocation());
+		this.appConfig.setDebugMode(false);
+		// this.appConfig.setHeadlessMode(headlessMode);
 
-		modelSystem.registerModel(AppConfigModel.class, appConfig);
+		this.modelSystem.registerModel(AppConfigModel.class, this.appConfig);
+	}
+
+	private void initializeAppProperties() {
+		// maybe move this to AppBasePlugIn
+		final var properties = new Properties();
+
+		final var classLoader = this.getClass().getClassLoader();
+		final var propertyContent = classLoader.getResourceAsStream("app.properties");
+		if (propertyContent != null) {
+			try (propertyContent) {
+				properties.load(propertyContent);
+			} catch (final IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if (properties.containsKey("app.version")) {
+			getAppConfig().setApplicationVersion(properties.getProperty("app.version"));
+		}
 	}
 
 	private void initializeEventSystem() {
 		// TODO
-		eventSystem = new EventBusSystem(new SubscriberExceptionHandler() {
-			@Override
-			public void handleException(Throwable exception, SubscriberExceptionContext context) {
-				// TODO Auto-generated method stub
-				throw new RuntimeException(exception);
-			}
+		this.eventSystem = new EventBusSystem((exception, context) -> {
+			// TODO Auto-generated method stub
+			throw new RuntimeException(exception);
 		});
 
-		eventSystem.registerEventHandler(new AppConfigObserver()); // TODO
+		this.eventSystem.registerEventHandler(new AppConfigObserver()); // TODO
 	}
 
 	private final class AppConfigObserver {
 		@Subscribe
 		public void onAppConfigChangedEvent(ModelPropertyChangedEvent<?> event) {
 			App.this.console.println(Level.CONSOLE, () -> {
-				if ((event.getOldValue() == null) && (event.getNewValue() == null)) {
-					return String.format("Property %s changed", event.getEventName());
+				if (event.getOldValue() == null && event.getNewValue() == null) {
+					return String.format("Property '%s' changed", event.getEventName());
 				} else if (event.getOldValue() == null) {
-					return String.format("Set %s to: '%s'", event.getEventName(), event.getNewValue());
+					return String.format("Set '%s' to: '%s'", event.getEventName(), event.getNewValue());
 				} else {
-					return String.format("Change %s\nfrom: '%s'\nto: '%s'", event.getEventName(), event.getOldValue(), event.getNewValue());
+					return String.format("Change '%s'\nfrom: '%s'\nto: '%s'", event.getEventName(), event.getOldValue(), event.getNewValue());
 				}
 			});
 
 			if (event instanceof AppConfigDebugModeChangedEvent) {
 				App.this.console.setDebugMode((Boolean) event.getNewValue());
 			} else if (event instanceof AppConfigAppPathChangedEvent) {
-				App.this.updateLogger();
+				updateLogger();
 			}
 		}
 	}
 
 	private void initializePlugIns() throws IOException {
-		plugInSystem = new BasePlugInProvider();
+		this.plugInSystem = new BasePlugInProvider();
 
 		final List<PlugIn> objs = initializeComponents("nexusvault.cli.plugin", PlugIn.class);
 		for (final PlugIn obj : objs) {
-			plugInSystem.registerPlugIn(obj.getClass(), obj);
+			this.plugInSystem.registerPlugIn(obj.getClass(), obj);
 		}
 
 		for (final PlugIn obj : objs) {
 			obj.initialize();
 		}
 
-		console.println(Level.DEBUG, "Plugin: " + objs.size() + " plugin(s) found.");
+		this.console.println(Level.DEBUG, "Plugin: " + objs.size() + " plugin(s) found.");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -366,10 +398,18 @@ public final class App {
 		}
 	}
 
-	public void startApp(String[] startUpArgs) {
-		commandManager.runArguments(startUpArgs);
-		// TODO
+	public void startApp(String[] args) {
+		setArguments(args);
+
+		getConsole().println(Level.CONSOLE, "Console mode: Enter 'help' to get a list of available commands."); // TODO
+
 		processConsole();
+
+		this.console.println(Level.CONSOLE, "Closing app");
+	}
+
+	protected void setArguments(String[] args) {
+		this.argumentManager.runArguments(args);
 	}
 
 	public void closeApp() {
@@ -401,9 +441,9 @@ public final class App {
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 		String line = null;
 
-		processConsole = true; // TODO
+		this.processConsole = true; // TODO
 		String[] arguments = null;
-		while (processConsole) {
+		while (this.processConsole) {
 			try {
 				line = reader.readLine();
 				if (line == null) {
@@ -411,18 +451,18 @@ public final class App {
 				}
 				line = line.trim();
 
-				if (line.length() > 0) {
-					if (!line.startsWith("-") && !line.startsWith("--")) {
-						line = "--" + line;
-					}
-				}
+				// if (line.length() > 0) {
+				// if (!line.startsWith("-") && !line.startsWith("--")) {
+				// line = "--" + line;
+				// }
+				// }
 
-				arguments = commandManager.parseArguments(line);
-				commandManager.runArguments(arguments);
+				arguments = ArgumentParser.parseArguments(line);
+				this.commandManager.executeCommand(arguments);
 
 			} catch (final CommandFormatException e1) {
 				logger.error(String.format("Error at cmd(s): %s", Arrays.toString(arguments)), e1);
-				console.println(Level.CONSOLE, () -> {
+				this.console.println(Level.CONSOLE, () -> {
 					final StringBuilder msg = new StringBuilder();
 					msg.append("Command not executable\n");
 					msg.append(e1.getMessage()).append("\n");
@@ -430,7 +470,7 @@ public final class App {
 				});
 			} catch (final Exception e2) {
 				logger.error(String.format("Error at cmd(s): %s", Arrays.toString(arguments)), e2);
-				console.println(Level.CONSOLE, () -> {
+				this.console.println(Level.CONSOLE, () -> {
 					final StringBuilder msg = new StringBuilder();
 					msg.append("An error occured: (The error log contains more detailed informations)\n");
 					msg.append(e2.getClass().toString()).append(" : ").append(e2.getMessage()).append("\n");
@@ -443,12 +483,10 @@ public final class App {
 				});
 			}
 		}
-
-		console.println(Level.CONSOLE, "Closing app");
 	}
 
 	public void requestShutDown() {
-		processConsole = false;
+		this.processConsole = false;
 	}
 
 }

@@ -2,7 +2,28 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com)
 
-## [Unreleased] 
+## [0.2.0] -  Unreleased
+### Added
+- Support for m3 to wavefront obj export
+- Command 'export-m3-texture': By default on. If set to off, m3 exporters will no longer export textures, which are referenced by the model. (UV maps are still included)
+- Command 'export-tex-split': By default on. If set to off, tex exporters will no longer split textures, which contain more than just colors, into sub-images, which containing more specific data.
+- Command 'show': new sub-command available to show file meta data
+- Command 'about': shows about page
+
+
+### Changed
+- App does no longer accept commands on start
+
+### Fixed
+- 'convert-file' will no longer lock the process
+
+## [0.1.3]
+### Added
+- Convert command 'convert-file'. Allows to directly convert exported or otherwise acquired binary data from Wildstar.
+
+### Changed
+- Search command. Will now write its results directly to file. The file will be loaded, if the search results are requested.
+- Switch from Java 8 to Java 11
 
 ## [0.1.2] - 2019-02-11
 ### Added

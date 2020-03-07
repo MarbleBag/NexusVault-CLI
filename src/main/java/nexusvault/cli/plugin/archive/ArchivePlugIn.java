@@ -1,6 +1,5 @@
 package nexusvault.cli.plugin.archive;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -28,20 +27,39 @@ import kreed.util.property.PropertyListener;
 import kreed.util.property.provider.ConstantProvider;
 import nexusvault.archive.IdxDirectory;
 import nexusvault.archive.IdxEntry;
-import nexusvault.archive.util.ArchivePath;
+import nexusvault.archive.IdxPath;
 import nexusvault.cli.App;
-import nexusvault.cli.Command;
 import nexusvault.cli.ConsoleSystem.Level;
 import nexusvault.cli.EventSystem;
 import nexusvault.cli.model.ModelPropertyChangedEvent;
 import nexusvault.cli.model.ModelSet;
 import nexusvault.cli.model.PropertyKey;
 import nexusvault.cli.model.PropertyOption;
-import nexusvault.cli.plugin.AbstPlugIn;
+import nexusvault.cli.plugin.AbstractPlugIn;
 
-public final class ArchivePlugIn extends AbstPlugIn {
+public final class ArchivePlugIn extends AbstractPlugIn {
 
 	private final static Logger logger = LogManager.getLogger(ArchivePlugIn.class);
+
+	public static abstract class ArchiveEvent {
+
+	}
+
+	public static final class ArchiveLoadedEvent extends ArchiveEvent {
+
+		public ArchiveLoadedEvent(Path archivePath) {
+			// TODO Auto-generated constructor stub
+		}
+
+	}
+
+	public static final class ArchiveDisposedEvent extends ArchiveEvent {
+
+		public ArchiveDisposedEvent(Path archivePath) {
+			// TODO Auto-generated constructor stub
+		}
+
+	}
 
 	public static abstract class ArchiveModelChangedEvent<T> extends ModelPropertyChangedEvent<T> {
 		private ArchiveModelChangedEvent(String eventName, T oldValue, T newValue) {
@@ -55,8 +73,8 @@ public final class ArchivePlugIn extends AbstPlugIn {
 		}
 	}
 
-	public static final class ArchiveModelPathPointerChangedEvent extends ArchiveModelChangedEvent<ArchivePath> {
-		private ArchiveModelPathPointerChangedEvent(ArchivePath oldValue, ArchivePath newValue) {
+	public static final class ArchiveModelPathPointerChangedEvent extends ArchiveModelChangedEvent<IdxPath> {
+		private ArchiveModelPathPointerChangedEvent(IdxPath oldValue, IdxPath newValue) {
 			super("Inner Archive Path", oldValue, newValue);
 		}
 	}
@@ -70,7 +88,7 @@ public final class ArchivePlugIn extends AbstPlugIn {
 	private static final class ArchiveModel {
 		private static enum Key implements PropertyKey<Key> {
 			ARCHIVE_PATHS(new PropertyOption<Key>("archive.paths", true, Set.class, new ConstantProvider<>(Collections.emptySet()))),
-			INNER_PATH(new PropertyOption<Key>("archive.pointer", false, ArchivePath.class, new ConstantProvider<>(new ArchivePath()))),
+			INNER_PATH(new PropertyOption<Key>("archive.pointer", false, IdxPath.class, new ConstantProvider<>(IdxPath.createPath()))),
 			ARCHIVES(new PropertyOption<Key>("archive.vaults", false, List.class, new ConstantProvider<>(Collections.emptyList())));
 
 			private final PropertyOption<Key> opt;
@@ -81,16 +99,16 @@ public final class ArchivePlugIn extends AbstPlugIn {
 
 			@Override
 			public PropertyOption<Key> getOptions() {
-				return opt;
+				return this.opt;
 			}
 		}
 
 		private final ModelSet<Key> data;
 
 		public ArchiveModel() {
-			data = new ModelSet<>(Arrays.asList(Key.values()));
+			this.data = new ModelSet<>(Arrays.asList(Key.values()));
 
-			data.setListener(new PropertyListener<Key>() {
+			this.data.setListener(new PropertyListener<Key>() {
 				@SuppressWarnings("unchecked")
 				@Override
 				public void onPropertyChange(PropertyChangedEvent<Key> property) {
@@ -107,7 +125,7 @@ public final class ArchivePlugIn extends AbstPlugIn {
 							eventSystem.postEvent(new ArchiveModelArchivePathsChangedEvent((Set<Path>) property.oldValue, (Set<Path>) property.newValue));
 							break;
 						case INNER_PATH:
-							eventSystem.postEvent(new ArchiveModelPathPointerChangedEvent((ArchivePath) property.oldValue, (ArchivePath) property.newValue));
+							eventSystem.postEvent(new ArchiveModelPathPointerChangedEvent((IdxPath) property.oldValue, (IdxPath) property.newValue));
 							break;
 						default:
 							break;
@@ -118,35 +136,35 @@ public final class ArchivePlugIn extends AbstPlugIn {
 		}
 
 		protected void setArchivePaths(Set<Path> pathes) {
-			if ((pathes == null) || pathes.isEmpty()) {
-				data.clearProperty(Key.ARCHIVE_PATHS);
+			if (pathes == null || pathes.isEmpty()) {
+				this.data.clearProperty(Key.ARCHIVE_PATHS);
 			} else {
-				data.setProperty(Key.ARCHIVE_PATHS, Collections.unmodifiableSet(new HashSet<>(pathes)));
+				this.data.setProperty(Key.ARCHIVE_PATHS, Collections.unmodifiableSet(new HashSet<>(pathes)));
 			}
 		}
 
 		public Set<Path> getArchivePaths() {
-			return data.getProperty(Key.ARCHIVE_PATHS);
+			return this.data.getProperty(Key.ARCHIVE_PATHS);
 		}
 
-		protected void setArchives(List<SourcedVaultReader> vaults) {
-			if ((vaults == null) || vaults.isEmpty()) {
-				data.clearProperty(Key.ARCHIVES);
+		protected void setArchives(List<NexusArchiveWrapper> vaults) {
+			if (vaults == null || vaults.isEmpty()) {
+				this.data.clearProperty(Key.ARCHIVES);
 			} else {
-				data.setProperty(Key.ARCHIVES, Collections.unmodifiableList(new ArrayList<>(vaults)));
+				this.data.setProperty(Key.ARCHIVES, Collections.unmodifiableList(new ArrayList<>(vaults)));
 			}
 		}
 
-		protected List<SourcedVaultReader> getArchives() {
-			return data.getProperty(Key.ARCHIVES);
+		protected List<NexusArchiveWrapper> getArchives() {
+			return this.data.getProperty(Key.ARCHIVES);
 		}
 
-		public ArchivePath getInnerArchivePath() {
-			return data.getProperty(Key.INNER_PATH);
+		public IdxPath getInnerArchivePath() {
+			return this.data.getProperty(Key.INNER_PATH);
 		}
 
-		protected void setInnerArchivePath(ArchivePath path) {
-			data.setProperty(Key.INNER_PATH, path);
+		protected void setInnerArchivePath(IdxPath path) {
+			this.data.setProperty(Key.INNER_PATH, path);
 		}
 	}
 
@@ -163,30 +181,34 @@ public final class ArchivePlugIn extends AbstPlugIn {
 
 		@Subscribe
 		public void onPathChanged(ArchiveModelArchivePathsChangedEvent event) {
-			callback.call();
+			this.callback.call();
 		}
 	}
 
+	private ArchiveModel model;
 	private boolean reloadArchive;
 
 	public ArchivePlugIn() {
 		final List<Object> listener = new ArrayList<>();
 		listener.add(new ArchivePathChangedEventListener(() -> this.reloadArchive = true));
 		setEventListener(listener);
+
 	}
 
 	@Override
-	public void initialize() {
-		final List<Command> cmds = new ArrayList<>();
-		cmds.add(new ArchivePathCmd());
-		if (!App.getInstance().getAppConfig().getHeadlessMode()) {
-			cmds.add(new NavigatorChangeDirectoryCmd());
-			cmds.add(new NavigatorListDirectoryContentCmd());
-		}
-		setCommands(cmds);
+	public void initialize() { // TODO
+		setCommands( //
+				new ArchivePathHandler(), //
+				new NavigatorListDirectoryContentCmd(), //
+				new NavigatorChangeDirectoryCmd() //
+		);
+
+		setArguments( //
+				new ArchivePathHandler()//
+		);
 
 		super.initialize();
-		App.getInstance().getModelSystem().registerModel(ArchiveModel.class, new ArchiveModel());
+		this.model = new ArchiveModel();
 	}
 
 	@Override
@@ -196,31 +218,31 @@ public final class ArchivePlugIn extends AbstPlugIn {
 	}
 
 	public void listDirectoryContent() {
-		final List<SourcedVaultReader> archives = loadArchives();
-		if (archives.isEmpty()) {
+		final List<NexusArchiveWrapper> wrappers = getArchives();
+		if (wrappers.isEmpty()) {
 			sendMsg("No vaults are loaded. Use 'help' to learn how to load them");
 			return;
 		}
 
-		final ArchivePath path = App.getInstance().getModelSystem().getModel(ArchiveModel.class).getInnerArchivePath();
+		final IdxPath path = this.model.getInnerArchivePath();
 
-		for (final SourcedVaultReader archive : archives) {
-			final IdxDirectory rootFolder = archive.getReader().getRootFolder();
+		for (final NexusArchiveWrapper wrapper : wrappers) {
+			final IdxDirectory rootFolder = wrapper.getArchive().getRootDirectory();
 			if (!path.isResolvable(rootFolder)) {
 				continue;
 			}
 
-			sendMsg("Archive: '" + archive.getSource() + "'");
+			sendMsg("Archive: '" + wrapper.getSource() + "'");
 
 			final IdxEntry resolvedEntry = path.resolve(rootFolder);
 			if (resolvedEntry.isFile()) {
-				sendMsg("\tFile: " + resolvedEntry.fullName());
+				sendMsg("\tFile: " + resolvedEntry.getFullName());
 			} else {
 				for (final IdxEntry child : resolvedEntry.asDirectory().getChilds()) {
 					if (child.isDir()) {
-						sendMsg("\tDir: " + child.fullName());
+						sendMsg("\tDir: " + child.getFullName());
 					} else {
-						sendMsg("\tFile: " + child.fullName());
+						sendMsg("\tFile: " + child.getFullName());
 					}
 				}
 			}
@@ -228,26 +250,26 @@ public final class ArchivePlugIn extends AbstPlugIn {
 	}
 
 	public void changeDirectory(String target) {
-		final List<SourcedVaultReader> archives = loadArchives();
-		if (archives.isEmpty()) {
+		final List<NexusArchiveWrapper> wrappers = getArchives();
+		if (wrappers.isEmpty()) {
 			sendMsg("No vaults are loaded. Use 'help' to learn how to load them");
 			return;
 		}
 
-		ArchivePath path = App.getInstance().getModelSystem().getModel(ArchiveModel.class).getInnerArchivePath();
+		IdxPath path = this.model.getInnerArchivePath();
 
 		target = Paths.get(target).toString();
-		if (target.startsWith(File.separator)) {
+		if (target.startsWith(IdxPath.SEPARATOR)) {
 			path = path.getRoot();
 		}
 
-		final String[] steps = target.split(Pattern.quote(File.separator));
-		ArchivePath newPath = path;
+		final String[] steps = target.split(Pattern.quote(IdxPath.SEPARATOR));
+		IdxPath newPath = path;
 		for (final String step : steps) {
 			newPath = newPath.resolve(step);
 			boolean isResolvable = false;
-			for (final SourcedVaultReader archive : archives) {
-				isResolvable |= newPath.isResolvable(archive.getReader().getRootFolder());
+			for (final NexusArchiveWrapper wrapper : wrappers) {
+				isResolvable |= newPath.isResolvable(wrapper.getArchive().getRootDirectory());
 				if (isResolvable) {
 					break;
 				}
@@ -258,38 +280,37 @@ public final class ArchivePlugIn extends AbstPlugIn {
 			}
 		}
 
-		App.getInstance().getModelSystem().getModel(ArchiveModel.class).setInnerArchivePath(newPath);
+		this.model.setInnerArchivePath(newPath);
 	}
 
-	public ArchivePath getPathWithinArchives() {
-		return App.getInstance().getModelSystem().getModel(ArchiveModel.class).getInnerArchivePath();
+	public IdxPath getPathWithinArchives() {
+		return this.model.getInnerArchivePath();
 	}
 
 	public void unloadArchives() {
-		final List<SourcedVaultReader> readers = App.getInstance().getModelSystem().getModel(ArchiveModel.class).getArchives();
-		App.getInstance().getModelSystem().getModel(ArchiveModel.class).setArchives(null);
-		for (final SourcedVaultReader reader : readers) {
-			reader.getReader().dispose();
+		final List<NexusArchiveWrapper> wrappers = this.model.getArchives();
+		this.model.setArchives(null);
+		for (final NexusArchiveWrapper wrapper : wrappers) {
+			wrapper.dispose();
 		}
-		reloadArchive = true;
+		this.model.setArchives(Collections.emptyList());
+		this.reloadArchive = true;
 	}
 
-	public List<SourcedVaultReader> loadArchives() {
-		final ArchiveModel model = App.getInstance().getModelSystem().getModel(ArchiveModel.class);
-
-		if (reloadArchive) {
+	public List<NexusArchiveWrapper> getArchives() {
+		if (this.reloadArchive) {
 			unloadArchives();
-			loadArchives(model);
-			return model.getArchives();
+			loadArchives();
+			return this.model.getArchives();
 		} else {
 			// maybe check for disposed readers and try to reload them
-			return model.getArchives();
+			return this.model.getArchives();
 		}
 	}
 
-	private void loadArchives(final ArchiveModel model) {
-		final Set<Path> paths = model.getArchivePaths();
-		final List<SourcedVaultReader> readers = new LinkedList<>();
+	private void loadArchives() {
+		final Set<Path> paths = this.model.getArchivePaths();
+		final List<NexusArchiveWrapper> wrappers = new LinkedList<>();
 
 		if (paths.isEmpty()) {
 			App.getInstance().getConsole().println(Level.CONSOLE, () -> String.format("No paths to archives set"));
@@ -299,27 +320,22 @@ public final class ArchivePlugIn extends AbstPlugIn {
 
 		for (final Path path : paths) {
 			try {
-				final SourcedVaultReader vault = new SourcedVaultReader(path);
-				vault.load();
-				readers.add(vault);
-				App.getInstance().getConsole().println(Level.CONSOLE, () -> String.format("Archive '%s' loaded", path));
+				final NexusArchiveWrapper wrapper = new NexusArchiveWrapper(path);
+				wrapper.load();
+				wrappers.add(wrapper);
+				// App.getInstance().getConsole().println(Level.CONSOLE, () -> String.format("Archive '%s' loaded", path));
 			} catch (final ArchiveCanNotBeLoadedException e) {
 				throw e;
-				// if (e.getCause() != null) {
-				// App.getInstance().getConsole().println(Level.ERROR, () -> e.getLocalizedMessage() + " : " + e.getCause().getLocalizedMessage());
-				// } else {
-				// App.getInstance().getConsole().println(Level.ERROR, () -> e.getLocalizedMessage());
-				// }
 			}
 		}
 
-		model.setArchives(readers);
-		reloadArchive = false;
+		this.model.setArchives(wrappers);
+		this.reloadArchive = false;
 	}
 
 	public void setArchivePaths(List<Path> paths) {
 		final Set<Path> archivePaths = findValidArchivePaths(paths);
-		App.getInstance().getModelSystem().getModel(ArchiveModel.class).setArchivePaths(archivePaths);
+		this.model.setArchivePaths(archivePaths);
 	}
 
 	private Set<Path> findValidArchivePaths(Collection<Path> paths) {
@@ -362,10 +378,10 @@ public final class ArchivePlugIn extends AbstPlugIn {
 					}
 					final String fileName = file.getFileName().toString();
 					if (fileName.toLowerCase().endsWith(".archive")) {
-						archiveFound.add(file);
+						this.archiveFound.add(file);
 					}
 					if (fileName.toLowerCase().endsWith(".index")) {
-						indexFound.add(file);
+						this.indexFound.add(file);
 					}
 					return FileVisitResult.CONTINUE;
 				}
@@ -374,17 +390,17 @@ public final class ArchivePlugIn extends AbstPlugIn {
 				public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
 					super.postVisitDirectory(dir, exc);
 
-					for (final Path archive : archiveFound) {
+					for (final Path archive : this.archiveFound) {
 						String fileName = archive.getFileName().toString();
 						fileName = fileName.substring(0, fileName.lastIndexOf(".archive")) + ".index";
 						final Path idxPath = archive.resolveSibling(fileName);
-						if (indexFound.contains(idxPath)) {
+						if (this.indexFound.contains(idxPath)) {
 							archivePaths.add(archive);
 						}
 					}
 
-					archiveFound.clear();
-					indexFound.clear();
+					this.archiveFound.clear();
+					this.indexFound.clear();
 					return FileVisitResult.CONTINUE;
 				}
 

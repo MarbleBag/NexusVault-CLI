@@ -1,13 +1,14 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>nexusvault</groupId>
 	<artifactId>nexusvault.cli</artifactId>
-	<version>0.1.2</version>
+	<version>0.2.0</version>
 
 	<properties>
-		<project.java.version>1.8</project.java.version>
+		<project.java.version>11</project.java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<project.application.exe.name>NexusvaultCLI</project.application.exe.name>
@@ -16,9 +17,9 @@
 
 	<repositories>
 		<repository>
-			<id>integrated.maven.repo</id>
-			<name>imavo</name>
-			<url>file:${project.basedir}\libs</url>
+			<id>nexusvault.localrepo</id>
+			<name>local-maven-repo</name>
+			<url>file:\\\${project.basedir}\maven-repo</url>
 		</repository>
 	</repositories>
 
@@ -29,10 +30,9 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.7.0</version>
+				<version>3.8.0</version>
 				<configuration>
-					<source>${project.java.version}</source>
-					<target>${project.java.version}</target>
+					<release>${project.java.version}</release>
 					<encoding>${project.build.sourceEncoding}</encoding>
 				</configuration>
 			</plugin>
@@ -57,7 +57,7 @@
 					</archive>
 				</configuration>
 			</plugin>
-
+ 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -99,7 +99,7 @@
 								<path>jre</path>
 								<bundledJre64Bit>true</bundledJre64Bit>
 								<bundledJreAsFallback>false</bundledJreAsFallback>
-								<minVersion>1.8.0</minVersion>
+								<minVersion>11.0</minVersion>
 								<jdkPreference>preferJre</jdkPreference>
 								<runtimeBits>64/32</runtimeBits>
 							</jre>
@@ -107,15 +107,39 @@
 					</execution>
 				</executions>
 			</plugin>
-
 		</plugins>
+
+		<resources>
+			<resource>
+				<directory>docs</directory>
+				<targetPath>doc</targetPath>
+				<filtering>false</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<resource>
+	          <directory>src/main/resources-filtered</directory>
+	          <filtering>true</filtering>
+	        </resource>
+		</resources>
 	</build>
 
 	<dependencies>
 		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.11.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.11.2</version>
+		</dependency>
+		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>27.0.1-jre</version>
+			<version>27.1-jre</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-cli</groupId>
@@ -135,12 +159,7 @@
 		<dependency>
 			<groupId>nexusvault</groupId>
 			<artifactId>nexusvault</artifactId>
-			<version>[2,3)</version>
-		</dependency>
-		<dependency>
-			<groupId>nexusvault</groupId>
-			<artifactId>nexusvault.format.tbl</artifactId>
-			<version>[1,2)</version>
+			<version>[3,4)</version>
 		</dependency>
 		<dependency>
 			<groupId>nexusvault</groupId>
@@ -150,12 +169,17 @@
 		<dependency>
 			<groupId>nexusvault</groupId>
 			<artifactId>nexusvault.format.tex</artifactId>
-			<version>[0,2)</version>
+			<version>[3.1,4)</version>
+		</dependency>
+		<dependency>
+			<groupId>nexusvault</groupId>
+			<artifactId>nexusvault.format.tbl</artifactId>
+			<version>[1,2)</version>
 		</dependency>
 		<dependency>
 			<groupId>nexusvault</groupId>
 			<artifactId>nexusvault.format.m3</artifactId>
-			<version>[0,2)</version>
+			<version>[0,1)</version>
 		</dependency>
 		<dependency>
 			<groupId>nexusvault</groupId>
@@ -163,14 +187,9 @@
 			<version>[0,2)</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId>
-			<version>2.11.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-core</artifactId>
-			<version>2.11.2</version>
+			<groupId>nexusvault</groupId>
+			<artifactId>nexusvault.format.m3.export.obj</artifactId>
+			<version>[0,2)</version>
 		</dependency>
 	</dependencies>
 </project>
