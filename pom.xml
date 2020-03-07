@@ -17,9 +17,9 @@
 
 	<repositories>
 		<repository>
-			<id>integrated.maven.repo</id>
-			<name>imavo</name>
-			<url>file:${project.basedir}\libs</url>
+			<id>nexusvault.localrepo</id>
+			<name>local-maven-repo</name>
+			<url>file:\\\${project.basedir}\maven-repo</url>
 		</repository>
 	</repositories>
 
@@ -57,7 +57,7 @@
 					</archive>
 				</configuration>
 			</plugin>
-
+ 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
