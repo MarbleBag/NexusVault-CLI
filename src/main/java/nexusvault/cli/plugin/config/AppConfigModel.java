@@ -3,10 +3,9 @@ package nexusvault.cli.plugin.config;
 import java.nio.file.Path;
 import java.util.Arrays;
 
-import kreed.util.property.PropertyChangedEvent;
-import kreed.util.property.PropertyListener;
 import kreed.util.property.provider.BoolProvider;
 import kreed.util.property.provider.PathExtensionProvider;
+import kreed.util.property.provider.StringProvider;
 import nexusvault.cli.App;
 import nexusvault.cli.EventSystem;
 import nexusvault.cli.model.ModelPropertyChangedEvent;
@@ -59,7 +58,8 @@ public final class AppConfigModel {
 		REPORT_PATH(new PropertyOption<Key>("report.path", false, Path.class)),
 		HEADLESS_MODE(new PropertyOption<Key>("app.headless", false, Boolean.class, new BoolProvider<>(false))),
 		DEBUG_MODE(new PropertyOption<Key>("app.debug", false, Boolean.class, new BoolProvider<>(false))),
-		DONT_SAVE_CONFIG(new PropertyOption<Key>("config.save.deactivate", false, Boolean.class, new BoolProvider<>(false)));
+		DONT_SAVE_CONFIG(new PropertyOption<Key>("config.save.deactivate", false, Boolean.class, new BoolProvider<>(false))),
+		APP_VERSION(new PropertyOption<Key>("app.version", false, String.class, new StringProvider<>("0.0.0")));
 
 		private final PropertyOption<Key> opt;
 
@@ -72,103 +72,111 @@ public final class AppConfigModel {
 
 		@Override
 		public PropertyOption<Key> getOptions() {
-			return opt;
+			return this.opt;
 		}
 	}
 
 	private final ModelSet<Key> data;
 
 	public AppConfigModel() {
-		data = new ModelSet<>(Arrays.asList(Key.values()));
+		this.data = new ModelSet<>(Arrays.asList(Key.values()));
 
-		data.setPropertyProvider(Key.OUTPUT_PATH, new PathExtensionProvider<AppConfigModel.Key>(this::getApplicationPath, "output"));
-		data.setPropertyProvider(Key.CONFIG_PATH, new PathExtensionProvider<AppConfigModel.Key>(this::getApplicationPath, "config.json"));
-		data.setPropertyProvider(Key.REPORT_PATH, new PathExtensionProvider<AppConfigModel.Key>(this::getApplicationPath, "report"));
+		this.data.setPropertyProvider(Key.OUTPUT_PATH, new PathExtensionProvider<AppConfigModel.Key>(this::getApplicationPath, "output"));
+		this.data.setPropertyProvider(Key.CONFIG_PATH, new PathExtensionProvider<AppConfigModel.Key>(this::getApplicationPath, "config.json"));
+		this.data.setPropertyProvider(Key.REPORT_PATH, new PathExtensionProvider<AppConfigModel.Key>(this::getApplicationPath, "report"));
 
-		data.setListener(new PropertyListener<AppConfigModel.Key>() {
-			@Override
-			public void onPropertyChange(PropertyChangedEvent<Key> property) {
-				final EventSystem eventSystem = App.getInstance().getEventSystem();
-				if (eventSystem == null) {
-					return;
-				}
+		this.data.setListener(property -> {
+			final EventSystem eventSystem = App.getInstance().getEventSystem();
+			if (eventSystem == null) {
+				return;
+			}
 
-				switch (property.key) {
-					case APP_PATH:
-						eventSystem.postEvent(new AppConfigAppPathChangedEvent((Path) property.oldValue, (Path) property.newValue));
-						break;
-					case DONT_SAVE_CONFIG:
-						break;
-					case CONFIG_PATH:
-						eventSystem.postEvent(new AppConfigPathChangedEvent((Path) property.oldValue, (Path) property.newValue));
-						break;
-					case DEBUG_MODE:
-						eventSystem.postEvent(new AppConfigDebugModeChangedEvent((Boolean) property.oldValue, (Boolean) property.newValue));
-						break;
-					case HEADLESS_MODE:
-						eventSystem.postEvent(new AppConfigHeadlessModeChangedEvent((Boolean) property.oldValue, (Boolean) property.newValue));
-						break;
-					case OUTPUT_PATH:
-						eventSystem.postEvent(new AppConfigOutputPathChangedEvent((Path) property.oldValue, (Path) property.newValue));
-						break;
-					case REPORT_PATH:
-						break;
-					default:
-						break;
-				}
+			switch (property.key) {
+				case APP_PATH:
+					eventSystem.postEvent(new AppConfigAppPathChangedEvent((Path) property.oldValue, (Path) property.newValue));
+					break;
+				case DONT_SAVE_CONFIG:
+					break;
+				case CONFIG_PATH:
+					eventSystem.postEvent(new AppConfigPathChangedEvent((Path) property.oldValue, (Path) property.newValue));
+					break;
+				case DEBUG_MODE:
+					eventSystem.postEvent(new AppConfigDebugModeChangedEvent((Boolean) property.oldValue, (Boolean) property.newValue));
+					break;
+				case HEADLESS_MODE:
+					eventSystem.postEvent(new AppConfigHeadlessModeChangedEvent((Boolean) property.oldValue, (Boolean) property.newValue));
+					break;
+				case OUTPUT_PATH:
+					eventSystem.postEvent(new AppConfigOutputPathChangedEvent((Path) property.oldValue, (Path) property.newValue));
+					break;
+				case REPORT_PATH:
+					break;
+				default:
+					break;
 			}
 		});
 
 	}
 
 	public Path getApplicationPath() {
-		return data.getProperty(Key.APP_PATH);
+		return this.data.getProperty(Key.APP_PATH);
 	}
 
 	public boolean setApplicationPath(Path value) {
-		return data.setProperty(Key.APP_PATH, value);
+		return this.data.setProperty(Key.APP_PATH, value);
 	}
 
 	public Path getConfigPath() {
-		return data.getProperty(Key.CONFIG_PATH);
+		return this.data.getProperty(Key.CONFIG_PATH);
 	}
 
 	protected boolean setConfigPath(Path value) {
-		return data.setProperty(Key.CONFIG_PATH, value);
+		return this.data.setProperty(Key.CONFIG_PATH, value);
 	}
 
 	public boolean getDebugMode() {
-		return data.getProperty(Key.DEBUG_MODE);
+		return this.data.getProperty(Key.DEBUG_MODE);
 	}
 
 	public boolean setDebugMode(Boolean value) {
-		return data.setProperty(Key.DEBUG_MODE, value);
+		return this.data.setProperty(Key.DEBUG_MODE, value);
 	}
 
 	protected void setOutputPath(Path value) {
-		data.setProperty(Key.OUTPUT_PATH, value);
+		this.data.setProperty(Key.OUTPUT_PATH, value);
 	}
 
 	public Path getOutputPath() {
-		return data.getProperty(Key.OUTPUT_PATH);
+		return this.data.getProperty(Key.OUTPUT_PATH);
 	}
 
 	/**
 	 * This property will be set at startup and can't be changed afterwards
 	 */
 	public void setHeadlessMode(boolean value) {
-		if (data.isPropertySet(Key.HEADLESS_MODE)) {
+		if (this.data.isPropertySet(Key.HEADLESS_MODE)) {
 			return;
 		}
-		data.setProperty(Key.HEADLESS_MODE, value);
+		this.data.setProperty(Key.HEADLESS_MODE, value);
 	}
 
 	public boolean getHeadlessMode() {
-		return data.getProperty(Key.HEADLESS_MODE);
+		return this.data.getProperty(Key.HEADLESS_MODE);
 	}
 
 	public Path getReportFolder() {
-		return data.getProperty(Key.REPORT_PATH);
+		return this.data.getProperty(Key.REPORT_PATH);
+	}
+
+	public void setApplicationVersion(String value) {
+		if (this.data.isPropertySet(Key.APP_VERSION)) {
+			return;
+		}
+		this.data.setProperty(Key.APP_VERSION, value);
+	}
+
+	public String getApplicationVersion() {
+		return this.data.getProperty(Key.APP_VERSION);
 	}
 
 }

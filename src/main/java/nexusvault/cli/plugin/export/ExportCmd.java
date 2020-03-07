@@ -6,10 +6,10 @@ import java.util.Set;
 
 import nexusvault.archive.IdxPath;
 import nexusvault.cli.App;
+import nexusvault.cli.core.cmd.AbstractCommandHandler;
 import nexusvault.cli.core.cmd.ArgumentDescription;
 import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
-import nexusvault.cli.plugin.AbstractCommandHandler;
 import nexusvault.cli.plugin.export.ExportPlugIn.ExportConfig;
 import nexusvault.cli.plugin.search.SearchPlugIn;
 

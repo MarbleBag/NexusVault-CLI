@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -120,6 +121,7 @@ public final class App {
 
 	public void initializeApp() throws IOException {
 		initializeModel();
+		initializeAppProperties();
 		// initializeLogging();
 		// updateLogger();
 		initializeConsole();
@@ -129,7 +131,6 @@ public final class App {
 		initializePlugIns();
 
 		// loadConfig();
-
 	}
 
 	protected void setHeadlessMode() {
@@ -271,6 +272,7 @@ public final class App {
 		this.commandManager.registerCommand(new ExitCmd((args) -> requestShutDown()));
 		this.commandManager.registerCommand(new SetCmd((args) -> setArguments(args.getUnnamedArgs())));
 		this.commandManager.registerCommand(new HelpCmd((args) -> printHelp(args)));
+		this.commandManager.registerCommand(new AboutCmd());
 	}
 
 	private void printHelp(Arguments args) {
@@ -289,12 +291,32 @@ public final class App {
 	private void initializeModel() {
 		this.modelSystem = new BaseModelSystem();
 
+		// maybe move this to AppBasePlugIn
 		this.appConfig = new AppConfigModel();
 		this.appConfig.setApplicationPath(getProjectLocation());
 		this.appConfig.setDebugMode(false);
 		// this.appConfig.setHeadlessMode(headlessMode);
 
 		this.modelSystem.registerModel(AppConfigModel.class, this.appConfig);
+	}
+
+	private void initializeAppProperties() {
+		// maybe move this to AppBasePlugIn
+		final var properties = new Properties();
+
+		final var classLoader = this.getClass().getClassLoader();
+		final var propertyContent = classLoader.getResourceAsStream("app.properties");
+		if (propertyContent != null) {
+			try (propertyContent) {
+				properties.load(propertyContent);
+			} catch (final IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if (properties.containsKey("app.version")) {
+			getAppConfig().setApplicationVersion(properties.getProperty("app.version"));
+		}
 	}
 
 	private void initializeEventSystem() {

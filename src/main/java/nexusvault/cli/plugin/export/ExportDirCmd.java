@@ -1,8 +1,8 @@
 package nexusvault.cli.plugin.export;
 
+import nexusvault.cli.core.cmd.AbstractCommandHandler;
 import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
-import nexusvault.cli.plugin.AbstractCommandHandler;
 
 final class ExportDirCmd extends AbstractCommandHandler {
 

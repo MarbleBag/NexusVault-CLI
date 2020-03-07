@@ -1,9 +1,9 @@
 package nexusvault.cli.plugin.show;
 
 import nexusvault.cli.App;
+import nexusvault.cli.core.cmd.AbstractCommandHandler;
 import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
-import nexusvault.cli.plugin.AbstractCommandHandler;
 
 final class ShowCmd extends AbstractCommandHandler {
 

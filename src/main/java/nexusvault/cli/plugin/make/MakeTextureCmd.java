@@ -11,11 +11,11 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import nexusvault.cli.App;
+import nexusvault.cli.core.cmd.AbstractCommandHandler;
 import nexusvault.cli.core.cmd.ArgumentDescription;
 import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
 import nexusvault.cli.core.cmd.CommandFormatException;
-import nexusvault.cli.plugin.AbstractCommandHandler;
 import nexusvault.format.tex.TexType;
 import nexusvault.format.tex.TextureImage;
 import nexusvault.format.tex.TextureImageFormat;

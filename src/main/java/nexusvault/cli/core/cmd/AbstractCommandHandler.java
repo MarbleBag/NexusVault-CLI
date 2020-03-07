@@ -1,10 +1,9 @@
-package nexusvault.cli.plugin;
+package nexusvault.cli.core.cmd;
 
 import com.google.common.base.Supplier;
 
 import nexusvault.cli.App;
 import nexusvault.cli.ConsoleSystem.Level;
-import nexusvault.cli.core.cmd.CommandHandler;
 
 public abstract class AbstractCommandHandler implements CommandHandler {
 
