@@ -4,6 +4,8 @@ Version 0.2.0
 A CLI application which incorporates the [NexusVault library](https://github.com/MarbleBag/NexusVault/tree/java)
 In its current form it mainly provides a way to traverse the content of .archive files and export its content, either in its original form or converted to a more known format.
 
+
+
 ### Getting started
 
 Check out the [latest release](https://github.com/MarbleBag/NexusVault-CLI/releases/latest).
@@ -22,7 +24,10 @@ A Windows compatible Java version can be downloaded [here](https://github.com/Ma
 Is no local Java version provide, the launcher will look up Java installations that are available on the system.
 
 ### Run the application
-Before anything can be done, the application needs to know which archives should be read, to do so either start the application with the flag `-a "path to folder"` or write `archive "path to folder"` after starting it. The application will immediately search for any archives there. It is also possible to load a specific archive by passing the direct file path to the application.
+Before anything can be done, the application needs to know which archives should be read, to do so either start the application with the flag `-a "path to folder"`, either via shortcut or batch/shell script, or write `archive "path to folder"` after starting it.
+
+The application will immediately search for any archives there. It is also possible to load a specific archive by passing the direct file path to the application.
+ 
 Console examples:
 * `-a "C:\Games\WildStar"`
 * `archive "C:\Games\Wildstar"`
