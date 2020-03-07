@@ -12,7 +12,7 @@ final class NavigatorListDirectoryContentCmd implements CommandHandler {
 		// @formatter:off
 		return CommandDescription.newInfo()
 				.setCommandName("ls")
-				.setDescription("List the contents of the currently selected folder")
+				.setDescription("Lists the contents of the currently selected folder")
 				.setNoNamedArguments()
 			    .build();
 		//@formatter:on

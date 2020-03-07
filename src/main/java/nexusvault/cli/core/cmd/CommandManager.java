@@ -238,10 +238,16 @@ public final class CommandManager {
 			textBuilder.append(helpText);
 		}
 
-		if (textBuilder.length() > 0) {
-			textBuilder.append('\n');
+		if (textBuilder.length() == 0) {
+			textBuilder.append("No help available.");
 		}
-		textBuilder.append("Flags and options:");
+
+		if (container.options.getOptions().size() > 0) {
+			if (textBuilder.length() > 0) {
+				textBuilder.append('\n');
+			}
+			textBuilder.append("Flags and options:");
+		}
 
 		final var header = textBuilder.toString();
 
@@ -250,6 +256,7 @@ public final class CommandManager {
 		formatter.printHelp(writer, formatter.getWidth(), description.getCommandName(), header, container.options, formatter.getLeftPadding(),
 				formatter.getDescPadding(), null, true);
 		writer.flush();
+
 	}
 
 	public void printHelp(PrintWriter writer) {

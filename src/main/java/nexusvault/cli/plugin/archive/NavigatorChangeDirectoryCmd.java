@@ -13,7 +13,7 @@ final class NavigatorChangeDirectoryCmd implements CommandHandler {
 		// @formatter:off
 		return CommandDescription.newInfo()
 				.setCommandName("cd")
-				.setDescription("Change directory - select a folder")
+				.setDescription("Change directory - selects a folder")
 				.setNoNamedArguments()
 //				.addArgument(
 //						ArgumentDescription.newInfo()

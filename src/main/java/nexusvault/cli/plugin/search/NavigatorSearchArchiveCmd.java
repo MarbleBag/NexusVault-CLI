@@ -74,11 +74,11 @@ final class NavigatorSearchArchiveHandler extends AbstractCommandHandler {
 
 			final StringBuilder msg = new StringBuilder();
 			msg.append("Accepts one or multiple regular expressions using java pattern. The space character is used as a seperator for multiple arguments.\n");
-			msg.append("This means, to use a space within a regular expression, the expression needs be surrounded by double quotes (\").\n");
+			msg.append("This means, to use a space within a regular expression, the expression needs be surrounded by double quotes ( \" ).\n");
 			msg.append("File seperator are OS dependend. This system uses ");
-			msg.append(File.separator);
+			msg.append("'").append(File.separator).append("' as a separator.\n");
 			msg.append(
-					"as a seperator. In case the seperator is equal to '\\' and should be included into the regular expression, it needs to be escaped with an additional '\\' -> '\\\\'\n");
+					"If the separator is identical to '\\' it needs to be escaped with an additional '\\' and should now look like '\\\\'. This is because the regular expression itself uses '\\' as an escape character.\n");
 
 			msg.append("General examples:\n");
 			msg.append("Finding all textures which are located within art/character/aurin:\n");

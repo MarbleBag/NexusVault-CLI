@@ -20,11 +20,11 @@ final class ExportCmd extends AbstractCommandHandler {
 		// @formatter:off
 		return CommandDescription.newInfo()
 				.setCommandName("export")
-				.setDescription("Export the last searched entries from the archive. Use '?' to get more informations.")
+				.setDescription("Exports the last searched entries from the archive.")
 				.addNamedArgument(
 							ArgumentDescription.newInfo()
 							.setName("binary")
-							.setDescription("exports files unprocessed")
+							.setDescription("export files unprocessed")
 							.setRequired(false)
 							.setNoArguments()
 							.build()
