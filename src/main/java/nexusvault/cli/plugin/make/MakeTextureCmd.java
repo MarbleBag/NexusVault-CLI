@@ -6,7 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
@@ -32,17 +34,17 @@ final class MakeTextureCmd extends AbstractCommandHandler {
 				.setDescription("Creates a ws compatible texture file")
 				.addNamedArgument(
 							ArgumentDescription.newInfo()
-							.setName("type").setDescription("")
-							.setRequired(true).setArguments(false).setNumberOfArguments(1).setNamesOfArguments("type").build()
+							.setName("type").setDescription("WS specific texture type.")
+							.setRequired(true).setArguments(false).setNumberOfArguments(1).setNamesOfArguments("name").build()
 						)
 				.addNamedArgument(
 							ArgumentDescription.newInfo()
-							.setName("filename").setDescription("Name of the created file. If not set, the name of the file will be equal to the name of the first passed image file")
+							.setName("filename").setDescription("Name of the created file. If not set, the name of the generated file will be equal to the name of -texture-1")
 							.setRequired(false).setArguments(false).setNumberOfArguments(1).setNamesOfArguments("name").build()
 						)
 				.addNamedArgument(
 							ArgumentDescription.newInfo()
-							.setName("texture-1").setDescription("")
+							.setName("texture-1").setDescription("Full path to texture. Use quotation marks when the path contains spaces.")
 							.setRequired(true).setArguments(false).setNumberOfArguments(1).setNamesOfArguments("path").build()
 						)
 				.addNamedArgument(
@@ -193,7 +195,13 @@ final class MakeTextureCmd extends AbstractCommandHandler {
 	public String onHelp() {
 		final var builder = new StringBuilder();
 
-		// TODO
+		builder.append("Available texture types: ");
+		final var excludedTypes = EnumSet.of(TexType.UNKNOWN, TexType.JPEG_TYPE_1, TexType.JPEG_TYPE_2, TexType.JPEG_TYPE_3);
+		final var availableTypes = EnumSet.complementOf(excludedTypes);
+		final var types = availableTypes.stream().map(String::valueOf).map(String::toLowerCase).collect(Collectors.joining(", "));
+		builder.append(types).append('\n');
+		builder.append("Example:\n");
+		builder.append("make-texture -type argb_1 -mipmaps 11 -texture-1 \"C:\\Nexusvault\\aurin_f_color.png\"");
 
 		return builder.toString();
 	}

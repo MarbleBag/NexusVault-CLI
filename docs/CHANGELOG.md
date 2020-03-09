@@ -2,14 +2,17 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com)
 
+## [0.2.1] - 2020-03-09
+### Added
+- Command 'make-texture': Generates a .tex file which should be readable by WS
+
 ## [0.2.0] -  2020-03-07
 ### Added
 - Support for m3 to wavefront obj export
 - Command 'export-m3-texture': By default on. If set to off, m3 exporters will no longer export textures, which are referenced by the model. (UV maps are still included)
-- Command 'export-tex-split': By default on. If set to off, tex exporters will no longer split textures, which contain more than just colors, into sub-images, which containing more specific data.
+- Command 'export-tex-split': By default on. If set to off, tex exporters will no longer split textures, which contain more than just colors, into sub-images, which contain more specific data.
 - Command 'show': new sub-command available to show file meta data
 - Command 'about': shows about page
-
 
 ### Changed
 - App does no longer accept commands on start
