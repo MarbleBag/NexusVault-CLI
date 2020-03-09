@@ -1,5 +1,5 @@
 # NexusVault CLI
-Version 0.2.0
+Version 0.2.1
 
 A CLI application which incorporates the [NexusVault library](https://github.com/MarbleBag/NexusVault/tree/java)
 In its current form it mainly provides a way to traverse the content of .archive files and export its content, either in its original form or converted to a more known format.
@@ -9,7 +9,7 @@ In its current form it mainly provides a way to traverse the content of .archive
 ### Getting started
 
 Check out the [latest release](https://github.com/MarbleBag/NexusVault-CLI/releases/latest).
-The release comes prepacked ([7zip](https://www.7-zip.org/)) with all needed dependencies (except Java) and a launch4j launcher, which supports to run the application without a Java installation, as long as it can find a valid JRE beside it. 
+The release comes prepacked ([7zip](https://www.7-zip.org/)) with all needed dependencies (except Java) and a launch4j launcher, which supports to run the application without a Java installation, as long as it can find a valid JRE beside it.
 
 A Windows compatible Java version can be downloaded [here](https://github.com/MarbleBag/NexusVault-CLI/releases/tag/v0.1.5.beta), packed as JRE_11_small_WIN64.zip
 
@@ -28,7 +28,7 @@ If no appropriate Java version can't be found, the launcher will open a Java dow
 Before anything can be done, the application needs to know which archives should be read, to do so either start the application with the flag `-a "path to folder"`, either via shortcut or batch/shell script, or write `archive "path to folder"` after starting it.
 
 The application will immediately search for any archives there. It is also possible to load a specific archive by passing the direct file path to the application.
- 
+
 Console examples:
 * `-a "C:\Games\WildStar"`
 * `archive "C:\Games\Wildstar"`
@@ -36,13 +36,13 @@ Console examples:
 
 ### How to find something to export
 The export mechanism works in 2-steps.
-* Step 1 is identifying what to export. 
+* Step 1 is identifying what to export.
 
 To do so use the build-in `search` command, which relies on Java's [regular expression pattern](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html)
-The archive is similar to a folder, which contains other folders and files. The expression for the search command looks at the full path for each file and determines if the path fulfills the expression or not. 
+The archive is similar to a folder, which contains other folders and files. The expression for the search command looks at the full path for each file and determines if the path fulfills the expression or not.
 
 As an example, the model for the female aurin is located under `Art\Character\Aurin\Female\aurin_f.m3`.
-To find exactly this file, and no other, a possible `search`command could be `search art\\character\\aurin\\female\\aurin_f.m3` The search is case-insensitive and note the `\\`instead of `\` as folder separator. 
+To find exactly this file, and no other, a possible `search`command could be `search art\\character\\aurin\\female\\aurin_f.m3` The search is case-insensitive and note the `\\`instead of `\` as folder separator.
 Another possible command is `search \\aurin_f.m3`, this works because there is no other file with the name `aurin_f.m3`.
 Whereas `search aurin_f.m3` will find over 1000 models, which all end in `aurin_f.m3`. The difference is, that `\\` in front of the file name tells the search command to look for files that start with the given name.
 
@@ -80,4 +80,3 @@ and stores a list of major changes in its [changelog](CHANGELOG.md), including u
 ## License
 
 This project is licensed under the GNU AGPLv3 License - see the [LICENSE.md](LICENSE.md) file for details
-
