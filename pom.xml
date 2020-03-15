@@ -5,7 +5,7 @@
 
 	<groupId>nexusvault</groupId>
 	<artifactId>nexusvault.cli</artifactId>
-	<version>0.2.0</version>
+	<version>0.2.2</version>
 
 	<properties>
 		<project.java.version>11</project.java.version>
@@ -169,7 +169,7 @@
 		<dependency>
 			<groupId>nexusvault</groupId>
 			<artifactId>nexusvault.format.tex</artifactId>
-			<version>[3.1,4)</version>
+			<version>[3.1.1,4)</version>
 		</dependency>
 		<dependency>
 			<groupId>nexusvault</groupId>

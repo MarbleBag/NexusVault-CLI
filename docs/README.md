@@ -1,5 +1,5 @@
 # NexusVault CLI
-Version 0.2.1
+Version 0.2.2
 
 A CLI application which incorporates the [NexusVault library](https://github.com/MarbleBag/NexusVault/tree/java)
 In its current form it mainly provides a way to traverse the content of .archive files and export its content, either in its original form or converted to a more known format.

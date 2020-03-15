@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com)
 
+## [0.2.2] - 2020-03-15
+### Fixed
+- An error which prevented the correct export of jpg textures with an unequal height and width
+
 ## [0.2.1] - 2020-03-09
 ### Added
 - Command 'make-texture': Generates a .tex file which should be readable by WS
