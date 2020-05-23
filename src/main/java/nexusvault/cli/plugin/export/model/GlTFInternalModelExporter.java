@@ -53,7 +53,7 @@ final class GlTFInternalModelExporter implements InternalModelExporter {
 
 	@Override
 	public void export(Model model, Path dstFolder, IdxPath filePath) throws IOException {
-		final GlTFExporter gltfExporter = new nexusvault.format.m3.export.gltf.GlTFExporter();
+		final GlTFExporter gltfExporter = nexusvault.format.m3.export.gltf.GlTFExporter.makeExporter();
 		final String modelName = PathUtil.getNameWithoutExtension(filePath);
 
 		final List<NexusArchiveWrapper> wrappers = App.getInstance().getPlugIn(ArchivePlugIn.class).getArchives();
@@ -61,7 +61,7 @@ final class GlTFInternalModelExporter implements InternalModelExporter {
 
 		gltfExporter.setGlTFExportMonitor(new GlTFExportMonitor() {
 			@Override
-			public void requestTextures(String textureId, ResourceBundle resourceBundle) {
+			public void requestTexture(String textureId, ResourceBundle resourceBundle) {
 				if (searchTexture) {
 					findAndSetTexture(dstFolder, modelName, wrappers, textureId, resourceBundle);
 				}
@@ -111,7 +111,7 @@ final class GlTFInternalModelExporter implements InternalModelExporter {
 			}
 
 			@Override
-			public void newFile(Path path) {
+			public void newFileCreated(Path path) {
 				// TODO Auto-generated method stub
 
 			}

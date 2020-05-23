@@ -64,7 +64,7 @@ public final class ModelExporter implements Exporter {
 			return this.data.getProperty(Key.INCLUDE_TEXTURE);
 		}
 
-		public boolean setIncludeTextureh(boolean value) {
+		public boolean setIncludeTextures(boolean value) {
 			return this.data.setProperty(Key.INCLUDE_TEXTURE, value);
 		}
 	}

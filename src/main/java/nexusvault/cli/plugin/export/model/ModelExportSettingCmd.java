@@ -29,15 +29,15 @@ final class ModelExportSettingCmd implements CommandHandler {
 	@Override
 	public void onCommand(Arguments args) {
 		if (args.getUnnamedArgumentSize() == 0) {
-			this.modelExporter.getConfig().setIncludeTextureh(!this.modelExporter.getConfig().isIncludeTexture());
+			this.modelExporter.getConfig().setIncludeTextures(!this.modelExporter.getConfig().isIncludeTexture());
 			return;
 		}
 
 		final String arg0 = args.getUnnamedArgs()[0].trim().toLowerCase();
 		if ("off".equals(arg0)) {
-			this.modelExporter.getConfig().setIncludeTextureh(false);
+			this.modelExporter.getConfig().setIncludeTextures(false);
 		} else if ("on".equals(arg0)) {
-			this.modelExporter.getConfig().setIncludeTextureh(true);
+			this.modelExporter.getConfig().setIncludeTextures(true);
 		} else {
 			App.getInstance().getConsole().println(Level.CONSOLE,
 					() -> String.format("Command '%s' does not accept '%s' as an argument. Use 'off' or 'on'.", CMD_NAME, arg0));
