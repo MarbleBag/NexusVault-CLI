@@ -179,17 +179,17 @@
 		<dependency>
 			<groupId>nexusvault</groupId>
 			<artifactId>nexusvault.format.m3</artifactId>
-			<version>[0,1)</version>
+			<version>[0.8,1)</version>
 		</dependency>
 		<dependency>
 			<groupId>nexusvault</groupId>
 			<artifactId>nexusvault.format.m3.export.gltf</artifactId>
-			<version>[0,2)</version>
+			<version>[0.6,2)</version>
 		</dependency>
 		<dependency>
 			<groupId>nexusvault</groupId>
 			<artifactId>nexusvault.format.m3.export.obj</artifactId>
-			<version>[0,2)</version>
+			<version>[0.5,2)</version>
 		</dependency>
 	</dependencies>
 </project>
