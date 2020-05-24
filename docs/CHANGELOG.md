@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com)
 
+## [0.2.3] - 2020-05-24
+### Fixed
+- A problem with the blender 2.82 gltf importer
+
 ## [0.2.2] - 2020-03-15
 ### Fixed
 - An error which prevented the correct export of jpg textures with an unequal height and width
@@ -43,14 +47,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com)
 - Debug command. Allows to toggle the debug mode of the app on/off. Debug mode will output more informations to the console
 - m3 export 'gltf' mode will now also export textures
 
-### Changed 
+### Changed
 - m3 export 'debug' mode will now bundle its output into a new folder, named after the m3, on the same folder level as the m3
 
-### Fixed 
+### Fixed
 - Changing a value with export-m3-type will now correctly show the old value
 - tex export didn't use the correct reader. Will no longer produce empty folders
 
-### Deprecated 
+### Deprecated
 - ModelSystem
 
 ## [0.1.0] - 2019-02-05
