@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Set;
 
 import nexusvault.archive.IdxPath;
-import nexusvault.cli.App;
+import nexusvault.cli.core.App;
 import nexusvault.cli.core.cmd.AbstractCommandHandler;
 import nexusvault.cli.core.cmd.ArgumentDescription;
 import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
+import nexusvault.cli.extensions.search.SearchExtension;
 import nexusvault.cli.plugin.export.ExportPlugIn.ExportConfig;
-import nexusvault.cli.plugin.search.SearchPlugIn;
 
 final class ExportCmd extends AbstractCommandHandler {
 
@@ -42,8 +42,8 @@ final class ExportCmd extends AbstractCommandHandler {
 			exportConfig.exportAsBinary(true);
 		}
 
-		final List<IdxPath> searchResults = App.getInstance().getPlugIn(SearchPlugIn.class).getLastSearchResults();
-		App.getInstance().getPlugIn(ExportPlugIn.class).exportIdxPath(searchResults, exportConfig);
+		final List<IdxPath> searchResults = App.getInstance().getExtension(SearchExtension.class).getLastSearchResults();
+		App.getInstance().getExtension(ExportPlugIn.class).exportIdxPath(searchResults, exportConfig);
 	}
 
 	@Override
@@ -64,7 +64,7 @@ final class ExportCmd extends AbstractCommandHandler {
 		// sendMsg("File types with converter: " + String.join(", ", supportedFileTypes));
 
 		final Set<String> supportedFileTypes = new HashSet<>();
-		for (final Exporter exporter : App.getInstance().getPlugIn(ExportPlugIn.class).getExporters()) {
+		for (final Exporter exporter : App.getInstance().getExtension(ExportPlugIn.class).getExporters()) {
 			supportedFileTypes.addAll(exporter.getAcceptedFileEndings());
 		}
 

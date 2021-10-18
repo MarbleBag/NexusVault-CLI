@@ -19,8 +19,8 @@ import javax.imageio.ImageIO;
 import kreed.util.property.provider.BoolProvider;
 import nexusvault.archive.IdxPath;
 import nexusvault.archive.util.DataHeader;
-import nexusvault.cli.App;
-import nexusvault.cli.EventSystem;
+import nexusvault.cli.core.App;
+import nexusvault.cli.core.EventManager;
 import nexusvault.cli.core.cmd.CommandHandler;
 import nexusvault.cli.model.ModelPropertyChangedEvent;
 import nexusvault.cli.model.ModelSet;
@@ -57,7 +57,7 @@ public final class TextureExporter implements Exporter {
 			this.data = new ModelSet<>(Arrays.asList(Key.values()));
 
 			this.data.setListener(property -> {
-				final EventSystem eventSystem = App.getInstance().getEventSystem();
+				final EventManager eventSystem = App.getInstance().getEventSystem();
 				if (eventSystem == null) {
 					return;
 				}

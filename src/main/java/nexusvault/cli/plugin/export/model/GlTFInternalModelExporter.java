@@ -16,9 +16,9 @@ import nexusvault.archive.IdxDirectory;
 import nexusvault.archive.IdxEntry;
 import nexusvault.archive.IdxFileLink;
 import nexusvault.archive.IdxPath;
-import nexusvault.cli.App;
-import nexusvault.cli.plugin.archive.ArchivePlugIn;
-import nexusvault.cli.plugin.archive.NexusArchiveWrapper;
+import nexusvault.cli.core.App;
+import nexusvault.cli.extensions.archive.ArchiveExtension;
+import nexusvault.cli.extensions.archive.NexusArchiveContainer;
 import nexusvault.cli.plugin.export.PathUtil;
 import nexusvault.cli.plugin.export.model.ModelExporter.ModelConfigModel;
 import nexusvault.format.m3.Model;
@@ -39,8 +39,8 @@ final class GlTFInternalModelExporter implements InternalModelExporter {
 		this.config = modelExporter.getConfig();
 	}
 
-	private IdxFileLink find(List<NexusArchiveWrapper> wrappers, String textureId) {
-		for (final NexusArchiveWrapper wrapper : wrappers) {
+	private IdxFileLink find(List<NexusArchiveContainer> wrappers, String textureId) {
+		for (final NexusArchiveContainer wrapper : wrappers) {
 			final IdxDirectory root = wrapper.getArchive().getRootDirectory();
 			final IdxPath path = IdxPath.createPathFrom(textureId);
 			if (path.isResolvable(root)) {
@@ -56,7 +56,7 @@ final class GlTFInternalModelExporter implements InternalModelExporter {
 		final GlTFExporter gltfExporter = nexusvault.format.m3.export.gltf.GlTFExporter.makeExporter();
 		final String modelName = PathUtil.getNameWithoutExtension(filePath);
 
-		final List<NexusArchiveWrapper> wrappers = App.getInstance().getPlugIn(ArchivePlugIn.class).getArchives();
+		final List<NexusArchiveContainer> wrappers = App.getInstance().getExtension(ArchiveExtension.class).getArchives();
 		final boolean searchTexture = this.config.isIncludeTexture();
 
 		gltfExporter.setGlTFExportMonitor(new GlTFExportMonitor() {
@@ -67,7 +67,7 @@ final class GlTFInternalModelExporter implements InternalModelExporter {
 				}
 			}
 
-			private void findAndSetTexture(Path dstFolder, final String modelName, final List<NexusArchiveWrapper> wrappers, String textureId,
+			private void findAndSetTexture(Path dstFolder, final String modelName, final List<NexusArchiveContainer> wrappers, String textureId,
 					ResourceBundle resourceBundle) {
 				final IdxFileLink textureLink = find(wrappers, textureId);
 				if (textureLink == null) {

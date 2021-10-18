@@ -3,12 +3,12 @@ package nexusvault.cli.plugin.config;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import nexusvault.cli.App;
+import nexusvault.cli.core.App;
 import nexusvault.cli.core.exception.FileNotFoundException;
 import nexusvault.cli.core.exception.FileNotReadableException;
-import nexusvault.cli.plugin.AbstractPlugIn;
+import nexusvault.cli.core.extension.AbstractExtension;
 
-public class AppBasePlugIn extends AbstractPlugIn {
+public class AppBasePlugIn extends AbstractExtension {
 
 	public AppBasePlugIn() {
 		// final List<Command> cmds = new ArrayList<>();

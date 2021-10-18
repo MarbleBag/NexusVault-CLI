@@ -1,8 +1,8 @@
 package nexusvault.cli.plugin.export;
 
-import nexusvault.cli.core.exception.NexusvaultCLIBaseException;
+import nexusvault.cli.core.exception.AppException;
 
-public class ExportException extends NexusvaultCLIBaseException {
+public class ExportException extends AppException {
 
 	private static final long serialVersionUID = 8767328590929264693L;
 

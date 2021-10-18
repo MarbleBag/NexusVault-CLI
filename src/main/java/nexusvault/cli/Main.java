@@ -2,6 +2,8 @@ package nexusvault.cli;
 
 import java.io.IOException;
 
+import nexusvault.cli.core.App;
+
 public final class Main {
 
 	public static void main(String[] args) throws IOException {

@@ -6,8 +6,8 @@ import java.util.Arrays;
 import kreed.util.property.provider.BoolProvider;
 import kreed.util.property.provider.PathExtensionProvider;
 import kreed.util.property.provider.StringProvider;
-import nexusvault.cli.App;
-import nexusvault.cli.EventSystem;
+import nexusvault.cli.core.App;
+import nexusvault.cli.core.EventManager;
 import nexusvault.cli.model.ModelPropertyChangedEvent;
 import nexusvault.cli.model.ModelSet;
 import nexusvault.cli.model.PropertyKey;
@@ -86,7 +86,7 @@ public final class AppConfigModel {
 		this.data.setPropertyProvider(Key.REPORT_PATH, new PathExtensionProvider<AppConfigModel.Key>(this::getApplicationPath, "report"));
 
 		this.data.setListener(property -> {
-			final EventSystem eventSystem = App.getInstance().getEventSystem();
+			final EventManager eventSystem = App.getInstance().getEventSystem();
 			if (eventSystem == null) {
 				return;
 			}

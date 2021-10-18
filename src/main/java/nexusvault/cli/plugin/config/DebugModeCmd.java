@@ -1,7 +1,7 @@
 package nexusvault.cli.plugin.config;
 
-import nexusvault.cli.App;
-import nexusvault.cli.ConsoleSystem.Level;
+import nexusvault.cli.core.App;
+import nexusvault.cli.core.Console.Level;
 import nexusvault.cli.core.cmd.Argument;
 import nexusvault.cli.core.cmd.ArgumentDescription;
 import nexusvault.cli.core.cmd.ArgumentHandler;
@@ -24,7 +24,7 @@ final class DebugModeCmd implements ArgumentHandler {
 
 	@Override
 	public void execute(Argument arg) {
-		final AppBasePlugIn configPlugin = App.getInstance().getPlugInSystem().getPlugIn(AppBasePlugIn.class);
+		final AppBasePlugIn configPlugin = App.getInstance().getExtensionManager().getExtension(AppBasePlugIn.class);
 
 		if (arg.getValue() == null) {
 			configPlugin.setDebugMode(!configPlugin.getDebugMode());

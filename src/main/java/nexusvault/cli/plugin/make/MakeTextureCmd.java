@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
-import nexusvault.cli.App;
+import nexusvault.cli.core.App;
 import nexusvault.cli.core.cmd.AbstractCommandHandler;
 import nexusvault.cli.core.cmd.ArgumentDescription;
 import nexusvault.cli.core.cmd.Arguments;

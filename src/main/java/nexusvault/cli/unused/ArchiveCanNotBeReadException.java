@@ -1,8 +1,8 @@
 package nexusvault.cli.unused;
 
-import nexusvault.cli.core.exception.NexusvaultCLIBaseException;
+import nexusvault.cli.core.exception.AppException;
 
-class ArchiveCanNotBeReadException extends NexusvaultCLIBaseException {
+class ArchiveCanNotBeReadException extends AppException {
 
 	private static final long serialVersionUID = -5147238759891485498L;
 

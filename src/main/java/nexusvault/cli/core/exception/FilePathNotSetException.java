@@ -1,6 +1,6 @@
 package nexusvault.cli.core.exception;
 
-public class FilePathNotSetException extends NexusvaultCLIBaseException {
+public class FilePathNotSetException extends AppException {
 
 	private static final long serialVersionUID = 8519301397403828639L;
 

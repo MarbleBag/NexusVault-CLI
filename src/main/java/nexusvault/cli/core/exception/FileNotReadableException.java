@@ -1,6 +1,6 @@
 package nexusvault.cli.core.exception;
 
-public class FileNotReadableException extends NexusvaultCLIBaseException {
+public class FileNotReadableException extends AppException {
 
 	private static final long serialVersionUID = 8456085386529168553L;
 

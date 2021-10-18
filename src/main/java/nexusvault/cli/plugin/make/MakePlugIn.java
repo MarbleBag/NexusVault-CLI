@@ -1,25 +1,19 @@
 package nexusvault.cli.plugin.make;
 
-import nexusvault.cli.plugin.AbstractPlugIn;
+import nexusvault.cli.core.extension.AbstractExtension;
 
-public final class MakePlugIn extends AbstractPlugIn {
+public final class MakePlugIn extends AbstractExtension {
 
-	public MakePlugIn() {
-		setCommands( //
-				new MakeTextureCmd()//
-		);
-		setNoArguments();
-	}
+	@Override
+	protected void initializeExtension(InitializationHelper initializationHelper) {
+		initializationHelper.addCommandHandler(new MakeTextureCmd());
 
-	public void initialze() {
-		super.initialize();
-		// TODO
 	}
 
 	@Override
-	public void deinitialize() {
-		super.deinitialize();
-		// TODO
+	protected void deinitializeExtension() {
+		// TODO Auto-generated method stub
+
 	}
 
 }

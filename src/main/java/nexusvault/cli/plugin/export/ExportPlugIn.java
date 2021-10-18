@@ -8,10 +8,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,14 +28,14 @@ import nexusvault.archive.IdxFileLink;
 import nexusvault.archive.IdxPath;
 import nexusvault.archive.NexusArchive;
 import nexusvault.archive.util.DataHeader;
-import nexusvault.cli.App;
-import nexusvault.cli.plugin.AbstractPlugIn;
-import nexusvault.cli.plugin.archive.ArchivePlugIn;
-import nexusvault.cli.plugin.archive.NexusArchiveWrapper;
+import nexusvault.cli.core.App;
+import nexusvault.cli.core.extension.AbstractExtension;
+import nexusvault.cli.extensions.archive.ArchiveExtension;
+import nexusvault.cli.extensions.archive.NexusArchiveContainer;
 import nexusvault.cli.plugin.export.model.ModelExporter;
 import nexusvault.cli.plugin.export.tex.TextureExporter;
 
-public final class ExportPlugIn extends AbstractPlugIn {
+public final class ExportPlugIn extends AbstractExtension {
 
 	private static final Logger logger = LogManager.getLogger(ExportPlugIn.class);
 
@@ -203,39 +208,8 @@ public final class ExportPlugIn extends AbstractPlugIn {
 		}
 	}
 
-	private List<Exporter> exporters;
-
-	public ExportPlugIn() { // TODO
-		setCommands(//
-				new ExportCmd(), //
-				new ExportFileCmd() //
-		);
-		setArguments();
-	}
-
-	@Override
-	public void initialize() {
-		super.initialize();
-		if (this.exporters == null) {
-			this.exporters = new ArrayList<>();
-			loadExporters(this.exporters);
-			this.exporters = Collections.unmodifiableList(this.exporters);
-			for (final Exporter exporter : this.exporters) {
-				exporter.initialize();
-			}
-		}
-	}
-
-	@Override
-	public void deinitialize() {
-		super.deinitialize();
-		if (this.exporters != null) {
-			for (final Exporter exporter : this.exporters) {
-				exporter.deinitialize();
-			}
-		}
-		this.exporters = null;
-	}
+	private List<Exporter> exporters = new ArrayList<>();
+	private ExecutorService threadPool;
 
 	private void loadExporters(List<Exporter> exporters) { // TODO
 		exporters.add(new ModelExporter());
@@ -268,7 +242,7 @@ public final class ExportPlugIn extends AbstractPlugIn {
 	}
 
 	private void export(Stream<ExportLoader> filesToExport, ExportConfig someConfig) {
-		final List<ExportError> exportErrors = new LinkedList<>();
+		final Collection<ExportError> exportErrors = new ConcurrentLinkedQueue<>();
 
 		export(filesToExport, someConfig, exportErrors);
 
@@ -277,23 +251,29 @@ public final class ExportPlugIn extends AbstractPlugIn {
 				final StringBuilder msg = new StringBuilder();
 				msg.append(String.format("Unable to export %d file(s)\n", exportErrors.size()));
 				msg.append("Error(s)\n");
-				for (final ExportError error : exportErrors) {
+				for (final var error : exportErrors) {
 					msg.append(error.getTarget()).append("\n");
 					msg.append("->").append(error.error.getClass());
 					msg.append(" : ").append(error.error.getMessage());
 					msg.append("\n");
+
+					var cause = error.error.getCause();
+					while (cause != null) {
+						msg.append("\t\t->").append(cause.getClass()).append(" : ").append(cause.getMessage()).append("\n");
+						cause = cause.getCause();
+					}
 				}
 				return msg.toString();
 			});
 
 			logger.error(String.format("Unable to export %d file(s)\n", exportErrors.size()));
-			for (final ExportError error : exportErrors) {
+			for (final var error : exportErrors) {
 				logger.error(error.getTarget(), error.error);
 			}
 		}
 	}
 
-	private void export(Stream<ExportLoader> filesToExport, ExportConfig someConfig, final List<ExportError> exportErrors) {
+	private void export2(Stream<ExportLoader> filesToExport, ExportConfig someConfig, final Collection<ExportError> exportErrors) {
 		final List<ExportLoader> oof = filesToExport.collect(Collectors.toList());
 		final int numberOfFilesToUnpack = oof.size();
 		final int reportAfterNFiles = Math.max(1, Math.min(500, numberOfFilesToUnpack / 20));
@@ -326,9 +306,72 @@ public final class ExportPlugIn extends AbstractPlugIn {
 		sendMsg(() -> String.format("Exporting done in %.2fs", (exportAllEnd - exportAllStart) / 1000f));
 	}
 
+	private void export(Stream<ExportLoader> filesToExport, ExportConfig someConfig, final Collection<ExportError> exportErrors) {
+		final var oof = filesToExport.collect(Collectors.toList());
+		final var numberOfFilesToUnpack = oof.size();
+
+		sendMsg(() -> "Start exporting to: " + getOutputFolder());
+
+		final var tasks = new LinkedList<Future<?>>();
+		final var exportAllStart = System.currentTimeMillis();
+
+		for (final ExportLoader exportLoader : oof) {
+			final var task = this.threadPool.submit(() -> {
+				try {
+					exportLoader.export(someConfig);
+				} catch (final Exception e) {
+					exportErrors.add(new ExportError(exportLoader.getSourceName(), e));
+				}
+			});
+
+			tasks.add(task);
+		}
+
+		reportToUserAndWait(tasks);
+
+		final long exportAllEnd = System.currentTimeMillis();
+		sendMsg(() -> String.format("Processed files %1$d of %1$d (100%%).", numberOfFilesToUnpack));
+		sendMsg(() -> String.format("Export done in %.2fs", (exportAllEnd - exportAllStart) / 1000f));
+	}
+
+	private void reportToUserAndWait(List<Future<?>> tasks) {
+		final var numberOfFilesToUnpack = tasks.size();
+		final var reportAfterNFiles = Math.max(1, Math.min(500, numberOfFilesToUnpack / 20));
+
+		int processedFiles = 0;
+		int reportIn = 0;
+		while (!tasks.isEmpty()) {
+			final var iterator = tasks.iterator();
+			while (iterator.hasNext()) {
+				final var task = iterator.next();
+				if (task.isDone()) {
+					iterator.remove();
+					++reportIn;
+				}
+			}
+
+			if (reportIn >= reportAfterNFiles) {
+				processedFiles += reportIn;
+				reportIn = 0;
+				final float percentage = processedFiles / (numberOfFilesToUnpack + 0f) * 100;
+				final String msg = String.format("Processed files %d of %d (%.2f%%).", processedFiles, numberOfFilesToUnpack, percentage);
+				sendMsg(msg);
+			}
+
+			if (tasks.size() > 100) {
+				try {
+					Thread.sleep((int) (tasks.size() * 0.2));
+				} catch (final InterruptedException e) {
+				}
+			} else {
+				Thread.yield();
+			}
+		}
+	}
+
 	private List<IdxFileLink> findFiles(List<IdxPath> paths) {
-		final ArchivePlugIn archivePlugIn = App.getInstance().getPlugIn(ArchivePlugIn.class);
-		final List<NexusArchiveWrapper> wrappers = archivePlugIn.getArchives();
+		final var archiveExtension = App.getInstance().getExtension(ArchiveExtension.class);
+		final List<NexusArchiveContainer> wrappers = archiveExtension.getArchives();
 		if (wrappers.isEmpty()) {
 			sendMsg("No vaults are loaded. Use 'help' to learn how to load them");
 			return Collections.emptyList();
@@ -336,7 +379,7 @@ public final class ExportPlugIn extends AbstractPlugIn {
 
 		final List<IdxFileLink> fileToExport = new ArrayList<>(paths.size());
 		for (final IdxPath path : paths) {
-			for (final NexusArchiveWrapper wrapper : wrappers) {
+			for (final NexusArchiveContainer wrapper : wrappers) {
 				final NexusArchive archive = wrapper.getArchive();
 				if (path.isResolvable(archive.getRootDirectory())) {
 					fileToExport.add(path.resolve(archive.getRootDirectory()).asFile());
@@ -395,6 +438,30 @@ public final class ExportPlugIn extends AbstractPlugIn {
 
 	public Path getOutputFolder() {
 		return App.getInstance().getAppConfig().getOutputPath();
+	}
+
+	@Override
+	protected void initializeExtension(InitializationHelper initializationHelper) {
+		initializationHelper.addCommandHandler(new ExportCmd());
+		initializationHelper.addCommandHandler(new ExportFileCmd());
+
+		loadExporters(this.exporters);
+		this.exporters = Collections.unmodifiableList(this.exporters);
+		for (final var exporter : this.exporters) {
+			exporter.initialize();
+		}
+
+		this.threadPool = Executors.newWorkStealingPool(); // runs as many threads as cores are available
+	}
+
+	@Override
+	protected void deinitializeExtension() {
+		for (final var exporter : this.exporters) {
+			exporter.deinitialize();
+		}
+		this.exporters.clear();
+
+		this.threadPool.shutdownNow();
 	}
 
 }

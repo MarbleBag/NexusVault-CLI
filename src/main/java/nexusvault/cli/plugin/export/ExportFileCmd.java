@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import nexusvault.cli.App;
+import nexusvault.cli.core.App;
 import nexusvault.cli.core.cmd.AbstractCommandHandler;
 import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
@@ -52,13 +52,13 @@ final class ExportFileCmd extends AbstractCommandHandler {
 		}
 
 		final ExportConfig exportConfig = new ExportConfig();
-		App.getInstance().getPlugIn(ExportPlugIn.class).exportPath(targets, exportConfig);
+		App.getInstance().getExtension(ExportPlugIn.class).exportPath(targets, exportConfig);
 	}
 
 	@Override
 	public String onHelp() {
 		final Set<String> supportedFileTypes = new HashSet<>();
-		for (final Exporter exporter : App.getInstance().getPlugIn(ExportPlugIn.class).getExporters()) {
+		for (final Exporter exporter : App.getInstance().getExtension(ExportPlugIn.class).getExporters()) {
 			supportedFileTypes.addAll(exporter.getAcceptedFileEndings());
 		}
 

@@ -1,8 +1,8 @@
 package nexusvault.cli.core.cmd;
 
-import nexusvault.cli.core.exception.NexusvaultCLIBaseException;
+import nexusvault.cli.core.exception.AppException;
 
-public abstract class CLIHandlerException extends NexusvaultCLIBaseException {
+public abstract class CLIHandlerException extends AppException {
 
 	private static final long serialVersionUID = 1L;
 

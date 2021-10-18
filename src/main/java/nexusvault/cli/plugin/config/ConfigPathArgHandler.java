@@ -3,7 +3,7 @@ package nexusvault.cli.plugin.config;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import nexusvault.cli.App;
+import nexusvault.cli.core.App;
 import nexusvault.cli.core.cmd.Argument;
 import nexusvault.cli.core.cmd.ArgumentDescription;
 import nexusvault.cli.core.cmd.ArgumentHandler;
@@ -28,7 +28,7 @@ final class ConfigPathArgHandler implements ArgumentHandler {
 	@Override
 	public void execute(Argument args) {
 		final Path path = Paths.get(args.getValue());
-		App.getInstance().getPlugInSystem().getPlugIn(AppBasePlugIn.class).setConfigPath(path);
+		App.getInstance().getExtensionManager().getExtension(AppBasePlugIn.class).setConfigPath(path);
 	}
 
 }

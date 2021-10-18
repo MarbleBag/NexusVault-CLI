@@ -1,7 +1,7 @@
 package nexusvault.cli.plugin.export.tex;
 
-import nexusvault.cli.App;
-import nexusvault.cli.ConsoleSystem.Level;
+import nexusvault.cli.core.App;
+import nexusvault.cli.core.Console.Level;
 import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
 import nexusvault.cli.core.cmd.CommandHandler;
