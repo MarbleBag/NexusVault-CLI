@@ -2,9 +2,16 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com)
 
+## [0.3.0] Unreleased - 202?-??-??
+### Added
+- Multi-Threading for exports
+
+### Fixed
+- A cascading error wasn't reported properly, only the last message was visible
+
 ## [0.2.3] - 2020-05-24
 ### Fixed
-- A problem with the blender 2.82 gltf importer
+- A problem with blender's 2.82 gltf importer
 
 ## [0.2.2] - 2020-03-15
 ### Fixed
