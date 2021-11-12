@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import nexusvault.cli.core.App;
+import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.cmd.Argument;
 import nexusvault.cli.core.cmd.ArgumentDescription;
 import nexusvault.cli.core.cmd.ArgumentHandler;
@@ -16,6 +17,7 @@ import nexusvault.cli.core.cmd.CommandHandler;
 import nexusvault.cli.core.exception.FilePathNotSetException;
 import nexusvault.cli.extensions.archive.ArchiveExtension;
 
+@AutoInstantiate
 public final class SetArchivePath implements ArgumentHandler, CommandHandler {
 
 	@Override

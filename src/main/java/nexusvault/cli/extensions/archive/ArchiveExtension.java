@@ -22,17 +22,16 @@ import nexusvault.archive.IdxPath;
 import nexusvault.cli.core.App;
 import nexusvault.cli.core.Console.Level;
 import nexusvault.cli.core.extension.AbstractExtension;
-import nexusvault.cli.extensions.archive.command.SetArchivePath;
 import nexusvault.cli.extensions.archive.command.ChangeDirectory;
-import nexusvault.cli.extensions.archive.command.ListDirectoryContent;
+import nexusvault.cli.extensions.archive.command.SetArchivePath;
 
 public final class ArchiveExtension extends AbstractExtension {
 
 	private final static Logger logger = LogManager.getLogger(ArchiveExtension.class);
 
-	private IdxPath innerPath;
-	private Set<Path> archiveFiles;
-	private List<NexusArchiveContainer> archiveContainers;
+	private IdxPath innerPath = IdxPath.createPath();
+	private Set<Path> archiveFiles = Collections.emptySet();
+	private List<NexusArchiveContainer> archiveContainers = Collections.emptyList();
 
 	private boolean reloadArchive;
 
@@ -41,11 +40,7 @@ public final class ArchiveExtension extends AbstractExtension {
 
 	@Override
 	public void initializeExtension(InitializationHelper initializationHelper) {
-		initializationHelper.addArgumentHandler(new SetArchivePath());
 
-		initializationHelper.addCommandHandler(new SetArchivePath());
-		initializationHelper.addCommandHandler(new ListDirectoryContent());
-		initializationHelper.addCommandHandler(new ChangeDirectory());
 	}
 
 	@Override
@@ -53,6 +48,9 @@ public final class ArchiveExtension extends AbstractExtension {
 		unloadArchives();
 	}
 
+	/**
+	 * Called by {@link ChangeDirectory}
+	 */
 	public void changeDirectory(String target) {
 		final List<NexusArchiveContainer> wrappers = getArchives();
 		if (wrappers.isEmpty()) {
@@ -87,17 +85,16 @@ public final class ArchiveExtension extends AbstractExtension {
 		this.innerPath = newPath;
 	}
 
-	public IdxPath getPathWithinArchives() {
-		return this.innerPath;
+	/**
+	 * Called by {@link SetArchivePath}
+	 */
+	public void setArchivePaths(List<Path> paths) {
+		this.archiveFiles = Collections.unmodifiableSet(findValidArchivePaths(paths));
+		this.reloadArchive = true;
 	}
 
-	public void unloadArchives() {
-		final var archiveContainers = this.archiveContainers;
-		this.archiveContainers = Collections.emptyList();
-		for (final var container : archiveContainers) {
-			container.dispose();
-		}
-		this.reloadArchive = true;
+	public IdxPath getPathWithinArchives() {
+		return this.innerPath;
 	}
 
 	public List<NexusArchiveContainer> getArchives() {
@@ -108,6 +105,15 @@ public final class ArchiveExtension extends AbstractExtension {
 
 		// maybe check for disposed readers and try to reload them
 		return this.archiveContainers;
+	}
+
+	private void unloadArchives() {
+		final var archiveContainers = this.archiveContainers;
+		this.archiveContainers = Collections.emptyList();
+		for (final var container : archiveContainers) {
+			container.dispose();
+		}
+		this.reloadArchive = true;
 	}
 
 	private void loadArchives() {
@@ -133,10 +139,6 @@ public final class ArchiveExtension extends AbstractExtension {
 
 		this.archiveContainers = Collections.unmodifiableList(containers);
 		this.reloadArchive = false;
-	}
-
-	public void setArchivePaths(List<Path> paths) {
-		this.archiveFiles = Collections.unmodifiableSet(findValidArchivePaths(paths));
 	}
 
 	private static Set<Path> findValidArchivePaths(Collection<Path> paths) {

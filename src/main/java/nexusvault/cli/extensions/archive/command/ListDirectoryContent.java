@@ -1,12 +1,14 @@
 package nexusvault.cli.extensions.archive.command;
 
 import nexusvault.cli.core.App;
+import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.cmd.AbstractCommandHandler;
 import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
 import nexusvault.cli.core.cmd.CommandHandler;
 import nexusvault.cli.extensions.archive.ArchiveExtension;
 
+@AutoInstantiate
 public final class ListDirectoryContent extends AbstractCommandHandler implements CommandHandler {
 
 	@Override
