@@ -30,7 +30,9 @@ public final class ShowSearchResults implements Showable {
 		app.getConsole().println(Level.CONSOLE, () -> {
 			final List<NexusArchiveContainer> containers = app.getExtension(ArchiveExtension.class).getArchives();
 			final Map<Path, Set<IdxPath>> mapping = new HashMap<>();
-			containers.stream().forEach(container -> mapping.put(container.getArchive().getSource().getArchiveFile(), new HashSet<>()));
+			for (final var container : containers) {
+				mapping.put(container.getArchive().getSource().getArchiveFile(), new HashSet<>());
+			}
 
 			final List<IdxPath> unresolved = new LinkedList<>();
 			final List<IdxPath> searchResults = app.getExtension(SearchExtension.class).getLastSearchResults();

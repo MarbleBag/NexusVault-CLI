@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import nexusvault.cli.core.App;
 import nexusvault.cli.core.extension.AbstractExtension;
-import nexusvault.cli.extensions.show.command.Show;
 import nexusvault.cli.extensions.show.property.ShowFileProperties;
 import nexusvault.cli.extensions.show.search.ShowSearchResults;
 
@@ -25,9 +24,7 @@ public final class ShowExtension extends AbstractExtension {
 	}
 
 	@Override
-	protected void initializeExtension(InitializationHelper initializationHelper) {
-		initializationHelper.addCommandHandler(new Show());
-
+	protected void initializeExtension(InitializationHelper helper) {
 		this.showables = new ArrayList<>();
 		this.showables.add(new ShowSearchResults());
 		this.showables.add(new ShowFileProperties());

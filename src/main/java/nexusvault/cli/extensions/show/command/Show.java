@@ -1,11 +1,13 @@
 package nexusvault.cli.extensions.show.command;
 
 import nexusvault.cli.core.App;
+import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.cmd.AbstractCommandHandler;
 import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
 import nexusvault.cli.extensions.show.ShowExtension;
 
+@AutoInstantiate
 public final class Show extends AbstractCommandHandler {
 
 	@Override
