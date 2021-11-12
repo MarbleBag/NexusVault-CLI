@@ -19,7 +19,7 @@ public interface Exporter {
 	/**
 	 * Called once, when {@link ExportPlugIn} loads this {@link Exporter}. Use this function to register necessary resources
 	 */
-	void loaded(ExportExtension extension);
+	void load(ExportExtension extension);
 
 	/**
 	 * Called once, when {@link ExportPlugIn} unloads this {@link Exporter}. Make sure to unload all resources which are only used by this {@link Exporter}.
