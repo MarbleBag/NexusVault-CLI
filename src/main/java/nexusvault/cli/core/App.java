@@ -35,16 +35,15 @@ import nexusvault.cli.core.cmd.ArgumentParser;
 import nexusvault.cli.core.cmd.CommandFormatException;
 import nexusvault.cli.core.cmd.CommandHandler;
 import nexusvault.cli.core.cmd.CommandManager;
-import nexusvault.cli.core.command.AboutCmd;
-import nexusvault.cli.core.command.ExitCmd;
+import nexusvault.cli.core.command.Exit;
 import nexusvault.cli.core.command.HeadlessModeArgument;
-import nexusvault.cli.core.command.HelpCmd;
+import nexusvault.cli.core.command.Help;
 import nexusvault.cli.core.command.SetCmd;
 import nexusvault.cli.core.extension.Extension;
+import nexusvault.cli.model.AppConfigModel;
+import nexusvault.cli.model.AppConfigModel.AppConfigAppPathChangedEvent;
+import nexusvault.cli.model.AppConfigModel.AppConfigDebugModeChangedEvent;
 import nexusvault.cli.model.ModelPropertyChangedEvent;
-import nexusvault.cli.plugin.config.AppConfigModel;
-import nexusvault.cli.plugin.config.AppConfigModel.AppConfigAppPathChangedEvent;
-import nexusvault.cli.plugin.config.AppConfigModel.AppConfigDebugModeChangedEvent;
 
 public final class App {
 
@@ -57,7 +56,7 @@ public final class App {
 		}
 	}
 
-	private final static Logger logger = LogManager.getLogger(App.class);
+	private static Logger logger;
 
 	private static App app;
 
@@ -133,8 +132,9 @@ public final class App {
 		}
 
 		initializeModel();
-		initializeAppProperties();
 		// initializeLogging();
+		initializeAppProperties();
+
 		// updateLogger();
 
 		{ // console and logger
@@ -170,9 +170,9 @@ public final class App {
 			};
 
 			getCLI().registerArgument(new HeadlessModeArgument());
-			getCLI().registerCommand(new ExitCmd((args) -> requestShutDown()));
+			getCLI().registerCommand(new Exit((args) -> requestShutDown()));
 			getCLI().registerCommand(new SetCmd((args) -> setArguments(args.getUnnamedArgs())));
-			getCLI().registerCommand(new HelpCmd((args) -> {
+			getCLI().registerCommand(new Help((args) -> {
 				final var output = getConsole().getWriter(Level.CONSOLE);
 				if (args.isNamedArgumentSet("cmd")) {
 					App.this.commandManager.printHelp(output);
@@ -183,7 +183,6 @@ public final class App {
 					App.this.commandManager.printHelp(output);
 				}
 			}));
-			getCLI().registerCommand(new AboutCmd());
 		}
 
 		{ // extensions
@@ -200,14 +199,12 @@ public final class App {
 		this.appConfig.setHeadlessMode(true);
 	}
 
-	private void updateLogger() {
-		final String appenderName = "RollingFile";
-		final String appenderRef = appenderName;// "rolling";
+	private void updateRootLogger() {
 		final String packageRef = "nexusvault.cli";
 
 		final LoggerContext context = (LoggerContext) LogManager.getContext(false);
 		final Configuration configuration = context.getConfiguration();
-		final RollingFileAppender oldAppender = configuration.getAppender(appenderName);
+		final RollingFileAppender oldAppender = configuration.getAppender("ToFile");
 		final RollingFileManager oldManager = oldAppender.getManager();
 
 		oldAppender.stop();
@@ -276,7 +273,7 @@ public final class App {
 		final String logName = getAppConfig().getReportFolder().resolve("app.log").toString();
 		final String logPattern = getAppConfig().getReportFolder().resolve("app-%i.log").toString();
 
-		final AppenderComponentBuilder appenderBuilder = builder.newAppender("rolling", "RollingFile");
+		final AppenderComponentBuilder appenderBuilder = builder.newAppender("rootappender", "RollingFile");
 		appenderBuilder.addAttribute("fileName", logName);
 		appenderBuilder.addAttribute("filePattern", logPattern);
 		appenderBuilder.add(layoutBuilder);
@@ -284,12 +281,14 @@ public final class App {
 		appenderBuilder.addComponent(rolloverStrategy);
 
 		builder.add(appenderBuilder);
-		builder.add(builder.newRootLogger(org.apache.logging.log4j.Level.ALL).add(builder.newAppenderRef("rolling")).addAttribute("additivity", false)
+		builder.add(builder.newRootLogger(org.apache.logging.log4j.Level.ALL).add(builder.newAppenderRef("rootappender")).addAttribute("additivity", false)
 				.addAttribute("name", "nexusvault.cli"));
 
 		final Configuration config = builder.build();
 
 		Configurator.initialize(config);
+
+		logger = LogManager.getLogger(App.class);
 	}
 
 	@Deprecated
@@ -340,7 +339,7 @@ public final class App {
 			if (event instanceof AppConfigDebugModeChangedEvent) {
 				App.this.consoleManager.setDebugMode((Boolean) event.getNewValue());
 			} else if (event instanceof AppConfigAppPathChangedEvent) {
-				updateLogger();
+				updateRootLogger();
 			}
 		}
 	}

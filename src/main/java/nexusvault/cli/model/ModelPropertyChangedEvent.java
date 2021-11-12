@@ -1,11 +1,11 @@
 package nexusvault.cli.model;
 
-public abstract class ModelPropertyChangedEvent<T> {
+public class ModelPropertyChangedEvent<T> {
 	private final String eventName;
 	private final T oldValue;
 	private final T newValue;
 
-	protected ModelPropertyChangedEvent(String eventName, T oldValue, T newValue) {
+	public ModelPropertyChangedEvent(String eventName, T oldValue, T newValue) {
 		if (eventName == null) {
 			throw new IllegalArgumentException("'eventName' must not be null");
 		}
@@ -15,15 +15,15 @@ public abstract class ModelPropertyChangedEvent<T> {
 	}
 
 	public T getOldValue() {
-		return oldValue;
+		return this.oldValue;
 	}
 
 	public T getNewValue() {
-		return newValue;
+		return this.newValue;
 	}
 
 	public String getEventName() {
-		return eventName;
+		return this.eventName;
 	}
 
 	@Override

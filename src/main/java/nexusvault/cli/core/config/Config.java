@@ -8,8 +8,6 @@ public abstract class Config {
 
 	}
 
-	abstract public void
-
 	abstract public void setValue(String key, Object value);
 
 	abstract public Object getValue(String key, Object fallback);

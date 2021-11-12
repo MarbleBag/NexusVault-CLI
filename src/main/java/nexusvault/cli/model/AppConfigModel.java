@@ -1,4 +1,4 @@
-package nexusvault.cli.plugin.config;
+package nexusvault.cli.model;
 
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -8,10 +8,6 @@ import kreed.util.property.provider.PathExtensionProvider;
 import kreed.util.property.provider.StringProvider;
 import nexusvault.cli.core.App;
 import nexusvault.cli.core.EventManager;
-import nexusvault.cli.model.ModelPropertyChangedEvent;
-import nexusvault.cli.model.ModelSet;
-import nexusvault.cli.model.PropertyKey;
-import nexusvault.cli.model.PropertyOption;
 
 public final class AppConfigModel {
 
@@ -90,7 +86,6 @@ public final class AppConfigModel {
 			if (eventSystem == null) {
 				return;
 			}
-
 			switch (property.key) {
 				case APP_PATH:
 					eventSystem.postEvent(new AppConfigAppPathChangedEvent((Path) property.oldValue, (Path) property.newValue));

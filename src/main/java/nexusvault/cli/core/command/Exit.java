@@ -6,11 +6,11 @@ import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
 import nexusvault.cli.core.cmd.CommandHandler;
 
-public final class ExitCmd implements CommandHandler {
+public final class Exit implements CommandHandler {
 
 	private final Consumer<Arguments> onCall;
 
-	public ExitCmd(Consumer<Arguments> onCmd) {
+	public Exit(Consumer<Arguments> onCmd) {
 		if (onCmd == null) {
 			throw new IllegalArgumentException("'onCall' must not b enull");
 		}
