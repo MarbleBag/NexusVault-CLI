@@ -1,12 +1,15 @@
-package nexusvault.cli.plugin.config;
+package nexusvault.cli.extensions.base.command;
 
 import nexusvault.cli.core.App;
+import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.Console.Level;
 import nexusvault.cli.core.cmd.Argument;
 import nexusvault.cli.core.cmd.ArgumentDescription;
 import nexusvault.cli.core.cmd.ArgumentHandler;
+import nexusvault.cli.extensions.base.AppBaseExtension;
 
-final class DebugModeCmd implements ArgumentHandler {
+@AutoInstantiate
+final class DebugMode implements ArgumentHandler {
 
 	@Override
 	public ArgumentDescription getArgumentDescription() {
@@ -24,7 +27,7 @@ final class DebugModeCmd implements ArgumentHandler {
 
 	@Override
 	public void execute(Argument arg) {
-		final AppBasePlugIn configPlugin = App.getInstance().getExtensionManager().getExtension(AppBasePlugIn.class);
+		final AppBaseExtension configPlugin = App.getInstance().getExtensionManager().getExtension(AppBaseExtension.class);
 
 		if (arg.getValue() == null) {
 			configPlugin.setDebugMode(!configPlugin.getDebugMode());

@@ -1,11 +1,14 @@
-package nexusvault.cli.plugin.config;
+package nexusvault.cli.extensions.base.command;
 
 import nexusvault.cli.core.App;
+import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
 import nexusvault.cli.core.cmd.CommandHandler;
+import nexusvault.cli.extensions.base.AppBaseExtension;
 
-final class ConfigReloadCmd implements CommandHandler {
+@AutoInstantiate
+final class ReloadConfig implements CommandHandler {
 
 	@Override
 	public CommandDescription getCommandDescription() {
@@ -20,7 +23,7 @@ final class ConfigReloadCmd implements CommandHandler {
 
 	@Override
 	public void onCommand(Arguments args) {
-		App.getInstance().getExtensionManager().getExtension(AppBasePlugIn.class).reloadConfig();
+		App.getInstance().getExtensionManager().getExtension(AppBaseExtension.class).reloadConfig();
 	}
 
 	@Override
