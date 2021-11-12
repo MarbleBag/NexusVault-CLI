@@ -1,6 +1,5 @@
 package nexusvault.cli.core.command;
 
-import nexusvault.cli.core.App;
 import nexusvault.cli.core.cmd.Argument;
 import nexusvault.cli.core.cmd.ArgumentDescription;
 import nexusvault.cli.core.cmd.ArgumentHandler;
@@ -25,7 +24,7 @@ public final class HeadlessModeArgument implements ArgumentHandler {
 
 	@Override
 	public void execute(Argument args) {
-		App.getInstance().setHeadlessMode();
+		// App.getInstance().setHeadlessMode();
 	}
 
 }
