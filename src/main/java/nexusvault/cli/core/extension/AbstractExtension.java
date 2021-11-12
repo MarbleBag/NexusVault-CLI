@@ -1,13 +1,21 @@
 package nexusvault.cli.core.extension;
 
+import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
+import com.google.common.reflect.ClassPath;
+import com.google.common.reflect.ClassPath.ClassInfo;
+
 import nexusvault.cli.core.App;
+import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.CommandLineManager;
 import nexusvault.cli.core.Console.Level;
 import nexusvault.cli.core.EventManager;
+import nexusvault.cli.core.ReflectionHelper;
 import nexusvault.cli.core.cmd.ArgumentHandler;
 import nexusvault.cli.core.cmd.CommandHandler;
 
@@ -33,7 +41,7 @@ public abstract class AbstractExtension implements Extension {
 
 	}
 
-	protected abstract void initializeExtension(InitializationHelper initializationHelper);
+	protected abstract void initializeExtension(InitializationHelper helper);
 
 	protected abstract void deinitializeExtension();
 
@@ -44,6 +52,40 @@ public abstract class AbstractExtension implements Extension {
 	@Override
 	public final void initialize(App app) {
 		this.app = app;
+
+		try {
+			final var classPathScanner = ClassPath.from(this.getClass().getClassLoader());
+			final Set<ClassInfo> classInfos = classPathScanner.getTopLevelClassesRecursive(this.getClass().getPackageName());
+
+			for (final var classInfo : classInfos) {
+				final var clazz = classInfo.load();
+
+				if (Modifier.isInterface(clazz.getModifiers())) {
+					continue;
+				}
+				if (Modifier.isAbstract(clazz.getModifiers())) {
+					continue;
+				}
+				if (!clazz.isAnnotationPresent(AutoInstantiate.class)) {
+					continue;
+				}
+
+				if (CommandHandler.class.isAssignableFrom(clazz)) {
+					final CommandHandler cmd = createHandler(clazz);
+					if (cmd != null) {
+						this.cmds.add(cmd);
+					}
+				}
+				if (ArgumentHandler.class.isAssignableFrom(clazz)) {
+					final ArgumentHandler arg = createHandler(clazz);
+					if (arg != null) {
+						this.arguments.add(arg);
+					}
+				}
+			}
+		} catch (final IOException e) {
+
+		}
 
 		initializeExtension(new InitializationHelper() {
 			@Override
@@ -134,6 +176,19 @@ public abstract class AbstractExtension implements Extension {
 
 	protected final void sendDebug(Supplier<String> msg) {
 		this.app.getConsole().println(Level.DEBUG, msg);
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T> T createHandler(Class<?> clazz) {
+		try {
+			try {
+				return (T) ReflectionHelper.initialize(clazz, this);
+			} catch (final NoSuchMethodException e1) {
+				return (T) ReflectionHelper.initialize(clazz);
+			}
+		} catch (final Exception e) {
+			throw new ExtensionInitializationException(e);
+		}
 	}
 
 }

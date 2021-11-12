@@ -5,12 +5,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import nexusvault.cli.core.Console.Level;
 import nexusvault.cli.core.exception.AppInitializationException;
 import nexusvault.cli.core.extension.Extension;
 import nexusvault.cli.core.extension.ExtensionInfo;
 
 final class BaseExtensionManager implements ExtensionManager {
+
+	private final static Logger logger = LogManager.getLogger(BaseExtensionManager.class);
 
 	private final Map<Class<? extends Extension>, Extension> extensions;
 	private final App app;
@@ -22,9 +27,9 @@ final class BaseExtensionManager implements ExtensionManager {
 
 	public void loadExtensions(String classPath) {
 		try {
-			final List<Class<Extension>> targets = ReflectionHelper.findClasses(classPath, Extension.class);
+			final List<Class<Extension>> extensionClasses = ReflectionHelper.findClasses(classPath, Extension.class);
 
-			targets.sort(Collections.reverseOrder((a, b) -> {
+			extensionClasses.sort(Collections.reverseOrder((a, b) -> {
 				final var annotationA = a.getAnnotation(ExtensionInfo.class);
 				final var annotationB = b.getAnnotation(ExtensionInfo.class);
 				if (annotationA == null) {
@@ -40,14 +45,21 @@ final class BaseExtensionManager implements ExtensionManager {
 				}
 			}));
 
-			final List<Extension> extensions = ReflectionHelper.initialize(targets);
-
-			for (final Extension extension : extensions) {
-				this.register(extension);
-				extension.initialize(this.app);
+			for (final var extensionClass : extensionClasses) {
+				try {
+					final var extension = ReflectionHelper.initialize(extensionClass);
+					this.register(extension);
+					extension.initialize(this.app);
+				} catch (final Exception e) {
+					logger.error(String.format("Unable to load extension: '%s'", extensionClass), e);
+					final var writer = this.app.getConsole().getWriter(Level.CONSOLE);
+					writer.format("Unable to load extension: '%s'", extensionClass);
+					e.printStackTrace(writer);
+					writer.flush();
+				}
 			}
 
-			this.app.getConsole().println(Level.DEBUG, String.format("Plugin: %d plugin(s) found.", extensions.size()));
+			this.app.getConsole().println(Level.DEBUG, String.format("Plugin: %d plugin(s) found.", extensionClasses.size()));
 		} catch (final Exception e) {
 			throw new AppInitializationException(e);
 		}
