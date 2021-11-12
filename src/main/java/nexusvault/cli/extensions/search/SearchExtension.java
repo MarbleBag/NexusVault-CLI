@@ -30,7 +30,6 @@ import nexusvault.cli.core.App;
 import nexusvault.cli.core.extension.AbstractExtension;
 import nexusvault.cli.extensions.archive.ArchiveExtension;
 import nexusvault.cli.extensions.archive.NexusArchiveContainer;
-import nexusvault.cli.extensions.search.command.Search;
 
 public final class SearchExtension extends AbstractExtension {
 
@@ -38,7 +37,7 @@ public final class SearchExtension extends AbstractExtension {
 
 	@Override
 	protected void initializeExtension(InitializationHelper initializationHelper) {
-		initializationHelper.addCommandHandler(new Search());
+
 	}
 
 	@Override

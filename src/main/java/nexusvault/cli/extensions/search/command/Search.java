@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import nexusvault.cli.core.App;
+import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.cmd.AbstractCommandHandler;
 import nexusvault.cli.core.cmd.ArgumentDescription;
 import nexusvault.cli.core.cmd.Arguments;
@@ -12,6 +13,7 @@ import nexusvault.cli.core.cmd.CommandDescription;
 import nexusvault.cli.extensions.search.SearchExtension;
 import nexusvault.cli.extensions.search.SearchRequest;
 
+@AutoInstantiate
 public final class Search extends AbstractCommandHandler {
 
 	@Override
