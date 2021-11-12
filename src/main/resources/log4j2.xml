@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration strict="true">
+	<Properties>
+		<Property name="logName">./report/app.log</Property>
+		<Property name="backupLogName">./report/app-%i.log.gz</Property>
+	</Properties>
+	<Appenders>
+		<Appender type="RollingFile" name="ToFile"
+			fileName="${logName}" filePattern="${backupLogName}"
+			createOnDemand="true">
+			<Layout type="PatternLayout" pattern="%d %p %C{1.} [%t] %m%n" />
+			<Policies>
+				<Policy type="OnStartupTriggeringPolicy"/>
+				<Policy type="SizeBasedTriggeringPolicy" size="5 MB" />
+			</Policies>
+			<Strategy type="DefaultRolloverStrategy" fileIndex="min"
+				min="1" max="4" />
+		</Appender>
+	</Appenders>
+	<Loggers>
+		<Logger name="nexusvault.cli" level="all" additivity="false">
+			<AppenderRef ref="ToFile" />
+		</Logger>
+	</Loggers>
+</Configuration>
