@@ -56,7 +56,7 @@ public final class App {
 		}
 	}
 
-	private static Logger logger;
+	private final static Logger logger = LogManager.getLogger(App.class);
 
 	private static App app;
 
@@ -288,7 +288,7 @@ public final class App {
 
 		Configurator.initialize(config);
 
-		logger = LogManager.getLogger(App.class);
+		// logger = LogManager.getLogger(App.class);
 	}
 
 	@Deprecated
