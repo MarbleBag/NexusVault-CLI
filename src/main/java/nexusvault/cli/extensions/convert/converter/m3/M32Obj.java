@@ -22,15 +22,15 @@ public class M32Obj implements Converter {
 	}
 
 	@Override
-	public void convert(ConversionManager data) throws IOException {
-		final var resource = data.getResource();
+	public void convert(ConversionManager manager) throws IOException {
+		final var resource = manager.getResource();
 		final var m3 = this.modelReader.read(resource.getDataAsBuffer());
 		final var fileName = PathUtil.getFileName(resource.getFile());
-		final var dir = data.resolveOutputPath(fileName);
+		final var dir = manager.resolveOutputPath(fileName);
 		final ObjExporter objExporter = new ObjExporter();
 		objExporter.exportModel(dir, fileName, m3);
-		data.addCreatedFile(dir.resolve(PathUtil.addFileExtension(fileName, "obj")));
-		data.addCreatedFile(dir.resolve(PathUtil.addFileExtension(fileName, "mtl")));
+		manager.addCreatedFile(dir.resolve(PathUtil.addFileExtension(fileName, "obj")));
+		manager.addCreatedFile(dir.resolve(PathUtil.addFileExtension(fileName, "mtl")));
 	}
 
 }
