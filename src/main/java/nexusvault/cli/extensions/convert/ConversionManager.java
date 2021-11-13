@@ -81,6 +81,10 @@ public final class ConversionManager {
 		return this.outputDir.resolve(path);
 	}
 
+	public Path getOutputPath() {
+		return this.outputDir;
+	}
+
 	public Path resolveOutputPath(Path path) {
 		if (path.isAbsolute()) {
 			return this.outputDir.resolve(path.getFileName());
