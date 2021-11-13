@@ -6,6 +6,6 @@ public interface Converter {
 
 	void deinitialize();
 
-	void convert(ConversionManager data) throws IOException;
+	void convert(ConversionManager manager) throws IOException;
 
 }
