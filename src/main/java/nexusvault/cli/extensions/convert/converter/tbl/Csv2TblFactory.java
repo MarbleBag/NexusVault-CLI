@@ -26,7 +26,7 @@ public final class Csv2TblFactory implements ConverterFactory {
 			public CommandDescription getCommandDescription() {
 				// @formatter:off
 				return CommandDescription.newInfo()
-						.setCommandName("convert-csv2tbl")
+						.setCommandName("config-csv2tbl")
 						.setDescription("Config for the csv2tbl converter.")
 						.addNamedArgument(ArgumentDescription.newInfo()
 								.setName("delimiter")
@@ -53,6 +53,11 @@ public final class Csv2TblFactory implements ConverterFactory {
 				return null;
 			}
 		});
+	}
+
+	@Override
+	public int getPriority() {
+		return 1;
 	}
 
 	@Override

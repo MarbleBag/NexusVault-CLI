@@ -22,6 +22,11 @@ public final class AsIsFactory implements ConverterFactory {
 	}
 
 	@Override
+	public int getPriority() {
+		return 0;
+	}
+
+	@Override
 	public Set<String> getAcceptedFileExtensions() {
 		return new HashSet<>(Arrays.asList("ttf", "lua", "xml"));
 	}
@@ -37,7 +42,6 @@ public final class AsIsFactory implements ConverterFactory {
 			public void convert(ConversionManager manager) throws IOException {
 				final var resource = manager.getResource();
 				final var outputPath = manager.resolveOutputPath(resource.getFile());
-				Files.createDirectories(outputPath.getParent());
 				try (var channel = Files.newByteChannel(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE,
 						StandardOpenOption.TRUNCATE_EXISTING)) {
 					final var data = resource.getDataAsBuffer();

@@ -2,6 +2,7 @@ package nexusvault.cli.extensions.convert;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,6 +17,7 @@ import com.google.common.reflect.Reflection;
 
 import nexusvault.cli.core.App;
 import nexusvault.cli.core.AutoInstantiate;
+import nexusvault.cli.core.PathUtil;
 import nexusvault.cli.core.ReflectionHelper;
 import nexusvault.cli.core.extension.AbstractExtension;
 import nexusvault.cli.core.extension.ExtensionInitializationException;
@@ -125,7 +127,8 @@ public final class ConverterExtension extends AbstractExtension {
 		var id = this.preferredFactory.get(extension);
 		if (id == null) {
 			final var ids = this.fileExtension2FactoryId.get(extension);
-			id = ids.stream().findAny().orElse(null);
+			id = ids.stream().map(this.factories::get).sorted((f1, f2) -> f2.getPriority() - f1.getPriority()).map(ConverterFactory::getId).findAny()
+					.orElse(null);
 			if (id != null) {
 				this.preferredFactory.put(extension, id);
 			}
@@ -184,7 +187,7 @@ public final class ConverterExtension extends AbstractExtension {
 						outputDir = rootOutputDir.resolve(outputDir);
 					}
 
-					final var inputDir = request.input.getDirectory();
+					final var inputDir = request.input.getDirectory().resolve(PathUtil.getFileName(request.input.getFile()));
 					if (!inputDir.isAbsolute()) {
 						outputDir = outputDir.resolve(inputDir);
 					} else {
@@ -196,6 +199,7 @@ public final class ConverterExtension extends AbstractExtension {
 
 				tasks.add(() -> {
 					try {
+						Files.createDirectories(input.getOutputPath());
 						converter.convert(input);
 						conversionResult[index].setOutput(input.getCreatedFiles());
 					} catch (final Exception e) {

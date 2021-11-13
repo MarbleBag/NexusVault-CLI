@@ -17,6 +17,11 @@ public final class M32ObjFactory implements ConverterFactory {
 	}
 
 	@Override
+	public int getPriority() {
+		return 2;
+	}
+
+	@Override
 	public Set<String> getAcceptedFileExtensions() {
 		return Collections.singleton("m3");
 	}

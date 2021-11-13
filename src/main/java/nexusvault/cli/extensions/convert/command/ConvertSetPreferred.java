@@ -43,7 +43,7 @@ public final class ConvertSetPreferred extends AbstractCommandHandler {
 
 	@Override
 	public void onCommand(Arguments args) {
-		final var extension = args.getArgumentByName("file");
+		final var extension = args.getArgumentByName("extension");
 		final var id = args.getArgumentByName("id");
 		final var converterExtension = App.getInstance().getExtension(ConverterExtension.class);
 		try {

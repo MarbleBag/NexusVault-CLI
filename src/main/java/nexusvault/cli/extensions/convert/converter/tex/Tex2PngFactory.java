@@ -25,7 +25,7 @@ public final class Tex2PngFactory implements ConverterFactory {
 			public CommandDescription getCommandDescription() {
 				// @formatter:off
 				return CommandDescription.newInfo()
-						.setCommandName("convert-tex2png")
+						.setCommandName("config-tex2png")
 						.setDescription("Config for the tex2png converter.")
 						.addNamedArgument(ArgumentDescription.newInfo()
 								.setName("split")
@@ -42,7 +42,7 @@ public final class Tex2PngFactory implements ConverterFactory {
 
 			@Override
 			public void onCommand(Arguments args) {
-				if (args.hasUnnamedArgValue("split")) {
+				if (args.isNamedArgumentSet("split")) {
 					final var split = args.getArgumentByName("split").getValue();
 					switch (split.toUpperCase()) {
 						case "NO":
@@ -66,6 +66,11 @@ public final class Tex2PngFactory implements ConverterFactory {
 				return msg;
 			}
 		});
+	}
+
+	@Override
+	public int getPriority() {
+		return 1;
 	}
 
 	@Override

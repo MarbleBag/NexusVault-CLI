@@ -6,6 +6,8 @@ public interface ConverterFactory {
 
 	String getId();
 
+	int getPriority();
+
 	Set<String> getAcceptedFileExtensions();
 
 	Converter createConverter(ConverterOptions options);

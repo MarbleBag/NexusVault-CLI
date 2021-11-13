@@ -17,6 +17,11 @@ public final class M32CsvFactory implements ConverterFactory {
 	}
 
 	@Override
+	public int getPriority() {
+		return 1;
+	}
+
+	@Override
 	public Set<String> getAcceptedFileExtensions() {
 		return Collections.singleton("m3");
 	}

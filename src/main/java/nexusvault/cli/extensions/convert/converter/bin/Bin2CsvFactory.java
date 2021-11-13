@@ -25,6 +25,11 @@ public final class Bin2CsvFactory implements ConverterFactory {
 	}
 
 	@Override
+	public int getPriority() {
+		return 1;
+	}
+
+	@Override
 	public Set<String> getAcceptedFileExtensions() {
 		return Collections.singleton("bin");
 	}
@@ -44,7 +49,6 @@ public final class Bin2CsvFactory implements ConverterFactory {
 				final var resource = manager.getResource();
 				final var dictionary = this.languageReader.read(resource.getData());
 				final var outputPath = manager.resolveOutputPath(PathUtil.replaceFileExtension(resource.getFile(), "csv"));
-				Files.createDirectories(outputPath.getParent());
 
 				try (BufferedWriter writer = Files.newBufferedWriter(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE,
 						StandardOpenOption.TRUNCATE_EXISTING)) {
