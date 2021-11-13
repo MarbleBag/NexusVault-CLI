@@ -133,6 +133,17 @@ public final class ConverterExtension extends AbstractExtension {
 		return id;
 	}
 
+	public void setPreferredConverterForFileExtension(String extension, String id) {
+		final var factory = this.factories.get(id);
+		if (factory == null) {
+			throw new NoConverterFoundException(String.format("No converter found for id '%s'", id));
+		}
+		if (!factory.getAcceptedFileExtensions().contains(extension)) {
+			throw new ConverterException(String.format("Converter '%s' does not support file extension '%s'", id, extension));
+		}
+		this.preferredFactory.put(extension, id);
+	}
+
 	public ConverterFactory getConverter(String id) {
 		return this.factories.get(id);
 	}
