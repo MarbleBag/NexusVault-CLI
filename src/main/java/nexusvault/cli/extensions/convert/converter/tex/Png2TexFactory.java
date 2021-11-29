@@ -6,10 +6,11 @@ import nexusvault.cli.extensions.convert.ConverterArgs;
 import nexusvault.cli.extensions.convert.ConverterException;
 import nexusvault.cli.extensions.convert.ConverterFactory;
 import nexusvault.cli.extensions.convert.IsArgument;
+import nexusvault.cli.extensions.convert.IsFactory;
 import nexusvault.format.tex.TexType;
 
 @AutoInstantiate
-// @IsFactory(id = "png2tex", priority = 1, fileExtensions = { "png" })
+@IsFactory(id = "png2tex", priority = 1, fileExtensions = { "png" })
 public final class Png2TexFactory implements ConverterFactory {
 
 	private TexType texType = TexType.ARGB_1;
@@ -61,8 +62,11 @@ public final class Png2TexFactory implements ConverterFactory {
 
 	@Override
 	public void applyArguments(ConverterArgs arg) {
-		// TODO Auto-generated method stub
-
+		arg.onHasArray("png2tex-defaults",
+				values -> setDefaultColor(Integer.parseInt(values[0]), Integer.parseInt(values[1]), Integer.parseInt(values[2]), Integer.parseInt(values[3])));
+		arg.onHas("png2tex-quality", value -> setQuality(Integer.parseInt(value)));
+		arg.onHas("png2tex-mipmaps", value -> setMipmaps(Integer.parseInt(value)));
+		arg.onHas("png2tex-mipmaps", value -> setType(TexType.resolve(value)));
 	}
 
 	@Override

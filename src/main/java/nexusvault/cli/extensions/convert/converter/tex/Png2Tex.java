@@ -64,7 +64,7 @@ public final class Png2Tex implements Converter {
 		TextureImage[] images;
 		if (this.mipmapCount == -1) {
 			final var value = Math.min(baseImage.getImageWidth(), baseImage.getImageHeight());
-			final var count = (int) Math.ceil(Math.log(value) / Math.log(2));
+			final var count = (int) Math.ceil(Math.log(value) / Math.log(2)) + 1;
 			images = TextureMipMapGenerator.buildMipMaps(baseImage, Math.min(13, count));
 		} else if (this.mipmapCount > 1) {
 			images = TextureMipMapGenerator.buildMipMaps(baseImage, this.mipmapCount);

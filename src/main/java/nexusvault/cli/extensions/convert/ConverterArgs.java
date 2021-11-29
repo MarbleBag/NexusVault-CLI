@@ -2,6 +2,7 @@ package nexusvault.cli.extensions.convert;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import nexusvault.cli.core.cmd.Arguments;
 
@@ -29,6 +30,18 @@ public final class ConverterArgs {
 
 	public boolean has(String key) {
 		return (this.args != null ? this.args.isNamedArgumentSet(key) : false) || this.fallbacks.containsKey(key);
+	}
+
+	public void onHas(String key, Consumer<String> consumer) {
+		if (has(key)) {
+			consumer.accept(get(key));
+		}
+	}
+
+	public void onHasArray(String key, Consumer<String[]> consumer) {
+		if (has(key)) {
+			consumer.accept(gets(key));
+		}
 	}
 
 	public String get(String key) {
