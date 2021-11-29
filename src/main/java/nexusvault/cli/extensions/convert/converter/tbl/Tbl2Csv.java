@@ -34,7 +34,6 @@ public final class Tbl2Csv implements Converter {
 
 		final var outputPath = manager.resolveOutputPath(PathUtil.replaceFileExtension(resource.getFile(), "csv"));
 
-		Files.createDirectories(outputPath.getParent());
 		try (var writer = Files.newBufferedWriter(outputPath, Charset.forName("UTF8"), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
 				StandardOpenOption.WRITE)) {
 			this.csvConverter.write(tbl, writer);

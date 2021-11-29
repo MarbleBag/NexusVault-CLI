@@ -34,7 +34,7 @@ public final class Png2Tex implements Converter {
 	public Png2Tex(TexType texType, int mipmapCount, int quality, int[] defaultColor) {
 		this.writer = TextureWriter.buildDefault();
 		this.target = texType;
-		this.mipmapCount = Math.min(1, mipmapCount);
+		this.mipmapCount = Math.max(-1, Math.min(13, mipmapCount));
 		this.config = new HashMap<>();
 		this.config.put(JPGTextureImageWriter.CONFIG_QUALITY, quality);
 		if (defaultColor[0] != -1) {
@@ -62,7 +62,11 @@ public final class Png2Tex implements Converter {
 		final var baseImage = loadImage(resource);
 
 		TextureImage[] images;
-		if (this.mipmapCount > 1) {
+		if (this.mipmapCount == -1) {
+			final var value = Math.min(baseImage.getImageWidth(), baseImage.getImageHeight());
+			final var count = (int) Math.ceil(Math.log(value) / Math.log(2));
+			images = TextureMipMapGenerator.buildMipMaps(baseImage, Math.min(13, count));
+		} else if (this.mipmapCount > 1) {
 			images = TextureMipMapGenerator.buildMipMaps(baseImage, this.mipmapCount);
 		} else {
 			images = new TextureImage[] { baseImage };
@@ -73,7 +77,6 @@ public final class Png2Tex implements Converter {
 		final var outputPath = manager.resolveOutputPath(PathUtil.replaceFileExtension(resource.getFile(), "tex"));
 		manager.addCreatedFile(outputPath);
 
-		Files.createDirectories(outputPath.getParent());
 		try (var channel = Files.newByteChannel(outputPath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
 				var writer = new SeekableByteChannelBinaryWriter(channel, ByteBuffer.allocate(1024).order(ByteOrder.LITTLE_ENDIAN))) {
 			channel.write(binaryData);

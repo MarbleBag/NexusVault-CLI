@@ -37,7 +37,6 @@ public final class Csv2Tbl implements Converter {
 
 		final var outputPath = manager.resolveOutputPath(PathUtil.replaceFileExtension(resource.getFile(), "tbl"));
 
-		Files.createDirectories(outputPath.getParent());
 		try (var channel = Files.newByteChannel(outputPath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
 				var writer = new SeekableByteChannelBinaryWriter(channel, ByteBuffer.allocate(1024).order(ByteOrder.LITTLE_ENDIAN))) {
 			this.tblWriter.write(tbl, writer);
