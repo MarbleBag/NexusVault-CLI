@@ -15,7 +15,7 @@ import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
 import nexusvault.cli.extensions.convert.ConversionRequest;
 import nexusvault.cli.extensions.convert.ConverterExtension;
-import nexusvault.cli.extensions.convert.ConverterOptions;
+import nexusvault.cli.extensions.convert.ConverterArgs;
 import nexusvault.cli.extensions.convert.resource.FileResource;
 import nexusvault.cli.extensions.convert.resource.Resource;
 
@@ -68,7 +68,7 @@ public final class ConvertFile extends AbstractCommandHandler {
 			return;
 		}
 
-		final var options = new ConverterOptions(Arrays.stream(args.getNamedArgs()).collect(Collectors.toMap(Argument::getName, Argument::getValues)));
+		final var options = new ConverterArgs(Arrays.stream(args.getNamedArgs()).collect(Collectors.toMap(Argument::getName, Argument::getValues)));
 		final var requests = targets.stream().map(e -> new ConversionRequest(e, null)).collect(Collectors.toList());
 		final var results = App.getInstance().getExtension(ConverterExtension.class).convert(requests, options, null);
 
@@ -101,8 +101,8 @@ public final class ConvertFile extends AbstractCommandHandler {
 		final var builder = new StringBuilder();
 		builder.append("Supported file conversions:").append("\n");
 		for (final var fileExtension : extension.getSupportedFileExtensions()) {
-			final var converters = new HashSet<>(extension.getConvertersForFileExtensions(fileExtension));
-			final var preferredConverter = extension.getPreferredConverterForFileExtension(fileExtension);
+			final var converters = new HashSet<>(extension.getConverterIdsForFileExtensions(fileExtension));
+			final var preferredConverter = extension.getConverterIdForFileExtension(fileExtension);
 			converters.remove(preferredConverter);
 			if (preferredConverter != null) {
 				converters.add("[" + preferredConverter + "]");

@@ -7,7 +7,6 @@ import java.util.Set;
 
 import nexusvault.archive.IdxPath;
 import nexusvault.archive.util.DataHeader;
-import nexusvault.cli.plugin.export.ExportPlugIn;
 
 public interface Exporter {
 	String getId();

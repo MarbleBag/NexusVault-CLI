@@ -42,13 +42,10 @@ public final class M32Csv implements Converter {
 		final var m3 = this.modelReader.read(resource.getDataAsBuffer());
 		final var table = this.debuger.debugModel(m3);
 
-		final var outputDir = manager.resolveOutputPath(PathUtil.getFileName(resource.getFile()));
-		Files.createDirectories(outputDir);
-
 		final var tablesToWrite = collectReferences(table, PathUtil.getFileName(resource.getFile()));
 
 		for (final var entry : tablesToWrite.entrySet()) {
-			final var outputFile = outputDir.resolve(PathUtil.addFileExtension(entry.getKey(), "csv"));
+			final var outputFile = manager.resolveOutputPath(PathUtil.addFileExtension(entry.getKey(), "csv"));
 			try (BufferedWriter writer = Files.newBufferedWriter(outputFile, Charset.forName("UTF8"), StandardOpenOption.CREATE, StandardOpenOption.WRITE,
 					StandardOpenOption.TRUNCATE_EXISTING)) {
 

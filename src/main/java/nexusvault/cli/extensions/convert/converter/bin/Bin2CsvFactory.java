@@ -4,38 +4,28 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.Collections;
-import java.util.Set;
 
 import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.PathUtil;
 import nexusvault.cli.extensions.convert.ConversionManager;
 import nexusvault.cli.extensions.convert.Converter;
+import nexusvault.cli.extensions.convert.ConverterArgs;
 import nexusvault.cli.extensions.convert.ConverterFactory;
-import nexusvault.cli.extensions.convert.ConverterOptions;
+import nexusvault.cli.extensions.convert.IsFactory;
 import nexusvault.format.bin.LanguageEntry;
 import nexusvault.format.bin.LanguageReader;
 
 @AutoInstantiate
+@IsFactory(id = "bin2csv", fileExtensions = "bin")
 public final class Bin2CsvFactory implements ConverterFactory {
 
 	@Override
-	public String getId() {
-		return "bin2csv";
+	public void applyArguments(ConverterArgs args) {
+
 	}
 
 	@Override
-	public int getPriority() {
-		return 1;
-	}
-
-	@Override
-	public Set<String> getAcceptedFileExtensions() {
-		return Collections.singleton("bin");
-	}
-
-	@Override
-	public Converter createConverter(ConverterOptions options) {
+	public Converter createConverter() {
 		return new Converter() {
 			LanguageReader languageReader = new LanguageReader();
 

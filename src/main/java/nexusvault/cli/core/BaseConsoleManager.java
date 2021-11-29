@@ -5,13 +5,12 @@ import java.util.function.Supplier;
 
 final class BaseConsoleManager implements Console {
 
-	public static final class Msg {
+	static final class Msg {
 		public final Level level;
 		public final String msg;
 		public final boolean lineEnd;
 
 		public Msg(Level level, String msg, boolean lineEnd) {
-			super();
 			this.level = level;
 			this.msg = msg;
 			this.lineEnd = lineEnd;

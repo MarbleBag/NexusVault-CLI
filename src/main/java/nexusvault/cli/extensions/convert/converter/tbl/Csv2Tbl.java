@@ -9,8 +9,8 @@ import java.nio.file.StandardOpenOption;
 
 import kreed.io.util.SeekableByteChannelBinaryWriter;
 import nexusvault.cli.core.PathUtil;
-import nexusvault.cli.extensions.convert.Converter;
 import nexusvault.cli.extensions.convert.ConversionManager;
+import nexusvault.cli.extensions.convert.Converter;
 import nexusvault.format.tbl.TableWriter;
 import nexusvault.format.tbl.converter.CSV;
 

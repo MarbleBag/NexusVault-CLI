@@ -1,75 +1,20 @@
 package nexusvault.cli.extensions.convert.converter.tbl;
 
-import java.util.Collections;
-import java.util.Set;
-
 import nexusvault.cli.core.AutoInstantiate;
-import nexusvault.cli.core.cmd.ArgumentDescription;
-import nexusvault.cli.core.cmd.Arguments;
-import nexusvault.cli.core.cmd.CommandDescription;
-import nexusvault.cli.core.cmd.CommandHandler;
-import nexusvault.cli.core.extension.AbstractExtension.InitializationHelper;
 import nexusvault.cli.extensions.convert.Converter;
-import nexusvault.cli.extensions.convert.ConverterExtension;
+import nexusvault.cli.extensions.convert.ConverterArgs;
 import nexusvault.cli.extensions.convert.ConverterFactory;
-import nexusvault.cli.extensions.convert.ConverterOptions;
+import nexusvault.cli.extensions.convert.IsArgument;
+import nexusvault.cli.extensions.convert.IsFactory;
 import nexusvault.format.tbl.converter.CSV;
 
 @AutoInstantiate
+@IsFactory(id = "tbl2csv", fileExtensions = "tbl")
 public final class Tbl2CsvFactory implements ConverterFactory {
 
 	private String cellDelimiter = ";";
 
-	private Tbl2CsvFactory(ConverterExtension extension, InitializationHelper helper) {
-		helper.addCommandHandler(new CommandHandler() {
-			@Override
-			public CommandDescription getCommandDescription() {
-				// @formatter:off
-				return CommandDescription.newInfo()
-						.setCommandName("config-tbl2csv")
-						.setDescription("Config for the tbl2csv converter.")
-						.addNamedArgument(ArgumentDescription.newInfo()
-								.setName("delimiter")
-								.setDescription("???")
-								.setRequired(false)
-								.setArguments(false)
-								.setNumberOfArguments(1)
-								.setNamesOfArguments("char")
-								.build())
-						.namedArgumentsDone()
-						.build();
-				//@formatter:on
-			}
-
-			@Override
-			public void onCommand(Arguments args) {
-				if (args.isNamedArgumentSet("delimiter")) {
-					setCellDelimiter(args.getArgumentByName("delimiter").getValue());
-				}
-			}
-
-			@Override
-			public String onHelp() {
-				return null;
-			}
-		});
-	}
-
-	@Override
-	public int getPriority() {
-		return 1;
-	}
-
-	@Override
-	public String getId() {
-		return "tbl2csv";
-	}
-
-	@Override
-	public Set<String> getAcceptedFileExtensions() {
-		return Collections.singleton("tbl");
-	}
-
+	@IsArgument(name = "tbl2csv-delimiter")
 	public void setCellDelimiter(String str) {
 		this.cellDelimiter = str;
 	}
@@ -79,8 +24,13 @@ public final class Tbl2CsvFactory implements ConverterFactory {
 	}
 
 	@Override
-	public Converter createConverter(ConverterOptions options) {
-		return new Tbl2Csv(new CSV(options.getOrElse("delimiter", getCellDelimiter())));
+	public void applyArguments(ConverterArgs args) {
+		setCellDelimiter(args.getOrElse("tbl2csv-delimiter", getCellDelimiter()));
+	}
+
+	@Override
+	public Converter createConverter() {
+		return new Tbl2Csv(new CSV(getCellDelimiter()));
 	}
 
 }

@@ -11,13 +11,13 @@ import nexusvault.cli.core.cmd.CommandDescription;
 import nexusvault.cli.extensions.convert.ConverterExtension;
 
 @AutoInstantiate
-public final class ConvertSetPreferred extends AbstractCommandHandler {
+public final class SetPreferredConverter extends AbstractCommandHandler {
 
 	@Override
 	public CommandDescription getCommandDescription() {
 		// @formatter:off
 		return CommandDescription.newInfo()
-				.setCommandName("converter")
+				.setCommandName("set-converter")
 				.setDescription("Sets the converter for a given file format")
 				.addNamedArgument(ArgumentDescription.newInfo()
 						.setName("extension")
@@ -47,7 +47,7 @@ public final class ConvertSetPreferred extends AbstractCommandHandler {
 		final var id = args.getArgumentByName("id");
 		final var converterExtension = App.getInstance().getExtension(ConverterExtension.class);
 		try {
-			converterExtension.setPreferredConverterForFileExtension(extension.getValue(), id.getValue());
+			converterExtension.setPreferredConverterIdForFileExtension(extension.getValue(), id.getValue());
 		} catch (final Exception e) {
 			sendMsg("An error occured");
 			sendMsg(e.getMessage());
@@ -60,8 +60,8 @@ public final class ConvertSetPreferred extends AbstractCommandHandler {
 		final var builder = new StringBuilder();
 		builder.append("File converter:").append("\n");
 		for (final var fileExtension : extension.getSupportedFileExtensions()) {
-			final var converters = new HashSet<>(extension.getConvertersForFileExtensions(fileExtension));
-			final var preferredConverter = extension.getPreferredConverterForFileExtension(fileExtension);
+			final var converters = new HashSet<>(extension.getConverterIdsForFileExtensions(fileExtension));
+			final var preferredConverter = extension.getConverterIdForFileExtension(fileExtension);
 			converters.remove(preferredConverter);
 			if (preferredConverter != null) {
 				converters.add("[" + preferredConverter + "]");

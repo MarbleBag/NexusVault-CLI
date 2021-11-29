@@ -83,6 +83,8 @@ public final class ArchiveExtension extends AbstractExtension {
 		}
 
 		this.innerPath = newPath;
+
+		sendMsg(String.format("Change directory to: %s", this.innerPath));
 	}
 
 	/**

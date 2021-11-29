@@ -3,36 +3,24 @@ package nexusvault.cli.extensions.convert.converter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.extensions.convert.ConversionManager;
 import nexusvault.cli.extensions.convert.Converter;
+import nexusvault.cli.extensions.convert.ConverterArgs;
 import nexusvault.cli.extensions.convert.ConverterFactory;
-import nexusvault.cli.extensions.convert.ConverterOptions;
+import nexusvault.cli.extensions.convert.IsFactory;
 
 @AutoInstantiate
+@IsFactory(id = "direct", fileExtensions = { "ttf", "lua", "xml" }, priority = 0)
 public final class AsIsFactory implements ConverterFactory {
 
 	@Override
-	public String getId() {
-		return "direct";
+	public void applyArguments(ConverterArgs arg) {
 	}
 
 	@Override
-	public int getPriority() {
-		return 0;
-	}
-
-	@Override
-	public Set<String> getAcceptedFileExtensions() {
-		return new HashSet<>(Arrays.asList("ttf", "lua", "xml"));
-	}
-
-	@Override
-	public Converter createConverter(ConverterOptions options) {
+	public Converter createConverter() {
 		return new Converter() {
 			@Override
 			public void deinitialize() {

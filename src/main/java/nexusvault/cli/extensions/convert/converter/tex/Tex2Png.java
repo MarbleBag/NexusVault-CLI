@@ -40,7 +40,6 @@ public final class Tex2Png implements Converter {
 		final var imageObject = this.reader.read(resource.getData());
 		final var image = imageObject.getImage(0);
 		final var outputPath = manager.resolveOutputPath(PathUtil.replaceFileExtension(resource.getFile(), "png"));
-		Files.createDirectories(outputPath.getParent());
 
 		writeImage(image, outputPath);
 		manager.addCreatedFile(outputPath);

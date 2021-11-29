@@ -5,7 +5,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -23,8 +25,9 @@ import nexusvault.cli.core.extension.AbstractExtension;
 import nexusvault.cli.core.extension.ExtensionInitializationException;
 import nexusvault.cli.extensions.archive.ArchiveExtension;
 import nexusvault.cli.extensions.convert.ConversionRequest;
+import nexusvault.cli.extensions.convert.Converter;
+import nexusvault.cli.extensions.convert.ConverterArgs;
 import nexusvault.cli.extensions.convert.ConverterExtension;
-import nexusvault.cli.extensions.convert.ConverterOptions;
 import nexusvault.cli.extensions.convert.resource.ArchiveResource;
 import nexusvault.cli.extensions.worker.StatusMonitor;
 import nexusvault.cli.extensions.worker.WorkerExtension;
@@ -45,7 +48,15 @@ public final class ExportExtension extends AbstractExtension {
 		this.threadPool.shutdown();
 	}
 
-	public void export(List<IdxPath> searchResults, boolean exportAsBinary) {
+	public void exportAsBinary(List<IdxPath> searchResults) {
+		export(searchResults, true, null, null);
+	}
+
+	public void exportViaConverters(List<IdxPath> searchResults, Map<String, String> defaultConvertersForExt, ConverterArgs args) {
+		export(searchResults, false, defaultConvertersForExt, args);
+	}
+
+	private void export(List<IdxPath> searchResults, boolean asBinary, Map<String, String> defaultConvertersForExt, ConverterArgs args) {
 		final var archiveExtension = App.getInstance().getExtension(ArchiveExtension.class);
 		final var archiveContainers = archiveExtension.getArchives();
 		if (archiveContainers.isEmpty()) {
@@ -64,12 +75,11 @@ public final class ExportExtension extends AbstractExtension {
 			return null;
 		}).filter(p -> p != null & p.isFile()).map(p -> p.asFile());
 
-		if (exportAsBinary) {
+		if (asBinary) {
 			exportAsBinaries(exportableFiles);
 		} else {
-			exportAndConvert(exportableFiles);
+			exportAndConvert(exportableFiles, defaultConvertersForExt, args);
 		}
-
 	}
 
 	private final class ExportStatusMonitor implements StatusMonitor {
@@ -97,13 +107,23 @@ public final class ExportExtension extends AbstractExtension {
 		}
 	}
 
-	protected void exportAndConvert(final Stream<IdxFileLink> exportableFiles) {
-		final var options = new ConverterOptions();
+	private void exportAndConvert(final Stream<IdxFileLink> exportableFiles, Map<String, String> defaultConvertersForExt, ConverterArgs args) {
+		args = args == null ? new ConverterArgs() : args;
+
 		final var outputPath = Paths.get("export");
 		final var convertFiles = exportableFiles.map(ArchiveResource::new).map(e -> new ConversionRequest(e, outputPath)).collect(Collectors.toList());
 
 		final var converterExtension = App.getInstance().getExtension(ConverterExtension.class);
-		final var results = converterExtension.convert(convertFiles, options, new ExportStatusMonitor());
+
+		final var converters = new HashMap<String, Converter>();
+		for (final var entry : converterExtension.getConverterFactories(convertFiles).entrySet()) {
+			final var id = defaultConvertersForExt.getOrDefault(entry.getKey(), entry.getValue());
+			final var factory = converterExtension.createConverterFactory(id);
+			factory.applyArguments(args);
+			converters.put(entry.getKey(), factory.createConverter());
+		}
+
+		final var results = converterExtension.convert(convertFiles, converters, new ExportStatusMonitor());
 
 		final var errors = results.stream().map(result -> result.isFailed() ? new ExportError(result.getRequest().input.getFile(), result.getError()) : null)
 				.filter(Objects::nonNull).collect(Collectors.toList());
@@ -111,7 +131,7 @@ public final class ExportExtension extends AbstractExtension {
 		sendError(errors);
 	}
 
-	protected void exportAsBinaries(final Stream<IdxFileLink> exportableFiles) {
+	private void exportAsBinaries(final Stream<IdxFileLink> exportableFiles) {
 		final var outputFolder = App.getInstance().getAppConfig().getOutputPath().resolve("binaries");
 		final var errors = new ConcurrentLinkedQueue<ExportError>();
 

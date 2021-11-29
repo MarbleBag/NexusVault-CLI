@@ -41,14 +41,56 @@ public final class CommandDescription {
 		CommandDescription build();
 	}
 
-	private static final class Builder implements CommandDescription.Builder1, CommandDescription.Builder2, CommandDescription.Builder3,
-			CommandDescription.Builder4, CommandDescription.BuilderEnd {
+	private static class BuilderData {
+		protected String name;
+		protected final List<String> altNames = new ArrayList<>();
+		protected String description;
+		protected boolean ignoreNoOptions;
+		protected final List<ArgumentDescription> args = new ArrayList<>();
 
-		private String name;
-		private final List<String> altNames = new ArrayList<>();
-		private String description;
-		private boolean ignoreNoOptions;
-		private final List<ArgumentDescription> args = new ArrayList<>();
+	}
+
+	public final static class CompactBuilder extends BuilderData {
+
+		public CommandDescription build() {
+			return new CommandDescription(this);
+		}
+
+		public CompactBuilder setCommandName(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public CompactBuilder addAlternativeNames(String name) {
+			if (name == null || name.isEmpty() || name.isBlank()) {
+				throw new IllegalArgumentException();
+			}
+			this.altNames.add(name);
+			return this;
+		}
+
+		public CompactBuilder setDescription(String description) {
+			this.description = description;
+			return this;
+		}
+
+		public CompactBuilder addNamedArgument(ArgumentDescription argInfo) {
+			if (argInfo == null) {
+				throw new IllegalArgumentException();
+			}
+			this.args.add(argInfo);
+			return this;
+		}
+
+		public CompactBuilder ignoreUnnamedArguments(boolean value) {
+			this.ignoreNoOptions = value;
+			return this;
+		}
+
+	}
+
+	private static final class Builder extends BuilderData implements CommandDescription.Builder1, CommandDescription.Builder2, CommandDescription.Builder3,
+			CommandDescription.Builder4, CommandDescription.BuilderEnd {
 
 		@Override
 		public CommandDescription build() {
@@ -112,11 +154,11 @@ public final class CommandDescription {
 	private final ArgumentDescription[] args;
 	private final boolean ignoreNonOptions;
 
-	private CommandDescription(CommandDescription.Builder builder) {
-		this.name = builder.name.strip();
-		this.description = builder.description;
-		this.args = builder.args.toArray(n -> new ArgumentDescription[n]);
-		this.ignoreNonOptions = builder.ignoreNoOptions;
+	private CommandDescription(BuilderData builderData) {
+		this.name = builderData.name.strip();
+		this.description = builderData.description;
+		this.args = builderData.args.toArray(n -> new ArgumentDescription[n]);
+		this.ignoreNonOptions = builderData.ignoreNoOptions;
 
 		if (this.name.isEmpty() || this.name.isBlank()) {
 			throw new IllegalArgumentException();
