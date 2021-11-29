@@ -19,8 +19,8 @@ public final class Csv2Tbl implements Converter {
 	private CSV csvConverter;
 	private TableWriter tblWriter;
 
-	protected Csv2Tbl(CSV converter) {
-		this.csvConverter = converter;
+	protected Csv2Tbl(CSV csv) {
+		this.csvConverter = csv;
 		this.tblWriter = new TableWriter();
 	}
 

@@ -32,17 +32,16 @@ final class BaseExtensionManager implements ExtensionManager {
 			extensionClasses.sort(Collections.reverseOrder((a, b) -> {
 				final var annotationA = a.getAnnotation(ExtensionInfo.class);
 				final var annotationB = b.getAnnotation(ExtensionInfo.class);
-				if (annotationA == null) {
-					if (annotationB == null) {
-						return 0;
-					} else {
-						return -1;
-					}
-				} else if (annotationB == null) {
-					return 1;
-				} else {
-					return annotationA.priority() - annotationB.priority();
+
+				final var priorityA = annotationA != null ? annotationA.priority() : Integer.MIN_VALUE;
+				final var priorityB = annotationB != null ? annotationB.priority() : Integer.MIN_VALUE;
+				if (priorityA < priorityB) {
+					return -1;
 				}
+				if (priorityA > priorityB) {
+					return 1;
+				}
+				return 0;
 			}));
 
 			for (final var extensionClass : extensionClasses) {

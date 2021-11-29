@@ -114,13 +114,13 @@ public final class WorkerExtension extends AbstractExtension {
 	public <T> Report<T>[] waitAndReportWork(Collection<? extends Callable<? extends T>> tasks, StatusMonitor callback) {
 
 		callback.start();
-		final var<Future<? extends T>> futures = new ArrayList<Future<? extends T>>(tasks.size());
+		final var futures = new ArrayList<Future<? extends T>>(tasks.size());
 		for (final var task : tasks) {
 			futures.add(this.threadPool.submit(task));
 		}
 
 		final var result = new Report[futures.size()];
-		final var<Integer> indices = new LinkedList<Integer>();
+		final var indices = new LinkedList<Integer>();
 		for (var i = 0; i < result.length; ++i) {
 			indices.add(Integer.valueOf(i));
 		}
@@ -131,7 +131,7 @@ public final class WorkerExtension extends AbstractExtension {
 		int processedTasks = 0;
 		int reportIn = 0;
 		while (!indices.isEmpty()) {
-			final var<Integer> iterator = indices.iterator();
+			final var iterator = indices.iterator();
 			while (iterator.hasNext()) {
 				final var index = iterator.next().intValue();
 				final var future = futures.get(index);

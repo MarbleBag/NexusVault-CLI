@@ -53,6 +53,38 @@ public abstract class AbstractExtension implements Extension {
 	public final void initialize(App app) {
 		this.app = app;
 
+		initializeExtension(new InitializationHelper() {
+			@Override
+			public void addCommandHandler(CommandHandler cmd) {
+				if (cmd == null) {
+					throw new IllegalArgumentException("'cmd' was null");
+				}
+				AbstractExtension.this.cmds.add(cmd);
+			}
+
+			@Override
+			public void addArgumentHandler(ArgumentHandler arg) {
+				if (arg == null) {
+					throw new IllegalArgumentException("'arg' was null");
+				}
+				AbstractExtension.this.arguments.add(arg);
+			}
+
+			@Override
+			public void addEventListener(Object listener) {
+				if (listener == null) {
+					throw new IllegalArgumentException("'listener' was null");
+				}
+				AbstractExtension.this.eventListeners.add(listener);
+			}
+
+			@Override
+			public <T> T loadConfig(Class<T> clazz) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+		});
+
 		try {
 			final var classPathScanner = ClassPath.from(this.getClass().getClassLoader());
 			final Set<ClassInfo> classInfos = classPathScanner.getTopLevelClassesRecursive(this.getClass().getPackageName());
@@ -86,38 +118,6 @@ public abstract class AbstractExtension implements Extension {
 		} catch (final IOException e) {
 
 		}
-
-		initializeExtension(new InitializationHelper() {
-			@Override
-			public void addCommandHandler(CommandHandler cmd) {
-				if (cmd == null) {
-					throw new IllegalArgumentException("'cmd' was null");
-				}
-				AbstractExtension.this.cmds.add(cmd);
-			}
-
-			@Override
-			public void addArgumentHandler(ArgumentHandler arg) {
-				if (arg == null) {
-					throw new IllegalArgumentException("'arg' was null");
-				}
-				AbstractExtension.this.arguments.add(arg);
-			}
-
-			@Override
-			public void addEventListener(Object listener) {
-				if (listener == null) {
-					throw new IllegalArgumentException("'listener' was null");
-				}
-				AbstractExtension.this.eventListeners.add(listener);
-			}
-
-			@Override
-			public <T> T loadConfig(Class<T> clazz) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-		});
 
 		if (this.cmds == null) {
 			throw new IllegalStateException("Commands are not initialized, use 'setCommands' on initialization");

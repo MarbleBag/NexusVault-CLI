@@ -17,7 +17,7 @@ public final class Tbl2Csv implements Converter {
 	private TableReader tblReader;
 
 	public Tbl2Csv(CSV csv) {
-		this.csvConverter = new CSV();
+		this.csvConverter = csv;
 		this.tblReader = new TableReader();
 	}
 

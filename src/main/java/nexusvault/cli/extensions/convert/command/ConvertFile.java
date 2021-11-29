@@ -14,8 +14,8 @@ import nexusvault.cli.core.cmd.Argument;
 import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
 import nexusvault.cli.extensions.convert.ConversionRequest;
-import nexusvault.cli.extensions.convert.ConverterExtension;
 import nexusvault.cli.extensions.convert.ConverterArgs;
+import nexusvault.cli.extensions.convert.ConverterExtension;
 import nexusvault.cli.extensions.convert.resource.FileResource;
 import nexusvault.cli.extensions.convert.resource.Resource;
 
@@ -24,23 +24,13 @@ public final class ConvertFile extends AbstractCommandHandler {
 
 	@Override
 	public CommandDescription getCommandDescription() {
-		// @formatter:off
-		return CommandDescription.newInfo()
-				.setCommandName("convert-file")
-				.setDescription("Converts files from one format to another.")
-				.setNoNamedArguments()
-				.build();
-//				.addNamedArgument(ArgumentDescription.newInfo()
-//						.setName("file")
-//						.setDescription("One or more files for conversion, this depends on the converter")
-//						.setRequired(true)
-//						.setArguments(false)
-//						.setNumberOfArgumentsUnlimited()
-//						.setNamesOfArguments("files,...")
-//						.build())
-//				.namedArgumentsDone()
-//				.build();
-		//@formatter:on
+		final var cmdBuilder = new CommandDescription.CompactBuilder();
+		cmdBuilder.setCommandName("convert-file");
+		cmdBuilder.setDescription("Converts files from one format to another.");
+		for (final var arg : App.getInstance().getExtension(ConverterExtension.class).getCLIOptions()) {
+			cmdBuilder.addNamedArgument(arg);
+		}
+		return cmdBuilder.build();
 	}
 
 	@Override

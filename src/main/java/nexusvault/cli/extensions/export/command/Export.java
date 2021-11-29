@@ -9,6 +9,7 @@ import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
 import nexusvault.cli.core.cmd.CommandHandler;
 import nexusvault.cli.extensions.convert.ConverterArgs;
+import nexusvault.cli.extensions.convert.ConverterExtension;
 import nexusvault.cli.extensions.export.ExportExtension;
 import nexusvault.cli.extensions.search.SearchExtension;
 
@@ -18,7 +19,7 @@ public final class Export implements CommandHandler {
 	@Override
 	public CommandDescription getCommandDescription() {
 		// @formatter:off
-		return CommandDescription.newInfo()
+		final var builder = CommandDescription.newInfo()
 				.setCommandName("export")
 				.setDescription("Exports the last searched entries from the archive.")
 				.addNamedArgument(
@@ -39,11 +40,14 @@ public final class Export implements CommandHandler {
 							.setNumberOfArgumentsUnlimited()
 							.setNamesOfArguments("ext->id")
 							.build()
-						)
-
-				.namedArgumentsDone()
-				.build();
+						);
 		//@formatter:on
+
+		for (final var arg : App.getInstance().getExtension(ConverterExtension.class).getCLIOptions()) {
+			builder.addNamedArgument(arg);
+		}
+
+		return builder.ignoreUnnamedArguments().namedArgumentsDone().build();
 	}
 
 	@Override

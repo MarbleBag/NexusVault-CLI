@@ -187,8 +187,8 @@ public final class App {
 
 		{ // extensions
 			final var manager = new BaseExtensionManager(this);
-			manager.loadExtensions("nexusvault.cli.extensions");
 			this.extensionManager = manager;
+			manager.loadExtensions("nexusvault.cli.extensions");
 		}
 
 		// loadConfig();

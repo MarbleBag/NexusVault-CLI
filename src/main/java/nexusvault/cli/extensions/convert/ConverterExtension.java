@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,16 +18,19 @@ import nexusvault.cli.core.App;
 import nexusvault.cli.core.Console.Level;
 import nexusvault.cli.core.PathUtil;
 import nexusvault.cli.core.ReflectionHelper;
+import nexusvault.cli.core.cmd.ArgumentDescription;
 import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
 import nexusvault.cli.core.cmd.CommandHandler;
 import nexusvault.cli.core.extension.AbstractExtension;
+import nexusvault.cli.core.extension.ExtensionInfo;
 import nexusvault.cli.core.extension.ExtensionInitializationException;
 import nexusvault.cli.extensions.convert.FactoryBuilder.FactoryContainer;
 import nexusvault.cli.extensions.worker.NullStatusMonitor;
 import nexusvault.cli.extensions.worker.StatusMonitor;
 import nexusvault.cli.extensions.worker.WorkerExtension;
 
+@ExtensionInfo(priority = 5)
 public final class ConverterExtension extends AbstractExtension {
 
 	private final Map<String, FactoryContainer> factoryContainers = new HashMap<>();
@@ -71,17 +75,20 @@ public final class ConverterExtension extends AbstractExtension {
 				cmdBuilder.setCommandName("convert-help");
 				cmdBuilder.setDescription("Lists all arguments which can be used for conversions.");
 				cmdBuilder.ignoreUnnamedArguments(true);
-
-				for (final var container : ConverterExtension.this.factoryContainers.values()) {
-					final var args = container.args;
-					for (final var arg : args) {
-						cmdBuilder.addNamedArgument(arg);
-					}
+				for (final var arg : getCLIOptions()) {
+					cmdBuilder.addNamedArgument(arg);
 				}
-
 				return cmdBuilder.build();
 			}
 		});
+	}
+
+	public List<ArgumentDescription> getCLIOptions() {
+		final var args = new LinkedList<ArgumentDescription>();
+		for (final var container : this.factoryContainers.values()) {
+			args.addAll(container.args);
+		}
+		return args;
 	}
 
 	public Set<String> getSupportedFileExtensions() {

@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target(TYPE_USE)
 public @interface ExtensionInfo {
-	int priority() default 0;
+	int priority();
 }
