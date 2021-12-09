@@ -15,8 +15,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import nexusvault.cli.App;
-import nexusvault.cli.ConsoleSystem.Level;
+import nexusvault.cli.core.App;
+import nexusvault.cli.core.Console.Level;
 
 public final class CommandManager {
 

@@ -1,6 +1,6 @@
 package nexusvault.cli.core.exception;
 
-public class FileNotFoundException extends NexusvaultCLIBaseException {
+public class FileNotFoundException extends AppException {
 
 	private static final long serialVersionUID = 6054345784552077959L;
 

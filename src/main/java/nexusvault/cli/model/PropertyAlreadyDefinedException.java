@@ -1,8 +1,8 @@
 package nexusvault.cli.model;
 
-import nexusvault.cli.core.exception.NexusvaultCLIBaseException;
+import nexusvault.cli.core.exception.AppException;
 
-public final class PropertyAlreadyDefinedException extends NexusvaultCLIBaseException {
+public final class PropertyAlreadyDefinedException extends AppException {
 
 	private static final long serialVersionUID = -7932491086087822201L;
 

@@ -2,9 +2,18 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com)
 
+## [0.3.0] Unreleased - 2021-12-09
+### Added
+- Multi-Threading for exports
+- Additional options to 'export' and 'convert-file'
+- A csv to tbl converter
+
+### Removed
+- Command 'make-texture': is now part of 'convert-file'
+
 ## [0.2.3] - 2020-05-24
 ### Fixed
-- A problem with the blender 2.82 gltf importer
+- A problem with blender's 2.82 gltf importer
 
 ## [0.2.2] - 2020-03-15
 ### Fixed

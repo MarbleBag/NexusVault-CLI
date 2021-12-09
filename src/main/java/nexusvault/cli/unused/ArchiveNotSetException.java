@@ -1,8 +1,8 @@
 package nexusvault.cli.unused;
 
-import nexusvault.cli.core.exception.NexusvaultCLIBaseException;
+import nexusvault.cli.core.exception.AppException;
 
-class ArchiveNotSetException extends NexusvaultCLIBaseException {
+class ArchiveNotSetException extends AppException {
 
 	public ArchiveNotSetException() {
 		super();

@@ -5,7 +5,7 @@
 
 	<groupId>nexusvault</groupId>
 	<artifactId>nexusvault.cli</artifactId>
-	<version>0.2.3</version>
+	<version>0.3.0</version>
 
 	<properties>
 		<project.java.version>11</project.java.version>
@@ -129,12 +129,12 @@
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
-			<version>2.11.2</version>
+			<version>2.13.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
-			<version>2.11.2</version>
+			<version>2.13.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -154,12 +154,12 @@
 		<dependency>
 			<groupId>kreed</groupId>
 			<artifactId>kreed.util.property</artifactId>
-			<version>1.0.0</version>
+			<version>[1.1,2)</version>
 		</dependency>
 		<dependency>
 			<groupId>nexusvault</groupId>
 			<artifactId>nexusvault</artifactId>
-			<version>[3,4)</version>
+			<version>[3.1,4)</version>
 		</dependency>
 		<dependency>
 			<groupId>nexusvault</groupId>
@@ -169,12 +169,12 @@
 		<dependency>
 			<groupId>nexusvault</groupId>
 			<artifactId>nexusvault.format.tex</artifactId>
-			<version>[3.1.1,4)</version>
+			<version>[4,5)</version>
 		</dependency>
 		<dependency>
 			<groupId>nexusvault</groupId>
 			<artifactId>nexusvault.format.tbl</artifactId>
-			<version>[1,2)</version>
+			<version>[2,3)</version>
 		</dependency>
 		<dependency>
 			<groupId>nexusvault</groupId>

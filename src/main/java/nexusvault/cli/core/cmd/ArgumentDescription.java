@@ -38,16 +38,68 @@ public final class ArgumentDescription {
 		ArgumentDescription build();
 	}
 
-	private static final class Builder implements ArgumentDescription.Builder1, ArgumentDescription.Builder2, ArgumentDescription.Builder3,
-			ArgumentDescription.Builder4, ArgumentDescription.Builder5, ArgumentDescription.Builder6, ArgumentDescription.BuilderEnd {
+	private static class BuilderData {
+		protected String[] argumentNames = new String[0];
+		protected boolean argumentOptional;
+		protected String description;
+		protected String name;
+		protected String nameShort;
+		protected int numberOfArgs = 0;
+		protected boolean required;
+	}
 
-		private String[] argumentNames;
-		private boolean argumentOptional;
-		private String description;
-		private String name;
-		private String nameShort;
-		private int numberOfArgs = 0;
-		private boolean required;
+	public static final class CompactBuilder extends BuilderData {
+		public ArgumentDescription build() {
+			return new ArgumentDescription(this);
+		}
+
+		public CompactBuilder setArguments(boolean areArgumentsOptional) {
+			this.argumentOptional = areArgumentsOptional;
+			return this;
+		}
+
+		public CompactBuilder setDescription(String description) {
+			this.description = description;
+			return this;
+		}
+
+		public CompactBuilder setName(String name) {
+			this.name = name;
+			return this;
+		}
+
+		public CompactBuilder setNameShort(String nameShort) {
+			this.nameShort = nameShort;
+			return this;
+		}
+
+		public CompactBuilder setNamesOfArguments(String... names) {
+			this.argumentNames = names == null ? new String[0] : names;
+			return this;
+		}
+
+		public CompactBuilder setNumberOfArguments(int number) {
+			if (number <= 0) {
+				throw new IllegalArgumentException(
+						String.format("Command was defined to have arguments. Expected number of arguments: 1 or greater than 1, was %d", number));
+			}
+			this.numberOfArgs = number;
+			return this;
+		}
+
+		public CompactBuilder setNumberOfArgumentsUnlimited() {
+			this.numberOfArgs = NUMBER_OF_ARGUMENTS_UNLIMITED;
+			return this;
+		}
+
+		public CompactBuilder setRequired(boolean isCommandRequired) {
+			this.required = isCommandRequired;
+			return this;
+		}
+	}
+
+	private static final class Builder extends BuilderData implements ArgumentDescription.Builder1, ArgumentDescription.Builder2, ArgumentDescription.Builder3,
+			ArgumentDescription.Builder4, ArgumentDescription.Builder5, ArgumentDescription.Builder6, ArgumentDescription.BuilderEnd {
 
 		@Override
 		public ArgumentDescription build() {
@@ -133,7 +185,7 @@ public final class ArgumentDescription {
 
 	private final boolean required;
 
-	private ArgumentDescription(ArgumentDescription.Builder builder) {
+	private ArgumentDescription(ArgumentDescription.BuilderData builder) {
 		this.name = builder.name;
 		this.nameShort = builder.nameShort;
 		this.description = builder.description;

@@ -2,8 +2,9 @@ package nexusvault.cli;
 
 import java.io.IOException;
 
-public final class Main {
+import nexusvault.cli.core.App;
 
+public final class Main {
 	public static void main(String[] args) throws IOException {
 		final App app = new App();
 		app.initializeApp();
@@ -19,5 +20,4 @@ public final class Main {
 			app.closeApp();
 		}
 	}
-
 }

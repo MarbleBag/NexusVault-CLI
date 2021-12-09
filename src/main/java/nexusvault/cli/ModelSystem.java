@@ -1,11 +1,11 @@
 package nexusvault.cli;
 
-import nexusvault.cli.core.exception.NexusvaultCLIBaseException;
+import nexusvault.cli.core.exception.AppException;
 
 @Deprecated
 public interface ModelSystem {
 
-	public static final class ModelAlreadyRegisteredException extends NexusvaultCLIBaseException {
+	public static final class ModelAlreadyRegisteredException extends AppException {
 
 		private static final long serialVersionUID = -4506449228495224517L;
 
@@ -26,7 +26,7 @@ public interface ModelSystem {
 		}
 	}
 
-	public static final class ModelNotFoundException extends NexusvaultCLIBaseException {
+	public static final class ModelNotFoundException extends AppException {
 
 		private static final long serialVersionUID = 3774077083264107365L;
 
