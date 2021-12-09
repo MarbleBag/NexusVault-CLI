@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com)
 
-## [0.3.0] Unreleased - 202?-??-??
+## [0.3.0] Unreleased - 2021-12-09
 ### Added
 - Multi-Threading for exports
 - Additional options to 'export' and 'convert-file'
