@@ -71,7 +71,7 @@ public final class Png2Tex implements Converter {
 		TextureImage[] images;
 		if (this.mipmapCount == -1) {
 			final var value = Math.min(baseImage.getImageWidth(), baseImage.getImageHeight());
-			final var count = (int) Math.ceil(Math.log(value) / Math.log(2)) + 1;
+			final var count = (int) Math.ceil(Math.log(value) / Math.log(2));
 			images = TextureMipMapGenerator.buildMipMaps(baseImage, Math.min(13, count));
 		} else if (this.mipmapCount > 1) {
 			images = TextureMipMapGenerator.buildMipMaps(baseImage, this.mipmapCount);
@@ -97,14 +97,14 @@ public final class Png2Tex implements Converter {
 		}
 
 		switch (this.target) {
-			case ARGB_1:
-			case ARGB_2:
+			case ARGB1:
+			case ARGB2:
 			case DXT1:
 			case DXT3:
 			case DXT5:
-			case JPEG_TYPE_1:
-			case JPEG_TYPE_2:
-			case JPEG_TYPE_3:
+			case JPG1:
+			case JPG2:
+			case JPG3:
 				return AwtImageConverter.convertToTextureImage(TextureImageFormat.ARGB, image);
 			case RGB:
 				return AwtImageConverter.convertToTextureImage(TextureImageFormat.RGB, image);

@@ -9,6 +9,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import nexusvault.archive.IdxException;
 import nexusvault.archive.IdxFileLink;
 import nexusvault.cli.core.App;
@@ -18,6 +21,8 @@ import nexusvault.cli.extensions.search.SearchExtension;
 import nexusvault.cli.extensions.show.ShowExtension.Showable;
 
 public final class ShowFileProperties implements Showable {
+
+	private static final Logger logger = LogManager.getLogger(ShowFileProperties.class);
 
 	interface PropertyCollector {
 		boolean accepts(IdxFileLink file);
@@ -84,13 +89,18 @@ public final class ShowFileProperties implements Showable {
 		final var properties = new TreeMap<String, Map<String, String>>();
 
 		for (final var propertyCollector : this.propertyCollectors) {
-			if (propertyCollector.accepts(file)) {
-				final var newProperties = propertyCollector.mapProperties(file);
-				if (newProperties == null) {
-					continue;
-				}
+			try {
+				if (propertyCollector.accepts(file)) {
+					final var newProperties = propertyCollector.mapProperties(file);
+					if (newProperties == null) {
+						continue;
+					}
 
-				deepMerge(newProperties, properties);
+					deepMerge(newProperties, properties);
+				}
+			} catch (final Exception e) {
+				App.getInstance().getConsole().print(Level.CONSOLE, e.getMessage());
+				logger.error(e);
 			}
 		}
 		return properties;

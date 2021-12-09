@@ -13,14 +13,14 @@ import nexusvault.format.tex.TexType;
 @IsFactory(id = "png2tex", priority = 1, fileExtensions = { "png" })
 public final class Png2TexFactory implements ConverterFactory {
 
-	private TexType texType = TexType.ARGB_1;
+	private TexType texType = TexType.ARGB1;
 	private int mipmapCount = -1;
 	private int quality = 100;
 	private final int[] defaultColor = new int[] { -1, -1, -1, -1 };
 	private int depth = 1;
 	private int sides = 1;
 
-	@IsArgument(name = "png2tex-type", description = "WS specific texture type.")
+	@IsArgument(name = "png2tex-type", description = "WS specific texture type. JPG may or may not work.")
 	public void setType(TexType texType) {
 		this.texType = texType;
 	}
@@ -84,7 +84,7 @@ public final class Png2TexFactory implements ConverterFactory {
 				values -> setDefaultColor(Integer.parseInt(values[0]), Integer.parseInt(values[1]), Integer.parseInt(values[2]), Integer.parseInt(values[3])));
 		arg.onHas("png2tex-quality", value -> setQuality(Integer.parseInt(value)));
 		arg.onHas("png2tex-mipmaps", value -> setMipmaps(Integer.parseInt(value)));
-		arg.onHas("png2tex-mipmaps", value -> setType(TexType.resolve(value)));
+		arg.onHas("png2tex-type", value -> setType(TexType.resolve(value)));
 		arg.onHas("png2tex-depth", value -> setDepth(Integer.parseInt(value)));
 		arg.onHas("png2tex-sides", value -> setSides(Integer.parseInt(value)));
 	}

@@ -1,6 +1,7 @@
 package nexusvault.cli.extensions.convert.command;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -43,14 +44,29 @@ public final class ConvertFile extends AbstractCommandHandler {
 		final var targets = new LinkedList<Resource>();
 		boolean allFilesFound = true;
 
-		for (final var strPath : args.getUnnamedArgs()) {
+		final var alternativeLookupPaths = new Path[] { App.getInstance().getAppConfig().getOutputPath(),
+				App.getInstance().getAppConfig().getApplicationPath() };
+
+		searchFiles: for (final var strPath : args.getUnnamedArgs()) {
 			final var path = Paths.get(strPath);
+
 			if (Files.exists(path)) {
 				targets.add(new FileResource(path));
-			} else {
-				sendMsg(() -> String.format("File not found: %s", path));
-				allFilesFound = false;
+				continue; // done
 			}
+
+			if (!path.isAbsolute()) {
+				for (final var parentPath : alternativeLookupPaths) {
+					final var newPath = parentPath.resolve(path);
+					if (Files.exists(newPath)) {
+						targets.add(new FileResource(newPath));
+						continue searchFiles; // done
+					}
+				}
+			}
+
+			sendMsg(() -> String.format("File not found: %s", strPath));
+			allFilesFound = false;
 		}
 
 		if (!allFilesFound) {

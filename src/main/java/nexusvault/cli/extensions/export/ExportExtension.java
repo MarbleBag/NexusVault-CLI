@@ -132,7 +132,7 @@ public final class ExportExtension extends AbstractExtension {
 	}
 
 	private void exportAsBinaries(final Stream<IdxFileLink> exportableFiles) {
-		final var outputFolder = App.getInstance().getAppConfig().getOutputPath().resolve("binaries");
+		final var outputFolder = App.getInstance().getAppConfig().getOutputPath().resolve("export");
 		final var errors = new ConcurrentLinkedQueue<ExportError>();
 
 		final var tasks = exportableFiles.map(file -> (Runnable) () -> {
