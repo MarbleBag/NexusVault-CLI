@@ -19,6 +19,7 @@ import nexusvault.cli.extensions.convert.resource.Resource;
 import nexusvault.format.tex.TexType;
 import nexusvault.format.tex.TextureImage;
 import nexusvault.format.tex.TextureImageFormat;
+import nexusvault.format.tex.TextureImageWriter;
 import nexusvault.format.tex.TextureWriter;
 import nexusvault.format.tex.jpg.JPGTextureImageWriter;
 import nexusvault.format.tex.util.AwtImageConverter;
@@ -31,7 +32,7 @@ public final class Png2Tex implements Converter {
 	private final HashMap<String, Object> config;
 	private final int mipmapCount;
 
-	public Png2Tex(TexType texType, int mipmapCount, int quality, int[] defaultColor) {
+	public Png2Tex(TexType texType, int depth, int sides, int mipmapCount, int quality, int[] defaultColor) {
 		this.writer = TextureWriter.buildDefault();
 		this.target = texType;
 		this.mipmapCount = Math.max(-1, Math.min(13, mipmapCount));
@@ -48,6 +49,12 @@ public final class Png2Tex implements Converter {
 		}
 		if (defaultColor[3] != -1) {
 			this.config.put(JPGTextureImageWriter.CONFIG_VALUE_LAYER4, defaultColor[3]);
+		}
+		if (depth >= 0) {
+			this.config.put(TextureImageWriter.CONFIG_DEPTH, depth);
+		}
+		if (sides >= 0) {
+			this.config.put(TextureImageWriter.CONFIG_SIDES, sides);
 		}
 	}
 

@@ -17,8 +17,8 @@ public final class SetPreferredConverter extends AbstractCommandHandler {
 	public CommandDescription getCommandDescription() {
 		// @formatter:off
 		return CommandDescription.newInfo()
-				.setCommandName("set-converter")
-				.setDescription("Sets the converter for a given file format")
+				.setCommandName("preferred-converter")
+				.setDescription("Sets the preferred converter for a given file format")
 				.addNamedArgument(ArgumentDescription.newInfo()
 						.setName("extension")
 						.setNameShort("ext")

@@ -29,6 +29,9 @@ final class TexFileProperties implements PropertyCollector {
 			properties.put("Width", String.valueOf(texObj.getImageWidth()));
 			properties.put("Height", String.valueOf(texObj.getImageHeight()));
 			properties.put("Mip Maps", String.valueOf(texObj.getMipMapCount()));
+			properties.put("Version", String.valueOf(texObj.getVersion()));
+			properties.put("Sides", String.valueOf(texObj.getSides()));
+			properties.put("Depth", String.valueOf(texObj.getDepth()));
 		} catch (final IOException e) {
 
 		}

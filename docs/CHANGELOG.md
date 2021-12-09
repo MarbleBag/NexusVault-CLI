@@ -5,9 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com)
 ## [0.3.0] Unreleased - 202?-??-??
 ### Added
 - Multi-Threading for exports
+- Additional options to 'export' and 'convert-file'
+- A csv to tbl converter
 
-### Fixed
-- A cascading error wasn't reported properly, only the last message was visible
+### Removed
+- Command 'make-texture': is now part of 'convert-file'
 
 ## [0.2.3] - 2020-05-24
 ### Fixed

@@ -20,7 +20,7 @@ final class TblFileProperties implements PropertyCollector {
 	@Override
 	public Map<String, Map<String, String>> mapProperties(IdxFileLink file) {
 		final var propertyCategory = new HashMap<String, Map<String, String>>();
-		final var properties = propertyCategory.put("Table", new HashMap<String, String>());
+		final var properties = propertyCategory.computeIfAbsent("Table", e -> new HashMap<>());
 
 		try {
 			final var reader = new TableReader();

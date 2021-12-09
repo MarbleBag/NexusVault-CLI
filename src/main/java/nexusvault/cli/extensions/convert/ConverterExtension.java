@@ -15,13 +15,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import nexusvault.cli.core.App;
-import nexusvault.cli.core.Console.Level;
 import nexusvault.cli.core.PathUtil;
 import nexusvault.cli.core.ReflectionHelper;
 import nexusvault.cli.core.cmd.ArgumentDescription;
-import nexusvault.cli.core.cmd.Arguments;
-import nexusvault.cli.core.cmd.CommandDescription;
-import nexusvault.cli.core.cmd.CommandHandler;
 import nexusvault.cli.core.extension.AbstractExtension;
 import nexusvault.cli.core.extension.ExtensionInfo;
 import nexusvault.cli.core.extension.ExtensionInitializationException;
@@ -56,31 +52,6 @@ public final class ConverterExtension extends AbstractExtension {
 		this.factoryContainers.putAll(FactoryBuilder.findAllFactories());
 		this.fileExtension2FactoryId.putAll(FactoryBuilder.computeFactoriesByExtension(this.factoryContainers));
 		this.preferredFactory.putAll(FactoryBuilder.computePreferredFactoryByExtension(this.factoryContainers, this.fileExtension2FactoryId));
-
-		helper.addCommandHandler(new CommandHandler() {
-
-			@Override
-			public String onHelp() {
-				return null;
-			}
-
-			@Override
-			public void onCommand(Arguments args) {
-				App.getInstance().getConsole().println(Level.CONSOLE, "Use as 'convert-help ?'");
-			}
-
-			@Override
-			public CommandDescription getCommandDescription() {
-				final var cmdBuilder = new CommandDescription.CompactBuilder();
-				cmdBuilder.setCommandName("convert-help");
-				cmdBuilder.setDescription("Lists all arguments which can be used for conversions.");
-				cmdBuilder.ignoreUnnamedArguments(true);
-				for (final var arg : getCLIOptions()) {
-					cmdBuilder.addNamedArgument(arg);
-				}
-				return cmdBuilder.build();
-			}
-		});
 	}
 
 	public List<ArgumentDescription> getCLIOptions() {
@@ -191,7 +162,8 @@ public final class ConverterExtension extends AbstractExtension {
 
 			final var converter = converterByExtension.get(request.input.getFileExtension());
 			if (converter == null) {
-				conversionResult[index].setError(new NoConverterFoundException());
+				conversionResult[index]
+						.setError(new NoConverterFoundException(String.format("No converter for file extension '%s'", request.input.getFileExtension())));
 				continue;
 			}
 

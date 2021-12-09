@@ -17,6 +17,8 @@ public final class Png2TexFactory implements ConverterFactory {
 	private int mipmapCount = -1;
 	private int quality = 100;
 	private final int[] defaultColor = new int[] { -1, -1, -1, -1 };
+	private int depth = 1;
+	private int sides = 1;
 
 	@IsArgument(name = "png2tex-type", description = "WS specific texture type.")
 	public void setType(TexType texType) {
@@ -37,6 +39,22 @@ public final class Png2TexFactory implements ConverterFactory {
 			throw new ConverterException();
 		}
 		this.quality = quality;
+	}
+
+	@IsArgument(name = "png2tex-depth", description = "Sets the depth of the texture, minimum 1.")
+	public void setDepth(int depth) {
+		if (depth < 0) {
+			throw new ConverterException();
+		}
+		this.depth = depth;
+	}
+
+	@IsArgument(name = "png2tex-sides", description = "Sets the number of sides of the texture, minimum 1.")
+	public void setSides(int sides) {
+		if (sides < 0) {
+			throw new ConverterException();
+		}
+		this.sides = sides;
 	}
 
 	@IsArgument(name = "png2tex-defaults", description = "Only used for JPEG 1 to 3. Requires 4 numbers from -1 to 255, -1 means it's not used. Each number represents a shade of grey for that channel. Used to reduce the file size for channels which only contain a uniform shade.")
@@ -67,11 +85,13 @@ public final class Png2TexFactory implements ConverterFactory {
 		arg.onHas("png2tex-quality", value -> setQuality(Integer.parseInt(value)));
 		arg.onHas("png2tex-mipmaps", value -> setMipmaps(Integer.parseInt(value)));
 		arg.onHas("png2tex-mipmaps", value -> setType(TexType.resolve(value)));
+		arg.onHas("png2tex-depth", value -> setDepth(Integer.parseInt(value)));
+		arg.onHas("png2tex-sides", value -> setSides(Integer.parseInt(value)));
 	}
 
 	@Override
 	public Converter createConverter() {
-		return new Png2Tex(this.texType, this.mipmapCount, this.quality, this.defaultColor);
+		return new Png2Tex(this.texType, this.depth, this.sides, this.mipmapCount, this.quality, this.defaultColor);
 	}
 
 }

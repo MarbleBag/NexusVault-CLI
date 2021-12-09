@@ -64,7 +64,7 @@ final class FactoryBuilder {
 
 	public static String findPreferredFactoryByExtension(Map<String, FactoryContainer> factories, Map<String, Set<String>> extensionMapping, String extension) {
 		final var ids = extensionMapping.get(extension);
-		if (ids.isEmpty()) {
+		if (ids == null || ids.isEmpty()) {
 			return null;
 		}
 		return ids.stream().map(factories::get).sorted((f1, f2) -> f2.getPriority() - f1.getPriority()).map(FactoryContainer::getId).findFirst().orElse(null);
