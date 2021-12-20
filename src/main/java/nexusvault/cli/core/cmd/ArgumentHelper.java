@@ -5,6 +5,10 @@ public final class ArgumentHelper {
 	}
 
 	public static boolean toBoolean(String value, boolean originalValue) {
+		if (value == null) {
+			return !originalValue;
+		}
+    
 		switch (value.toUpperCase()) {
 			case "N":
 			case "NO":

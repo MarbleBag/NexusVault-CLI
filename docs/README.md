@@ -1,5 +1,5 @@
 # NexusVault CLI
-Version 0.3.0
+Version 0.3.1
 
 A CLI application which incorporates the [NexusVault library](https://github.com/MarbleBag/NexusVault)
 In its current form it mainly provides a way to traverse the content of .archive files and export its content, either in its original form or converted to a more known format.
@@ -11,7 +11,7 @@ In its current form it mainly provides a way to traverse the content of .archive
 Check out the [latest release](https://github.com/MarbleBag/NexusVault-CLI/releases/latest).
 The release comes prepacked ([7zip](https://www.7-zip.org/)) with all needed dependencies (except Java) and a launch4j launcher, which supports to run the application without a Java installation, as long as it can find a valid JRE beside it.
 
-A Windows compatible Java version can be downloaded [here](https://github.com/MarbleBag/NexusVault-CLI/releases/tag/v0.1.5.beta), packed as JRE_11_small_WIN64.zip
+A Windows compatible Java version can be downloaded [here](https://github.com/MarbleBag/NexusVault-CLI/releases/tag/v0.3.1), packed as JRE_11_small_WIN64.zip
 
 ```Bash
 ├── NexusVaultCLI
@@ -64,9 +64,10 @@ The application runs on a JRE 11 which contains the listed modules:
 - java.desktop
 - java.logging
 - java.management
+- java.naming
 
 JLink can be used to create a minimal JRE with all requirements:
-* jlink --no-header-files --no-man-pages --compress=2 --strip-debug --add-modules java.desktop,java.logging,java.management
+* jlink --no-header-files --no-man-pages --compress=2 --strip-debug --add-modules java.desktop,java.logging,java.management,java.naming
 
 ## Built With
 

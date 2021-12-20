@@ -1,6 +1,5 @@
 package nexusvault.cli.extensions.convert.converter.tex;
 
-import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.extensions.convert.Converter;
 import nexusvault.cli.extensions.convert.ConverterArgs;
 import nexusvault.cli.extensions.convert.ConverterException;
@@ -9,7 +8,6 @@ import nexusvault.cli.extensions.convert.IsArgument;
 import nexusvault.cli.extensions.convert.IsFactory;
 import nexusvault.format.tex.TexType;
 
-@AutoInstantiate
 @IsFactory(id = "png2tex", priority = 1, fileExtensions = { "png" })
 public final class Png2TexFactory implements ConverterFactory {
 
@@ -25,7 +23,7 @@ public final class Png2TexFactory implements ConverterFactory {
 		this.texType = texType;
 	}
 
-	@IsArgument(name = "png2tex-mipmaps", description = "How many mip maps the texture should contain. Maximal number of mip maps is 13.")
+	@IsArgument(name = "png2tex-mipmaps", description = "How many mip maps the texture should contain. Maximal number of mip maps is 13. By default the optimal number, down to 1x1, is generated.")
 	public void setMipmaps(int mipmaps) {
 		if (mipmaps < 0 || mipmaps > 13) {
 			throw new ConverterException();

@@ -62,7 +62,7 @@ public final class Export implements CommandHandler {
 			final var useConverters = new HashMap<String, String>();
 			if (args.isNamedArgumentSet("converters")) {
 				for (final var use : args.getArgumentByName("converters").getValues()) {
-					final var extId = use.split(">");
+					final var extId = use.split("->");
 					if (extId.length == 2) {
 						useConverters.put(extId[0], extId[1]);
 					}
