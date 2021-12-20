@@ -53,7 +53,7 @@ public final class ArgumentDescription {
 			return new ArgumentDescription(this);
 		}
 
-		public CompactBuilder setArguments(boolean areArgumentsOptional) {
+		public CompactBuilder isArgumentOptional(boolean areArgumentsOptional) {
 			this.argumentOptional = areArgumentsOptional;
 			return this;
 		}

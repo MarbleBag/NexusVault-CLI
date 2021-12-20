@@ -103,6 +103,7 @@ public final class CommandManager {
 		builder.required(description.isCommandRequired());
 
 		if (description.hasArguments()) {
+			builder.hasArg();
 			builder.optionalArg(description.isArgumentOptional());
 			builder.argName(String.join(", ", description.getArgumentNames()));
 

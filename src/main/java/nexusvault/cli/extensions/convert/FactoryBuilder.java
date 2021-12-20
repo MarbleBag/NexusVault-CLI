@@ -111,7 +111,7 @@ final class FactoryBuilder {
 			argumentBuilder.setName(getArgumentName(method, argumentAnnotation));
 			argumentBuilder.setDescription(argumentAnnotation.description());
 			argumentBuilder.setRequired(false);
-
+			argumentBuilder.isArgumentOptional(argumentAnnotation.isArgumentOptional());
 			if (argumentAnnotation.numberOfArgs() != Integer.MAX_VALUE) {
 				argumentBuilder.setNumberOfArguments(argumentAnnotation.numberOfArgs());
 			} else {
