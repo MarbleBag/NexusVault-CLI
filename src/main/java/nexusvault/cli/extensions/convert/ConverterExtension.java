@@ -191,7 +191,12 @@ public final class ConverterExtension extends AbstractExtension {
 		final var factories = createConverterFactory(factoryIds);
 		applyConvertersArgs(factories, options);
 		final var converters = createConverters(factories);
-		return convert(requests, converters, callback);
+		try {
+			final var results = convert(requests, converters, callback);
+			return results;
+		} finally {
+			converters.forEach((k, v) -> v.deinitialize());
+		}
 	}
 
 	private Path makeOutputDir(final Path rootOutputDir, final ConversionRequest request) {

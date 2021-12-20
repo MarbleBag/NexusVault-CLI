@@ -123,12 +123,15 @@ public final class ExportExtension extends AbstractExtension {
 			converters.put(entry.getKey(), factory.createConverter());
 		}
 
-		final var results = converterExtension.convert(convertFiles, converters, new ExportStatusMonitor());
-
-		final var errors = results.stream().map(result -> result.isFailed() ? new ExportError(result.getRequest().input.getFile(), result.getError()) : null)
-				.filter(Objects::nonNull).collect(Collectors.toList());
-
-		sendError(errors);
+		try {
+			final var results = converterExtension.convert(convertFiles, converters, new ExportStatusMonitor());
+			final var errors = results.stream()
+					.map(result -> result.isFailed() ? new ExportError(result.getRequest().input.getFile(), result.getError()) : null).filter(Objects::nonNull)
+					.collect(Collectors.toList());
+			sendError(errors);
+		} finally {
+			converters.forEach((k, v) -> v.deinitialize());
+		}
 	}
 
 	private void exportAsBinaries(final Stream<IdxFileLink> exportableFiles) {
