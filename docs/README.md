@@ -64,9 +64,10 @@ The application runs on a JRE 11 which contains the listed modules:
 - java.desktop
 - java.logging
 - java.management
+- java.naming
 
 JLink can be used to create a minimal JRE with all requirements:
-* jlink --no-header-files --no-man-pages --compress=2 --strip-debug --add-modules java.desktop,java.logging,java.management
+* jlink --no-header-files --no-man-pages --compress=2 --strip-debug --add-modules java.desktop,java.logging,java.management,java.naming
 
 ## Built With
 

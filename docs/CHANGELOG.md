@@ -10,6 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com)
 ### Fixed
 - An error where the wrong texture exporter was selected, which raised an exception.
 
+### Attention
+- Requires a new jre 11 build
+
 ## [0.3.0] - 2021-12-09
 ### Added
 - Multi-Threading for exports
