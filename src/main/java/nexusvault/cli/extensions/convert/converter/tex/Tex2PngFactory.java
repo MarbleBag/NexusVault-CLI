@@ -10,15 +10,15 @@ import nexusvault.cli.extensions.convert.IsFactory;
 @IsFactory(id = "tex2png", fileExtensions = { "tex" }, priority = 1)
 public final class Tex2PngFactory implements ConverterFactory {
 
-	private boolean splitImage = true;
+	private boolean splitImage = false;
 	private boolean exportMipMaps = false;
 
-	@IsArgument(name = "tex2png-split", description = "Toggles the splitting of textures. By default, this is on. Can be set directly to 'on' or 'off'. Some textures use their color and alpha channels to store different information, like normal maps, masks and roughness. If set to on, the exporter will export will not only export the image, but each channel as a separate image if applicable.")
+	@IsArgument(name = "tex2png-split", description = "Toggles the splitting of textures. By default off. Can be set directly to 'on' or 'off'. Some textures use their color and alpha channels to store different information, like normal maps, masks and roughness. If set to on, the exporter will export will not only export the image, but each channel as a separate image if applicable.")
 	public void setSplitImage(boolean value) {
 		this.splitImage = value;
 	}
 
-	@IsArgument(name = "tex2png-mipmaps", description = "Toggles the export of mipmaps. By default, this is off. Can be set directly to 'on' or 'off'.")
+	@IsArgument(name = "tex2png-mipmaps", description = "Toggles the export of mipmaps. By default off. Can be set directly to 'on' or 'off'.")
 	public void setExportMipMaps(boolean value) {
 		this.exportMipMaps = value;
 	}
