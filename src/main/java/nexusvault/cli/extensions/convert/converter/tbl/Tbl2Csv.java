@@ -1,6 +1,7 @@
 package nexusvault.cli.extensions.convert.converter.tbl;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
@@ -8,22 +9,26 @@ import java.nio.file.StandardOpenOption;
 import nexusvault.cli.core.PathUtil;
 import nexusvault.cli.extensions.convert.ConversionManager;
 import nexusvault.cli.extensions.convert.Converter;
+import nexusvault.format.tbl.Table;
 import nexusvault.format.tbl.TableReader;
-import nexusvault.format.tbl.converter.CSV;
 
 public final class Tbl2Csv implements Converter {
 
-	private CSV csvConverter;
+	public static interface CSVWriter {
+		void write(Table tbl, Writer writer) throws IOException;
+	}
+
+	private CSVWriter csvWriter;
 	private TableReader tblReader;
 
-	public Tbl2Csv(CSV csv) {
-		this.csvConverter = csv;
+	public Tbl2Csv(CSVWriter csvWriter) {
+		this.csvWriter = csvWriter;
 		this.tblReader = new TableReader();
 	}
 
 	@Override
 	public void deinitialize() {
-		this.csvConverter = null;
+		this.csvWriter = null;
 		this.tblReader = null;
 	}
 
@@ -36,7 +41,7 @@ public final class Tbl2Csv implements Converter {
 
 		try (var writer = Files.newBufferedWriter(outputPath, Charset.forName("UTF8"), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
 				StandardOpenOption.WRITE)) {
-			this.csvConverter.write(tbl, writer);
+			this.csvWriter.write(tbl, writer);
 		}
 		manager.addCreatedFile(outputPath);
 	}
