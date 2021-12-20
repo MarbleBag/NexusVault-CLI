@@ -3,7 +3,6 @@ package nexusvault.cli.extensions.convert.converter.tbl;
 import java.io.IOException;
 import java.io.Writer;
 
-import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.cmd.ArgumentHelper;
 import nexusvault.cli.extensions.convert.Converter;
 import nexusvault.cli.extensions.convert.ConverterArgs;
@@ -14,7 +13,6 @@ import nexusvault.format.tbl.Table;
 import nexusvault.format.tbl.converter.CSV;
 import nexusvault.format.tbl.converter.CSVSimple;
 
-@AutoInstantiate
 @IsFactory(id = "tbl2csv", fileExtensions = "tbl")
 public final class Tbl2CsvFactory implements ConverterFactory {
 
