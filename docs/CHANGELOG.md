@@ -2,7 +2,15 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com)
 
-## [0.3.0] Unreleased - 2021-12-09
+## [0.3.1] - 2021-12-20
+### Added
+- tex2png; argument for mipmap extraction [ tex2png-mipmaps on/off ]
+- tbl2csv; argument for simple csvs [ tbl2csv-simple yes/no ]
+
+### Fixed
+- An error where the wrong texture exporter was selected, which raised an exception.
+
+## [0.3.0] - 2021-12-09
 ### Added
 - Multi-Threading for exports
 - Additional options to 'export' and 'convert-file'
