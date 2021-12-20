@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 
-import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.PathUtil;
 import nexusvault.cli.extensions.convert.ConversionManager;
 import nexusvault.cli.extensions.convert.Converter;
@@ -15,7 +14,6 @@ import nexusvault.cli.extensions.convert.IsFactory;
 import nexusvault.format.bin.LanguageEntry;
 import nexusvault.format.bin.LanguageReader;
 
-@AutoInstantiate
 @IsFactory(id = "bin2csv", fileExtensions = "bin")
 public final class Bin2CsvFactory implements ConverterFactory {
 
