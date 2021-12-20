@@ -11,7 +11,7 @@ In its current form it mainly provides a way to traverse the content of .archive
 Check out the [latest release](https://github.com/MarbleBag/NexusVault-CLI/releases/latest).
 The release comes prepacked ([7zip](https://www.7-zip.org/)) with all needed dependencies (except Java) and a launch4j launcher, which supports to run the application without a Java installation, as long as it can find a valid JRE beside it.
 
-A Windows compatible Java version can be downloaded [here](https://github.com/MarbleBag/NexusVault-CLI/releases/tag/v0.1.5.beta), packed as JRE_11_small_WIN64.zip
+A Windows compatible Java version can be downloaded [here](https://github.com/MarbleBag/NexusVault-CLI/releases/tag/v0.3.1), packed as JRE_11_small_WIN64.zip
 
 ```Bash
 ├── NexusVaultCLI
