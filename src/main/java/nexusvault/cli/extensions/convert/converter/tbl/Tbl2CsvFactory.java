@@ -30,7 +30,7 @@ public final class Tbl2CsvFactory implements ConverterFactory {
 		return this.cellDelimiter;
 	}
 
-	@IsArgument(name = "tbl2csv-simple", description = "Export only column names and values. Can be set to 'yes' or 'no'. A simple csv can't be converted back to a tbl!")
+	@IsArgument(name = "tbl2csv-simple", description = "Export only column names and values. Can be set to 'yes' or 'no'. A simple csv can't be converted back to a tbl!", isArgumentOptional = true)
 	public void setSimpleCSV(boolean simple) {
 		this.simple = simple;
 	}
