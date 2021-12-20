@@ -21,5 +21,4 @@ public @interface IsArgument {
 	String name();
 
 	boolean isArgumentOptional() default false;
-
 }

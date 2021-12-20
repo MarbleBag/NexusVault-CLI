@@ -6,7 +6,6 @@ import nexusvault.cli.extensions.convert.ConverterArgs;
 import nexusvault.cli.extensions.convert.ConverterFactory;
 import nexusvault.cli.extensions.convert.IsArgument;
 import nexusvault.cli.extensions.convert.IsFactory;
-
 @IsFactory(id = "tex2png", fileExtensions = { "tex" }, priority = 1)
 public final class Tex2PngFactory implements ConverterFactory {
 

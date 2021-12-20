@@ -42,7 +42,6 @@ public final class Tex2Png implements Converter {
 	public void convert(ConversionManager manager) throws IOException {
 		final var resource = manager.getResource();
 		final var imageObject = this.reader.read(resource.getData());
-
 		final var images = new LinkedList<TextureImage>();
 		images.add(imageObject.getImage(0));
 

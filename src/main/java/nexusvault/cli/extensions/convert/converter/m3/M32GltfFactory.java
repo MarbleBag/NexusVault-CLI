@@ -30,5 +30,4 @@ public final class M32GltfFactory implements ConverterFactory {
 	public void applyArguments(ConverterArgs args) {
 		args.onHas("m32gltf-textures", value -> setIncludeTextures(ArgumentHelper.toBoolean(value, getIncludeTextures())));
 	}
-
 }

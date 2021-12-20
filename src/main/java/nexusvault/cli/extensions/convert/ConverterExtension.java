@@ -209,7 +209,7 @@ public final class ConverterExtension extends AbstractExtension {
 			} else {
 				outputDir = rootOutputDir.resolve(outputDir);
 			}
-
+      
 			final var inputDir = request.input.getFilePath().resolveSibling(PathUtil.getFileName(request.input.getFile()));
 			if (!inputDir.isAbsolute()) {
 				outputDir = outputDir.resolve(inputDir);

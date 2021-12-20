@@ -8,7 +8,7 @@ public final class ArgumentHelper {
 		if (value == null) {
 			return !originalValue;
 		}
-
+    
 		switch (value.toUpperCase()) {
 			case "N":
 			case "NO":
