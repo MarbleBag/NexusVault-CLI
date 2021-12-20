@@ -4,8 +4,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com)
 
 ## [0.3.1] - 2021-12-20
 ### Added
-- tex2png; argument for mipmap extraction [ tex2png-mipmaps on/off ]
-- tbl2csv; argument for simple csvs [ tbl2csv-simple yes/no ]
+- tex2png; argument for mipmap extraction [ -tex2png-mipmaps ]
+- tbl2csv; argument for simple csvs [ -tbl2csv-simple ]
 
 ### Fixed
 - An error where the wrong texture exporter was selected, which raised an exception.
