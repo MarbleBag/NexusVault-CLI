@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import nexusvault.archive.NexusArchive;
 import nexusvault.cli.core.App;
 import nexusvault.cli.core.Console.Level;
 import nexusvault.cli.core.exception.FileNotFoundException;
 import nexusvault.cli.core.exception.FileNotReadableException;
+import nexusvault.vault.NexusArchive;
 
 public final class NexusArchiveContainer {
 
@@ -38,8 +38,8 @@ public final class NexusArchiveContainer {
 				throw new FileNotReadableException(String.format("Archive at %s not readable", this.archivePath));
 			}
 
-			this.archive = NexusArchive.loadArchive(this.archivePath);
 			App.getInstance().getConsole().println(Level.CONSOLE, () -> String.format("Load archive: %s", this.archivePath)); // TODO
+			this.archive = NexusArchive.open(this.archivePath);
 			App.getInstance().getEventSystem().postEvent(new ArchiveLoadedEvent(this.archivePath));
 		} catch (final IOException e) {
 			throw new ArchiveCanNotBeLoadedException(e);

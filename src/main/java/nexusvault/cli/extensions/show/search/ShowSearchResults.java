@@ -9,14 +9,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import nexusvault.archive.IdxPath;
-import nexusvault.archive.NexusArchive;
 import nexusvault.cli.core.App;
 import nexusvault.cli.core.Console.Level;
 import nexusvault.cli.extensions.archive.ArchiveExtension;
 import nexusvault.cli.extensions.archive.NexusArchiveContainer;
 import nexusvault.cli.extensions.search.SearchExtension;
 import nexusvault.cli.extensions.show.ShowExtension.Showable;
+import nexusvault.vault.IdxPath;
+import nexusvault.vault.NexusArchive;
 
 public final class ShowSearchResults implements Showable {
 
@@ -31,7 +31,7 @@ public final class ShowSearchResults implements Showable {
 			final List<NexusArchiveContainer> containers = app.getExtension(ArchiveExtension.class).getArchives();
 			final Map<Path, Set<IdxPath>> mapping = new HashMap<>();
 			for (final var container : containers) {
-				mapping.put(container.getArchive().getSource().getArchiveFile(), new HashSet<>());
+				mapping.put(container.getArchive().getFiles().getArchiveFile(), new HashSet<>());
 			}
 
 			final List<IdxPath> unresolved = new LinkedList<>();
@@ -40,8 +40,8 @@ public final class ShowSearchResults implements Showable {
 				boolean found = false;
 				for (final NexusArchiveContainer container : containers) {
 					final NexusArchive archive = container.getArchive();
-					if (path.isResolvable(archive.getRootDirectory())) {
-						mapping.get(archive.getSource().getArchiveFile()).add(path);
+					if (archive.find(path).isPresent()) {
+						mapping.get(archive.getFiles().getArchiveFile()).add(path);
 						found = true;
 						break;
 					}

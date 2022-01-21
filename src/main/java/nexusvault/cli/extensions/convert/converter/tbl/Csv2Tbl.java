@@ -11,23 +11,20 @@ import kreed.io.util.SeekableByteChannelBinaryWriter;
 import nexusvault.cli.core.PathUtil;
 import nexusvault.cli.extensions.convert.ConversionManager;
 import nexusvault.cli.extensions.convert.Converter;
+import nexusvault.export.tbl.csv.CsvComplete;
 import nexusvault.format.tbl.TableWriter;
-import nexusvault.format.tbl.converter.CSV;
 
 public final class Csv2Tbl implements Converter {
 
-	private CSV csvConverter;
-	private TableWriter tblWriter;
+	private CsvComplete csvConverter;
 
-	protected Csv2Tbl(CSV csv) {
+	protected Csv2Tbl(CsvComplete csv) {
 		this.csvConverter = csv;
-		this.tblWriter = new TableWriter();
 	}
 
 	@Override
 	public void deinitialize() {
 		this.csvConverter = null;
-		this.tblWriter = null;
 	}
 
 	@Override
@@ -39,7 +36,7 @@ public final class Csv2Tbl implements Converter {
 
 		try (var channel = Files.newByteChannel(outputPath, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
 				var writer = new SeekableByteChannelBinaryWriter(channel, ByteBuffer.allocate(1024).order(ByteOrder.LITTLE_ENDIAN))) {
-			this.tblWriter.write(tbl, writer);
+			TableWriter.write(tbl, writer);
 		}
 
 		manager.addCreatedFile(outputPath);

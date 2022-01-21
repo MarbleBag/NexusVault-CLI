@@ -30,7 +30,6 @@ public class Tbl2DebugFactory implements ConverterFactory {
 	public Converter createConverter() {
 		return new Converter() {
 
-			private final TableReader tblReader = new TableReader();
 			private final Path outputPath = App.getInstance().getAppConfig().getOutputPath().resolve("TblColumnsOverview.csv");
 			private final Map<String, Set<Long>> samples = new HashMap<>();
 
@@ -56,9 +55,9 @@ public class Tbl2DebugFactory implements ConverterFactory {
 			@Override
 			public void convert(ConversionManager manager) throws IOException {
 				final var resource = manager.getResource();
-				final var tbl = this.tblReader.read(resource.getData());
+				final var tbl = TableReader.read(resource.getData());
 				for (final var c : tbl.columns) {
-					final var set = this.samples.computeIfAbsent(c.dataType.toString(), k -> new HashSet<>());
+					final var set = this.samples.computeIfAbsent(c.type.toString(), k -> new HashSet<>());
 					set.add(c.unk2);
 				}
 			}

@@ -5,8 +5,8 @@ import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.Set;
 
-import nexusvault.archive.IdxPath;
-import nexusvault.archive.util.DataHeader;
+import nexusvault.util.DataHeader;
+import nexusvault.vault.IdxPath;
 
 public interface Exporter {
 	String getId();

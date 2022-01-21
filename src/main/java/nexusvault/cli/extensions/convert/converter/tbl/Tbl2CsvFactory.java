@@ -9,9 +9,9 @@ import nexusvault.cli.extensions.convert.ConverterArgs;
 import nexusvault.cli.extensions.convert.ConverterFactory;
 import nexusvault.cli.extensions.convert.IsArgument;
 import nexusvault.cli.extensions.convert.IsFactory;
+import nexusvault.export.tbl.csv.CsvComplete;
+import nexusvault.export.tbl.csv.CsvSimple;
 import nexusvault.format.tbl.Table;
-import nexusvault.format.tbl.converter.CSV;
-import nexusvault.format.tbl.converter.CSVSimple;
 
 @IsFactory(id = "tbl2csv", fileExtensions = "tbl")
 public final class Tbl2CsvFactory implements ConverterFactory {
@@ -48,7 +48,7 @@ public final class Tbl2CsvFactory implements ConverterFactory {
 		Tbl2Csv.CSVWriter writer;
 		if (this.simple) {
 			writer = new Tbl2Csv.CSVWriter() {
-				private final CSVSimple writer = new CSVSimple(getCellDelimiter());
+				private final CsvSimple writer = new CsvSimple(getCellDelimiter());
 
 				@Override
 				public void write(Table tbl, Writer writer) throws IOException {
@@ -57,7 +57,7 @@ public final class Tbl2CsvFactory implements ConverterFactory {
 			};
 		} else {
 			writer = new Tbl2Csv.CSVWriter() {
-				private final CSV writer = new CSV(getCellDelimiter());
+				private final CsvComplete writer = new CsvComplete(getCellDelimiter());
 
 				@Override
 				public void write(Table tbl, Writer writer) throws IOException {

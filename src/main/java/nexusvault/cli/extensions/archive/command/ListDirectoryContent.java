@@ -35,19 +35,19 @@ public final class ListDirectoryContent extends AbstractCommandHandler implement
 		final var path = extension.getPathWithinArchives();
 
 		for (final var archiveWrapper : archiveWrappers) {
-			final var rootFolder = archiveWrapper.getArchive().getRootDirectory();
-			if (!path.isResolvable(rootFolder)) {
+			final var entry = archiveWrapper.getArchive().find(path);
+			if (entry.isEmpty()) {
 				continue;
 			}
 
 			sendMsg("Archive: '" + archiveWrapper.getSource() + "'");
 
-			final var resolvedEntry = path.resolve(rootFolder);
+			final var resolvedEntry = entry.get();
 			if (resolvedEntry.isFile()) {
 				sendMsg("\tFile: " + resolvedEntry.getFullName());
 			} else {
-				for (final var child : resolvedEntry.asDirectory().getChilds()) {
-					if (child.isDir()) {
+				for (final var child : resolvedEntry.asDirectory().getEntries()) {
+					if (child.isDirectory()) {
 						sendMsg("\tDir: " + child.getFullName());
 					} else {
 						sendMsg("\tFile: " + child.getFullName());

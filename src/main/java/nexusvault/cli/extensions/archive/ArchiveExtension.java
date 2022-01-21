@@ -18,12 +18,12 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import nexusvault.archive.IdxPath;
 import nexusvault.cli.core.App;
 import nexusvault.cli.core.Console.Level;
 import nexusvault.cli.core.extension.AbstractExtension;
 import nexusvault.cli.extensions.archive.command.ChangeDirectory;
 import nexusvault.cli.extensions.archive.command.SetArchivePath;
+import nexusvault.vault.IdxPath;
 
 public final class ArchiveExtension extends AbstractExtension {
 
@@ -71,7 +71,7 @@ public final class ArchiveExtension extends AbstractExtension {
 			newPath = newPath.resolve(step);
 			boolean isResolvable = false;
 			for (final NexusArchiveContainer wrapper : wrappers) {
-				isResolvable |= newPath.isResolvable(wrapper.getArchive().getRootDirectory());
+				isResolvable |= wrapper.getArchive().find(newPath).isPresent();
 				if (isResolvable) {
 					break;
 				}

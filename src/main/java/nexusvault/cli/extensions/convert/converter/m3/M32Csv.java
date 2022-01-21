@@ -14,32 +14,29 @@ import java.util.Queue;
 import nexusvault.cli.core.PathUtil;
 import nexusvault.cli.extensions.convert.ConversionManager;
 import nexusvault.cli.extensions.convert.Converter;
-import nexusvault.format.m3.v100.ModelReader;
-import nexusvault.format.m3.v100.debug.ModelDebugger;
-import nexusvault.format.m3.v100.debug.Table;
-import nexusvault.format.m3.v100.debug.Table.DataType;
-import nexusvault.format.m3.v100.debug.Table.TableColumn;
+import nexusvault.format.m3.ModelReader;
+import nexusvault.format.m3.debug.ModelDebugger;
+import nexusvault.format.m3.debug.Table;
+import nexusvault.format.m3.debug.Table.DataType;
+import nexusvault.format.m3.debug.Table.TableColumn;
 
 public final class M32Csv implements Converter {
 
 	private ModelDebugger debuger;
-	private ModelReader modelReader;
 
 	public M32Csv() {
-		this.modelReader = new ModelReader();
 		this.debuger = ModelDebugger.createDefaultModelDebugger();
 	}
 
 	@Override
 	public void deinitialize() {
-		this.modelReader = null;
 		this.debuger = null;
 	}
 
 	@Override
 	public void convert(ConversionManager manager) throws IOException {
 		final var resource = manager.getResource();
-		final var m3 = this.modelReader.read(resource.getDataAsBuffer());
+		final var m3 = ModelReader.read(resource.getData());
 		final var table = this.debuger.debugModel(m3);
 
 		final var tablesToWrite = collectReferences(table, PathUtil.getFileName(resource.getFile()));

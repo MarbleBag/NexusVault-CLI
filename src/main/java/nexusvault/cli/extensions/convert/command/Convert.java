@@ -11,7 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import nexusvault.archive.IdxPath;
 import nexusvault.cli.core.App;
 import nexusvault.cli.core.cmd.AbstractCommandHandler;
 import nexusvault.cli.core.cmd.Argument;
@@ -25,6 +24,7 @@ import nexusvault.cli.extensions.convert.ConverterExtension;
 import nexusvault.cli.extensions.convert.resource.ArchiveResource;
 import nexusvault.cli.extensions.convert.resource.FileResource;
 import nexusvault.cli.extensions.convert.resource.Resource;
+import nexusvault.vault.IdxPath;
 
 public final class Convert extends AbstractCommandHandler {
 
@@ -170,7 +170,7 @@ public final class Convert extends AbstractCommandHandler {
 			for (final var possiblePath : possibleFiles) {
 				final var idxPath = IdxPath.createPathFrom(possiblePath);
 				for (final var container : archiveContainers) {
-					final var optionalEntry = idxPath.tryToResolve(container.getArchive().getRootDirectory());
+					final var optionalEntry = container.getArchive().find(idxPath);
 					if (optionalEntry.isPresent()) {
 						final var entry = optionalEntry.get();
 						if (entry.isFile()) {

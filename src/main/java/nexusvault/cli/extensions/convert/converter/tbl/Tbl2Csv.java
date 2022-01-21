@@ -19,23 +19,20 @@ public final class Tbl2Csv implements Converter {
 	}
 
 	private CSVWriter csvWriter;
-	private TableReader tblReader;
 
 	public Tbl2Csv(CSVWriter csvWriter) {
 		this.csvWriter = csvWriter;
-		this.tblReader = new TableReader();
 	}
 
 	@Override
 	public void deinitialize() {
 		this.csvWriter = null;
-		this.tblReader = null;
 	}
 
 	@Override
 	public void convert(ConversionManager manager) throws IOException {
 		final var resource = manager.getResource();
-		final var tbl = this.tblReader.read(resource.getData());
+		final var tbl = TableReader.read(resource.getData());
 
 		final var outputPath = manager.resolveOutputPath(PathUtil.replaceFileExtension(resource.getFile(), "csv"));
 

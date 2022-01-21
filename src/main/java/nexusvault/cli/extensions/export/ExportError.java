@@ -2,7 +2,7 @@ package nexusvault.cli.extensions.export;
 
 import java.nio.file.Path;
 
-import nexusvault.archive.IdxFileLink;
+import nexusvault.vault.IdxEntry.IdxFileLink;
 
 final class ExportError {
 

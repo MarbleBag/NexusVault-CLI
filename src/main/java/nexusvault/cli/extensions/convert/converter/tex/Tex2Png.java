@@ -12,43 +12,34 @@ import javax.imageio.ImageIO;
 import nexusvault.cli.core.PathUtil;
 import nexusvault.cli.extensions.convert.ConversionManager;
 import nexusvault.cli.extensions.convert.Converter;
-import nexusvault.format.tex.TextureImage;
-import nexusvault.format.tex.TextureImageSplitter;
+import nexusvault.format.tex.Image;
 import nexusvault.format.tex.TextureReader;
 import nexusvault.format.tex.util.AwtImageConverter;
 
 public final class Tex2Png implements Converter {
 
-	private final boolean splitImages;
 	private final boolean exportMipMaps;
-	private TextureReader reader;
-	private TextureImageSplitter textureSplitter;
 
-	public Tex2Png(boolean splitImages, boolean exportMipMaps) {
-		this.splitImages = splitImages;
+	public Tex2Png(boolean exportMipMaps) {
 		this.exportMipMaps = exportMipMaps;
-
-		this.reader = TextureReader.buildDefault();
-		this.textureSplitter = new nexusvault.format.tex.TextureImageSplitter();
 	}
 
 	@Override
 	public void deinitialize() {
-		this.reader = null;
-		this.textureSplitter = null;
 	}
 
 	@Override
 	public void convert(ConversionManager manager) throws IOException {
 		final var resource = manager.getResource();
-		final var imageObject = this.reader.read(resource.getData());
-		final var images = new LinkedList<TextureImage>();
-		images.add(imageObject.getImage(0));
-
+		final var images = new LinkedList<Image>();
 		if (this.exportMipMaps) {
-			for (var i = 1; i < imageObject.getMipMapCount(); ++i) {
-				images.add(imageObject.getImage(i));
+			final var data = resource.getData();
+			final var texture = TextureReader.read(data);
+			for (var i = 0; i < texture.getMipMapCount(); ++i) {
+				images.add(texture.getMipMap(i));
 			}
+		} else {
+			images.add(TextureReader.readFirstImage(resource.getData()));
 		}
 
 		final var fileName = PathUtil.getFileName(resource.getFile());
@@ -57,17 +48,6 @@ public final class Tex2Png implements Converter {
 			final var outputPath = manager.resolveOutputPath(getFileName(fileName, i) + ".png");
 			writeImage(image, outputPath);
 			manager.addCreatedFile(outputPath);
-		}
-
-		if (this.splitImages && this.textureSplitter.isSplitable(imageObject.getTextureDataType())) {
-			for (var i = 0; i < images.size(); ++i) {
-				final var textureComponents = this.textureSplitter.split(images.get(i), imageObject.getTextureDataType());
-				for (var j = 0; j < textureComponents.size(); ++j) {
-					final var outputPath = manager.resolveOutputPath(getFileName(fileName, i) + String.format(".%d.png", j));
-					writeImage(textureComponents.get(j), outputPath);
-					manager.addCreatedFile(outputPath);
-				}
-			}
 		}
 	}
 
@@ -78,7 +58,7 @@ public final class Tex2Png implements Converter {
 		return fileName + String.format(".m%02d", mipmap);
 	}
 
-	private void writeImage(TextureImage image, Path path) throws IOException {
+	private void writeImage(Image image, Path path) throws IOException {
 		final var bufferedImage = AwtImageConverter.convertToBufferedImage(image);
 		try (OutputStream writer = Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
 			ImageIO.write(bufferedImage, "PNG", writer);

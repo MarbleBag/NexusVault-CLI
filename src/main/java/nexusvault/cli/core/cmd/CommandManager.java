@@ -105,8 +105,12 @@ public final class CommandManager {
 		if (description.hasArguments()) {
 			builder.hasArg();
 			builder.optionalArg(description.isArgumentOptional());
-			builder.argName(String.join(", ", description.getArgumentNames()));
-
+			if (description.getArgumentNames() != null && description.getArgumentNames().length > 0) {
+				builder.argName(String.join(", ", description.getArgumentNames()));
+			}
+			if (description.hasValueSeparator()) {
+				builder.valueSeparator(description.getValueSeparator());
+			}
 			if (description.isNumberOfArgumentsUnlimited()) {
 				builder.numberOfArgs(Option.UNLIMITED_VALUES);
 			} else {

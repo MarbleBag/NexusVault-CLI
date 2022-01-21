@@ -1,5 +1,6 @@
 package nexusvault.cli.extensions.export;
 
+import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,8 +19,6 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import nexusvault.archive.IdxFileLink;
-import nexusvault.archive.IdxPath;
 import nexusvault.cli.core.App;
 import nexusvault.cli.core.extension.AbstractExtension;
 import nexusvault.cli.core.extension.ExtensionInitializationException;
@@ -31,6 +30,8 @@ import nexusvault.cli.extensions.convert.ConverterExtension;
 import nexusvault.cli.extensions.convert.resource.ArchiveResource;
 import nexusvault.cli.extensions.worker.StatusMonitor;
 import nexusvault.cli.extensions.worker.WorkerExtension;
+import nexusvault.vault.IdxEntry.IdxFileLink;
+import nexusvault.vault.IdxPath;
 
 public final class ExportExtension extends AbstractExtension {
 
@@ -66,7 +67,7 @@ public final class ExportExtension extends AbstractExtension {
 
 		final var exportableFiles = searchResults.parallelStream().map(p -> {
 			for (final var container : archiveContainers) {
-				final var optionalEntry = p.tryToResolve(container.getArchive().getRootDirectory());
+				final var optionalEntry = container.getArchive().find(p);
 				if (optionalEntry.isPresent()) {
 					return optionalEntry.get();
 				}
@@ -143,7 +144,7 @@ public final class ExportExtension extends AbstractExtension {
 				final var filePath = outputFolder.resolve(Path.of(file.getFullName()));
 				Files.createDirectories(filePath.getParent());
 				try (var channel = Files.newByteChannel(filePath, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
-					final var data = file.getData();
+					final var data = ByteBuffer.wrap(file.getData());
 					while (data.hasRemaining()) {
 						channel.write(data);
 					}

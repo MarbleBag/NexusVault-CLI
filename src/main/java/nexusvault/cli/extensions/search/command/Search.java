@@ -33,7 +33,18 @@ public final class Search extends AbstractCommandHandler {
 							.setNamesOfArguments("number")
 							.build()
 						)
-				.ignoreUnnamedArguments()
+				.addNamedArgument(
+						ArgumentDescription.newInfo()
+							.setName("P")
+							.setDescription("search for certain properties")
+							.setRequired(false)
+							.setArguments(false)
+							.setValueSeparator()
+							.setNumberOfArguments(2)
+							.setNamesOfArguments("property=value")
+							.build()
+						)
+				//.ignoreUnnamedArguments()
 				.namedArgumentsDone()
 			    .build();
 		//@formatter:on
@@ -46,13 +57,13 @@ public final class Search extends AbstractCommandHandler {
 			return;
 		}
 
-		int maxSearchResults = Integer.MAX_VALUE;
+		final var request = new SearchRequest();
 
 		if (args.isNamedArgumentSet("max")) {
 			final var argMaxResults = args.getArgumentByName("max");
 			try {
 				final int result = Integer.valueOf(argMaxResults.getValue());
-				maxSearchResults = Math.max(1, result);
+				request.setMaxResults(Math.max(1, result));
 			} catch (final NumberFormatException e) {
 				// ignore
 			}
@@ -63,10 +74,12 @@ public final class Search extends AbstractCommandHandler {
 		for (final String unnamedArg : unnamedArgs) {
 			regex.add(Pattern.compile(unnamedArg, Pattern.CASE_INSENSITIVE));
 		}
-
-		final var request = new SearchRequest();
 		request.setPattern(regex);
-		request.setMaxResults(maxSearchResults);
+
+		final var properties = args.getProperties("P");
+		if (!properties.isEmpty()) {
+			request.setProperties(properties);
+		}
 
 		App.getInstance().getExtension(SearchExtension.class).searchArchive(request);
 	}
