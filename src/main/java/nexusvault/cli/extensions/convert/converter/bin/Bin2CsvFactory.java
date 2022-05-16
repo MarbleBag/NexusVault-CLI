@@ -25,6 +25,8 @@ public final class Bin2CsvFactory implements ConverterFactory {
 	public Converter createConverter() {
 		return new Converter() {
 
+			nexusvault.export.bin.csv.Csv exporter = new nexusvault.export.bin.csv.Csv();
+
 			@Override
 			public void deinitialize() {
 
@@ -38,15 +40,7 @@ public final class Bin2CsvFactory implements ConverterFactory {
 
 				try (BufferedWriter writer = Files.newBufferedWriter(outputPath, StandardOpenOption.CREATE, StandardOpenOption.WRITE,
 						StandardOpenOption.TRUNCATE_EXISTING)) {
-
-					writer.append(dictionary.locale.tagName).append(";").append(dictionary.locale.longName).append(";").append(dictionary.locale.shortName)
-							.append("\n");
-					writer.append("Code").append(";").append("Text").append("\n");
-
-					for (final var entry : dictionary.entries.entrySet()) {
-						writer.append(String.valueOf(entry.getKey())).append(";");
-						writer.append(entry.getValue()).append("\n");
-					}
+					this.exporter.write(dictionary, writer);
 				}
 
 				manager.addCreatedFile(outputPath);

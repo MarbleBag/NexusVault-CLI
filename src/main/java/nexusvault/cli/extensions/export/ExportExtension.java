@@ -67,7 +67,7 @@ public final class ExportExtension extends AbstractExtension {
 
 		final var exportableFiles = searchResults.parallelStream().map(p -> {
 			for (final var container : archiveContainers) {
-				final var optionalEntry = container.getArchive().find(p);
+				final var optionalEntry = container.find(p);
 				if (optionalEntry.isPresent()) {
 					return optionalEntry.get();
 				}

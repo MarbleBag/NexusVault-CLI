@@ -52,8 +52,8 @@ public final class ArchiveExtension extends AbstractExtension {
 	 * Called by {@link ChangeDirectory}
 	 */
 	public void changeDirectory(String target) {
-		final List<NexusArchiveContainer> wrappers = getArchives();
-		if (wrappers.isEmpty()) {
+		final List<NexusArchiveContainer> archives = getArchives();
+		if (archives.isEmpty()) {
 			sendMsg("No vaults are loaded. Use 'help' to learn how to load them");
 			return;
 		}
@@ -70,8 +70,8 @@ public final class ArchiveExtension extends AbstractExtension {
 		for (final String step : steps) {
 			newPath = newPath.resolve(step);
 			boolean isResolvable = false;
-			for (final NexusArchiveContainer wrapper : wrappers) {
-				isResolvable |= wrapper.getArchive().find(newPath).isPresent();
+			for (final NexusArchiveContainer archive : archives) {
+				isResolvable |= archive.find(newPath).isPresent();
 				if (isResolvable) {
 					break;
 				}
@@ -113,7 +113,11 @@ public final class ArchiveExtension extends AbstractExtension {
 		final var archiveContainers = this.archiveContainers;
 		this.archiveContainers = Collections.emptyList();
 		for (final var container : archiveContainers) {
-			container.dispose();
+			try {
+				container.dispose();
+			} catch (final IOException e) {
+				logger.catching(e);
+			}
 		}
 		this.reloadArchive = true;
 	}

@@ -49,7 +49,7 @@ public final class ShowFileProperties implements Showable {
 		final var searchResults = App.getInstance().getExtension(SearchExtension.class).getLastSearchResults();
 		for (final var searchResult : searchResults) {
 			for (final var archive : archives) {
-				final var file = archive.getArchive().find(searchResult);
+				final var file = archive.find(searchResult);
 				if (file.isPresent() && file.get().isFile()) {
 					result.add(file.get().asFile());
 				}

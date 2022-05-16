@@ -18,6 +18,9 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import nexusvault.cli.core.App;
 import nexusvault.cli.core.extension.AbstractExtension;
 import nexusvault.cli.extensions.archive.ArchiveExtension;
@@ -32,6 +35,8 @@ import nexusvault.vault.util.IdxDirectoryTraverser.IdxEntryVisitor.EntryFilterRe
 import nexusvault.vault.util.ReportingIdxFileCollector;
 
 public final class SearchExtension extends AbstractExtension {
+
+	private static final Logger logger = LogManager.getLogger(SearchExtension.class);
 
 	private final static String REPORT_FILE = "search_result.txt";
 
@@ -62,8 +67,8 @@ public final class SearchExtension extends AbstractExtension {
 	public void searchArchive(SearchRequest request) {
 		final var archiveExtension = App.getInstance().getExtension(ArchiveExtension.class);
 
-		final List<NexusArchiveContainer> archiveContainer = archiveExtension.getArchives();
-		if (archiveContainer.isEmpty()) {
+		final List<NexusArchiveContainer> archives = archiveExtension.getArchives();
+		if (archives.isEmpty()) {
 			sendMsg("No vaults are loaded. Use 'help' to learn how to load them");
 			return;
 		}
@@ -74,14 +79,18 @@ public final class SearchExtension extends AbstractExtension {
 
 		int maxResults = request.getMaxResults();
 		int resultsFound = 0;
-		for (final NexusArchiveContainer wrapper : archiveContainer) {
-			sendMsg("Scanning archive: " + wrapper.getSource());
-			final var entry = wrapper.getArchive().find(path);
+		for (final NexusArchiveContainer archive : archives) {
+			sendMsg("Scanning archive: " + archive.getSource());
+			final var entry = archive.find(path);
 			if (entry.isPresent()) {
-				final Set<IdxFileLink> results = search(wrapper.getArchive(), entry.get(), request, maxResults);
-				maxResults -= results.size();
-				resultsFound += results.size();
-				results.stream().map(IdxFileLink::getPath).forEach(searchResults::add);
+				try {
+					final Set<IdxFileLink> results = search(archive.getArchive(), entry.get(), request, maxResults);
+					maxResults -= results.size();
+					resultsFound += results.size();
+					results.stream().map(IdxFileLink::getPath).forEach(searchResults::add);
+				} catch (final IOException e) {
+					logger.catching(e); // TODO
+				}
 			}
 		}
 
@@ -160,7 +169,7 @@ public final class SearchExtension extends AbstractExtension {
 		return result;
 	}
 
-	private Set<IdxFileLink> search(NexusArchive archive, IdxEntry startPoint, SearchRequest request, int maxResults) {
+	private Set<IdxFileLink> search(NexusArchive archive, IdxEntry startPoint, SearchRequest request, int maxResults) throws IOException {
 		if (startPoint.isFile()) {
 			for (final Pattern pattern : request.getPattern()) {
 				if (pattern.matcher(startPoint.getFullName()).find()) {

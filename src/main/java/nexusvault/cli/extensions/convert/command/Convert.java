@@ -163,14 +163,14 @@ public final class Convert extends AbstractCommandHandler {
 		final var missingFiles = new LinkedList<String>();
 
 		final var archiveExtension = App.getInstance().getExtension(ArchiveExtension.class);
-		final var archiveContainers = archiveExtension.getArchives();
-		if (archiveContainers.isEmpty()) {
+		final var archives = archiveExtension.getArchives();
+		if (archives.isEmpty()) {
 			sendMsg("No vaults are loaded. Use 'help' to learn how to load them");
 		} else {
 			for (final var possiblePath : possibleFiles) {
 				final var idxPath = IdxPath.createPathFrom(possiblePath);
-				for (final var container : archiveContainers) {
-					final var optionalEntry = container.getArchive().find(idxPath);
+				for (final var archive : archives) {
+					final var optionalEntry = archive.find(idxPath);
 					if (optionalEntry.isPresent()) {
 						final var entry = optionalEntry.get();
 						if (entry.isFile()) {

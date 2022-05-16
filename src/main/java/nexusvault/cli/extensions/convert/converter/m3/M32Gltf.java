@@ -49,7 +49,11 @@ public final class M32Gltf implements Converter {
 			@Override
 			public void requestTexture(String textureId, ResourceBundle resourceBundle) {
 				if (M32Gltf.this.includeTextures) {
-					findAndLoatTexture(manager.getOutputPath(), textureId, resourceBundle);
+					try {
+						findAndLoatTexture(manager.getOutputPath(), textureId, resourceBundle);
+					} catch (final IOException e) {
+						throw new IllegalStateException(e); // TODO
+					}
 				}
 			}
 
@@ -64,7 +68,7 @@ public final class M32Gltf implements Converter {
 		gltfExporter.exportModel(manager.getOutputPath(), PathUtil.getFileName(resource.getFile()), m3);
 	}
 
-	private IdxFileLink find(String textureId) {
+	private IdxFileLink find(String textureId) throws IOException {
 		final var path = IdxPath.createPathFrom(textureId);
 		for (final var container : this.archiveContainers) {
 			final var entry = container.getArchive().find(path);
@@ -75,34 +79,28 @@ public final class M32Gltf implements Converter {
 		return null;
 	}
 
-	private void findAndLoatTexture(Path outputDir, String textureId, ResourceBundle resourceBundle) {
+	private void findAndLoatTexture(Path outputDir, String textureId, ResourceBundle resourceBundle) throws IOException {
 		final var textureLink = find(textureId);
 		if (textureLink == null) {
 			return;
 		}
 
-		try {
-			outputDir = outputDir.resolve("textures");
-			Files.createDirectories(outputDir);
+		outputDir = outputDir.resolve("textures");
+		Files.createDirectories(outputDir);
 
-			final var images = new ArrayList<Image>();
-			images.add(TextureReader.readFirstImage(textureLink.getData()));
+		final var images = new ArrayList<Image>();
+		images.add(TextureReader.readFirstImage(textureLink.getData()));
 
-			for (int i = 0; i < images.size(); i++) {
-				final String fileName = String.format("%s.%d.png", textureLink.getNameWithoutFileExtension(), i);
-				final Path filePath = outputDir.resolve(Paths.get(fileName));
-				try (OutputStream writer = Files.newOutputStream(filePath, StandardOpenOption.CREATE, StandardOpenOption.WRITE,
-						StandardOpenOption.TRUNCATE_EXISTING)) {
-
-					final var bufferedImage = AwtImageConverter.convertToBufferedImage(images.get(i));
-					ImageIO.write(bufferedImage, "PNG", writer);
-
-				}
-
-				resourceBundle.addTextureResource(new PathTextureResource(filePath));
+		for (int i = 0; i < images.size(); i++) {
+			final String fileName = String.format("%s.%d.png", textureLink.getNameWithoutFileExtension(), i);
+			final Path filePath = outputDir.resolve(Paths.get(fileName));
+			try (OutputStream writer = Files.newOutputStream(filePath, StandardOpenOption.CREATE, StandardOpenOption.WRITE,
+					StandardOpenOption.TRUNCATE_EXISTING)) {
+				final var bufferedImage = AwtImageConverter.convertToBufferedImage(images.get(i));
+				ImageIO.write(bufferedImage, "PNG", writer);
 			}
-		} catch (final IOException e1) {
-			throw new IllegalStateException(e1);
+
+			resourceBundle.addTextureResource(new PathTextureResource(filePath));
 		}
 	}
 }

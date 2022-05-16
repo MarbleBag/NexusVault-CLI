@@ -47,7 +47,7 @@ public final class Png2Tex implements Converter {
 		final var resource = manager.getResource();
 		final var baseImage = loadImage(resource);
 
-		final var binaryData = TextureWriter.writeBinary(this.target, baseImage, this.mipmapCount, this.quality, this.defaultColors);
+		final var binaryData = TextureWriter.toBinary(this.target, baseImage, this.mipmapCount, this.quality, this.defaultColors);
 
 		final var outputPath = manager.resolveOutputPath(PathUtil.replaceFileExtension(resource.getFile(), "tex"));
 		manager.addCreatedFile(outputPath);

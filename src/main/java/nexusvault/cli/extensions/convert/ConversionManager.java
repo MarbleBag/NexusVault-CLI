@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,9 +48,8 @@ public final class ConversionManager {
 
 		final var idxPath = IdxPath.createPathFrom(path.toString());
 		final var archiveExtension = App.getInstance().getExtension(ArchiveExtension.class);
-		final List<NexusArchiveContainer> archiveContainer = archiveExtension.getArchives();
-		for (final NexusArchiveContainer wrapper : archiveContainer) {
-			final var entry = wrapper.getArchive().find(idxPath);
+		for (final NexusArchiveContainer archive : archiveExtension.getArchives()) {
+			final var entry = archive.find(idxPath);
 			if (entry.isPresent() && entry.get().isFile()) {
 				return new ArchiveResource(entry.get().asFile());
 			}
