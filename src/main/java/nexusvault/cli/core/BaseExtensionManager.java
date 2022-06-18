@@ -45,6 +45,10 @@ final class BaseExtensionManager implements ExtensionManager {
 			}));
 
 			for (final var extensionClass : extensionClasses) {
+				if (!extensionClass.isAnnotationPresent(AutoInstantiate.class)) {
+					continue;
+				}
+
 				try {
 					final var extension = ReflectionHelper.initialize(extensionClass);
 					this.register(extension);

@@ -31,6 +31,14 @@ public final class Export implements CommandHandler {
 							.build()
 						)
 				.addNamedArgument(
+						ArgumentDescription.newInfo()
+						.setName("separate")
+						.setDescription("export files into separate folders, each folder will only contain files specific to the exported file")
+						.setRequired(false)
+						.setNoArguments()
+						.build()
+					)
+				.addNamedArgument(
 							ArgumentDescription.newInfo()
 							.setName("converters")
 							.setNameShort("cvts")
@@ -53,23 +61,24 @@ public final class Export implements CommandHandler {
 	@Override
 	public void onCommand(Arguments args) {
 		final var exportAsBinary = args.isNamedArgumentSet("binary");
+		final var separateExports = args.isNamedArgumentSet("separate");
 		final var searchResults = App.getInstance().getExtension(SearchExtension.class).getLastSearchResults();
 
 		if (exportAsBinary) {
-			App.getInstance().getExtension(ExportExtension.class).exportAsBinary(searchResults);
+			App.getInstance().getExtension(ExportExtension.class).exportAsBinary(searchResults, separateExports);
 		} else {
 
 			final var useConverters = new HashMap<String, String>();
 			if (args.isNamedArgumentSet("converters")) {
-				for (final var use : args.getArgumentByName("converters").getValues()) {
-					final var extId = use.split("->");
-					if (extId.length == 2) {
-						useConverters.put(extId[0], extId[1]);
+				for (final var mapping : args.getArgumentByName("converters").getValues()) {
+					final var ids = mapping.split("->");
+					if (ids.length == 2) {
+						useConverters.put(ids[0], ids[1]);
 					}
 				}
 			}
 
-			App.getInstance().getExtension(ExportExtension.class).exportViaConverters(searchResults, useConverters, new ConverterArgs(args));
+			App.getInstance().getExtension(ExportExtension.class).exportViaConverters(searchResults, separateExports, useConverters, new ConverterArgs(args));
 		}
 	}
 

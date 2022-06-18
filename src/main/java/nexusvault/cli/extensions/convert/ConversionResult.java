@@ -7,6 +7,7 @@ import java.util.Set;
 
 public final class ConversionResult {
 	public static enum Status {
+		PENDING,
 		SUCCESSFUL,
 		FAILED,
 	}
@@ -14,23 +15,27 @@ public final class ConversionResult {
 	private final ConversionRequest request;
 	private final Set<Path> createdFiles = new HashSet<>();
 	private ConversionResult.Status status;
-	private Exception error;
+	private Throwable error;
 
 	public ConversionResult(ConversionRequest request) {
 		this.request = request;
-		this.status = Status.SUCCESSFUL;
+		this.status = Status.PENDING;
 	}
 
-	protected void setError(Exception error) {
+	protected void setError(Throwable error) {
 		this.error = error;
 		this.status = Status.FAILED;
+	}
+
+	protected void setSuccess() {
+		this.status = Status.SUCCESSFUL;
 	}
 
 	public ConversionRequest getRequest() {
 		return this.request;
 	}
 
-	public Exception getError() {
+	public Throwable getError() {
 		return this.error;
 	}
 

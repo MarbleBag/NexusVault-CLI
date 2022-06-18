@@ -7,19 +7,19 @@ import nexusvault.vault.IdxEntry.IdxFileLink;
 final class ExportError {
 
 	private final String path;
-	private final Exception error;
+	private final Throwable error;
 
-	public ExportError(IdxFileLink path, Exception error) {
+	public ExportError(IdxFileLink path, Throwable error) {
 		this.path = path.getFullName();
 		this.error = error;
 	}
 
-	public ExportError(Path path, Exception error) {
+	public ExportError(Path path, Throwable error) {
 		this.path = path.toString();
 		this.error = error;
 	}
 
-	public ExportError(String path, Exception error) {
+	public ExportError(String path, Throwable error) {
 		this.path = path;
 		this.error = error;
 	}
@@ -28,7 +28,7 @@ final class ExportError {
 		return this.path;
 	}
 
-	public Exception getError() {
+	public Throwable getError() {
 		return this.error;
 	}
 }

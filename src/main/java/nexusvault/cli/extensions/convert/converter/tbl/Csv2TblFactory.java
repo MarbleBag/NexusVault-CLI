@@ -15,7 +15,7 @@ import nexusvault.cli.extensions.convert.ConverterArgs;
 import nexusvault.cli.extensions.convert.ConverterFactory;
 import nexusvault.cli.extensions.convert.IsArgument;
 import nexusvault.cli.extensions.convert.IsFactory;
-import nexusvault.export.tbl.csv.CsvComplete;
+import nexusvault.export.tbl.csv.Csv;
 import nexusvault.format.tbl.TableWriter;
 
 @IsFactory(id = "csv2tbl", fileExtensions = "csv")
@@ -40,7 +40,7 @@ public final class Csv2TblFactory implements ConverterFactory {
 	@Override
 	public Converter createConverter() {
 		return new Converter() {
-			private final CsvComplete csvConverter = new CsvComplete(getCellDelimiter());
+			private final Csv csvConverter = new Csv(getCellDelimiter());
 
 			@Override
 			public void convert(ConversionManager manager) throws IOException {

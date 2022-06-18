@@ -1,13 +1,17 @@
 package nexusvault.cli.extensions.convert.converter.tex;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import nexusvault.cli.extensions.convert.Converter;
 import nexusvault.cli.extensions.convert.ConverterArgs;
 import nexusvault.cli.extensions.convert.ConverterException;
 import nexusvault.cli.extensions.convert.ConverterFactory;
 import nexusvault.cli.extensions.convert.IsArgument;
+import nexusvault.cli.extensions.convert.IsFactory;
 import nexusvault.format.tex.TextureType;
 
-// @IsFactory(id = "png2tex", priority = 1, fileExtensions = { "png" })
+@IsFactory(id = "png2tex", fileExtensions = { "png" }, priority = 1)
 public final class Png2TexFactory implements ConverterFactory {
 
 	private TextureType texType = TextureType.ARGB1;
@@ -17,8 +21,13 @@ public final class Png2TexFactory implements ConverterFactory {
 	private int depth = 1;
 	private int sides = 1;
 
-	@IsArgument(name = "png2tex-type", description = "WS specific texture type. JPG may or may not work.")
+	@IsArgument(name = "png2tex-type", description = "WS specific texture type. JPG may or may not work. Defaults to ARGB1.")
 	public void setType(TextureType texType) {
+		if (texType == null || texType == TextureType.UNKNOWN) {
+			throw new ConverterException(String.format("Unknown type '%s', known types are: %s", texType,
+					Arrays.asList(TextureType.values()).stream().map(Object::toString).collect(Collectors.joining(", "))));
+		}
+
 		this.texType = texType;
 	}
 

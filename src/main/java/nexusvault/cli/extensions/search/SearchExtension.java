@@ -22,6 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import nexusvault.cli.core.App;
+import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.extension.AbstractExtension;
 import nexusvault.cli.extensions.archive.ArchiveExtension;
 import nexusvault.cli.extensions.archive.NexusArchiveContainer;
@@ -34,6 +35,7 @@ import nexusvault.vault.util.IdxDirectoryTraverser;
 import nexusvault.vault.util.IdxDirectoryTraverser.IdxEntryVisitor.EntryFilterResult;
 import nexusvault.vault.util.ReportingIdxFileCollector;
 
+@AutoInstantiate
 public final class SearchExtension extends AbstractExtension {
 
 	private static final Logger logger = LogManager.getLogger(SearchExtension.class);

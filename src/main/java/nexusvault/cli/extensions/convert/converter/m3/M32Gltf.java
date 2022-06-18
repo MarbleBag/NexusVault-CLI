@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +63,8 @@ public final class M32Gltf implements Converter {
 		});
 
 		final var resource = manager.getResource();
-		final var m3 = ModelReader.read(resource.getData());
+		final var data = resource.getData();
+		final var m3 = ModelReader.read(data);
 		gltfExporter.exportModel(manager.getOutputPath(), PathUtil.getFileName(resource.getFile()), m3);
 	}
 
@@ -93,7 +93,7 @@ public final class M32Gltf implements Converter {
 
 		for (int i = 0; i < images.size(); i++) {
 			final String fileName = String.format("%s.%d.png", textureLink.getNameWithoutFileExtension(), i);
-			final Path filePath = outputDir.resolve(Paths.get(fileName));
+			final Path filePath = outputDir.resolve(Path.of(fileName));
 			try (OutputStream writer = Files.newOutputStream(filePath, StandardOpenOption.CREATE, StandardOpenOption.WRITE,
 					StandardOpenOption.TRUNCATE_EXISTING)) {
 				final var bufferedImage = AwtImageConverter.convertToBufferedImage(images.get(i));

@@ -2,7 +2,6 @@ package nexusvault.cli.extensions.convert;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,7 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import nexusvault.cli.core.App;
-import nexusvault.cli.core.PathUtil;
+import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.ReflectionHelper;
 import nexusvault.cli.core.cmd.ArgumentDescription;
 import nexusvault.cli.core.extension.AbstractExtension;
@@ -26,6 +25,7 @@ import nexusvault.cli.extensions.worker.NullStatusMonitor;
 import nexusvault.cli.extensions.worker.StatusMonitor;
 import nexusvault.cli.extensions.worker.WorkerExtension;
 
+@AutoInstantiate
 @ExtensionInfo(priority = 5)
 public final class ConverterExtension extends AbstractExtension {
 
@@ -95,7 +95,7 @@ public final class ConverterExtension extends AbstractExtension {
 				ext -> FactoryBuilder.findPreferredFactoryByExtension(this.factoryContainers, this.fileExtension2FactoryId, ext));
 	}
 
-	public Map<String, String> getConverterFactories(Set<String> extensions) {
+	public Map<String, String> getConverterIdsForFileExtension(Set<String> extensions) {
 		final var factoriesByExtension = new HashMap<String, String>();
 		for (final var extension : extensions) {
 			factoriesByExtension.computeIfAbsent(extension, ext -> {
@@ -107,7 +107,7 @@ public final class ConverterExtension extends AbstractExtension {
 
 	public Map<String, String> getConverterFactories(Collection<ConversionRequest> requests) {
 		final var extensions = requests.parallelStream().map(e -> e.input.getFileExtension()).collect(Collectors.toSet());
-		return getConverterFactories(extensions);
+		return getConverterIdsForFileExtension(extensions);
 	}
 
 	public ConverterFactory createConverterFactory(String id) {
@@ -167,7 +167,7 @@ public final class ConverterExtension extends AbstractExtension {
 				continue;
 			}
 
-			final var outputDir = makeOutputDir(rootOutputDir, request);
+			final var outputDir = rootOutputDir.resolve(request.outputDir);
 			final var input = new ConversionManager(request.input, outputDir);
 
 			tasks.add(() -> {
@@ -175,7 +175,8 @@ public final class ConverterExtension extends AbstractExtension {
 					Files.createDirectories(input.getOutputPath());
 					converter.convert(input);
 					conversionResult[index].setOutput(input.getCreatedFiles());
-				} catch (final Exception e) {
+					conversionResult[index].setSuccess();
+				} catch (final Throwable e) {
 					conversionResult[index].setError(e);
 				}
 			});
@@ -199,24 +200,4 @@ public final class ConverterExtension extends AbstractExtension {
 		}
 	}
 
-	private Path makeOutputDir(final Path rootOutputDir, final ConversionRequest request) {
-		var outputDir = request.outputDir;
-		if (outputDir != null && outputDir.isAbsolute()) {
-			// pass
-		} else {
-			if (outputDir == null) {
-				outputDir = rootOutputDir.resolve("convert");
-			} else {
-				outputDir = rootOutputDir.resolve(outputDir);
-			}
-      
-			final var inputDir = request.input.getFilePath().resolveSibling(PathUtil.getFileName(request.input.getFile()));
-			if (!inputDir.isAbsolute()) {
-				outputDir = outputDir.resolve(inputDir);
-			} else {
-				outputDir = outputDir.resolve(inputDir.getFileName());
-			}
-		}
-		return outputDir;
-	}
 }

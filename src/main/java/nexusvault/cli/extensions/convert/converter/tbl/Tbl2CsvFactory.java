@@ -13,8 +13,7 @@ import nexusvault.cli.extensions.convert.ConverterArgs;
 import nexusvault.cli.extensions.convert.ConverterFactory;
 import nexusvault.cli.extensions.convert.IsArgument;
 import nexusvault.cli.extensions.convert.IsFactory;
-import nexusvault.export.tbl.csv.CsvComplete;
-import nexusvault.export.tbl.csv.CsvSimple;
+import nexusvault.export.tbl.csv.Csv;
 import nexusvault.format.tbl.TableReader;
 
 @IsFactory(id = "tbl2csv", fileExtensions = "tbl")
@@ -49,51 +48,32 @@ public final class Tbl2CsvFactory implements ConverterFactory {
 
 	@Override
 	public Converter createConverter() {
-		if (this.simple) {
-			return new Converter() {
-				private final CsvSimple csv = new CsvSimple(getCellDelimiter());
+		return new Converter() {
+			private final Csv csv = new Csv(getCellDelimiter());
+			private final boolean isSimple = Tbl2CsvFactory.this.simple;
 
-				@Override
-				public void convert(ConversionManager manager) throws IOException {
-					final var resource = manager.getResource();
-					final var tbl = TableReader.read(resource.getData());
+			@Override
+			public void convert(ConversionManager manager) throws IOException {
+				final var resource = manager.getResource();
+				final var tbl = TableReader.read(resource.getData());
 
-					final var outputPath = manager.resolveOutputPath(PathUtil.replaceFileExtension(resource.getFile(), "csv"));
+				final var outputPath = manager.resolveOutputPath(PathUtil.replaceFileExtension(resource.getFile(), "csv"));
 
-					try (var writer = Files.newBufferedWriter(outputPath, Charset.forName("UTF8"), StandardOpenOption.CREATE,
-							StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
+				try (var writer = Files.newBufferedWriter(outputPath, Charset.forName("UTF8"), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
+						StandardOpenOption.WRITE)) {
+					if (this.isSimple) {
+						this.csv.writeSimple(tbl, writer);
+					} else {
 						this.csv.write(tbl, writer);
 					}
-					manager.addCreatedFile(outputPath);
 				}
+				manager.addCreatedFile(outputPath);
+			}
 
-				@Override
-				public void deinitialize() {
-				}
-			};
-		} else {
-			return new Converter() {
-				private final CsvComplete csv = new CsvComplete(getCellDelimiter());
-
-				@Override
-				public void convert(ConversionManager manager) throws IOException {
-					final var resource = manager.getResource();
-					final var tbl = TableReader.read(resource.getData());
-
-					final var outputPath = manager.resolveOutputPath(PathUtil.replaceFileExtension(resource.getFile(), "csv"));
-
-					try (var writer = Files.newBufferedWriter(outputPath, Charset.forName("UTF8"), StandardOpenOption.CREATE,
-							StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
-						this.csv.write(tbl, writer);
-					}
-					manager.addCreatedFile(outputPath);
-				}
-
-				@Override
-				public void deinitialize() {
-				}
-			};
-		}
+			@Override
+			public void deinitialize() {
+			}
+		};
 	}
 
 }

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
@@ -19,12 +18,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import nexusvault.cli.core.App;
+import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.Console.Level;
 import nexusvault.cli.core.extension.AbstractExtension;
 import nexusvault.cli.extensions.archive.command.ChangeDirectory;
 import nexusvault.cli.extensions.archive.command.SetArchivePath;
 import nexusvault.vault.IdxPath;
 
+@AutoInstantiate
 public final class ArchiveExtension extends AbstractExtension {
 
 	private final static Logger logger = LogManager.getLogger(ArchiveExtension.class);
@@ -60,7 +61,7 @@ public final class ArchiveExtension extends AbstractExtension {
 
 		IdxPath path = this.innerPath;
 
-		target = Paths.get(target).toString();
+		target = Path.of(target).toString();
 		if (target.startsWith(IdxPath.SEPARATOR)) {
 			path = path.getRoot();
 		}

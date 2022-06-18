@@ -12,7 +12,7 @@ public final class M32GltfFactory implements ConverterFactory {
 
 	private boolean includeTextures = true;
 
-	@IsArgument(name = "m32gltf-textures", isArgumentOptional = true)
+	@IsArgument(name = "m32gltf-textures", isArgumentOptional = true, description = "Export includes textures. By default on. Can be set to 'on' or 'off'")
 	public void setIncludeTextures(boolean value) {
 		this.includeTextures = value;
 	}
