@@ -1,6 +1,7 @@
 package nexusvault.cli.core.cmd;
 
 import java.util.Arrays;
+import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
 
@@ -21,6 +22,10 @@ public final class Arguments {
 
 	public String[] getUnnamedArgs() {
 		return this.args;
+	}
+
+	public Properties getProperties(String value) {
+		return this.cmdLine.getOptionProperties(value);
 	}
 
 	public boolean hasUnnamedArgValue(String value) {

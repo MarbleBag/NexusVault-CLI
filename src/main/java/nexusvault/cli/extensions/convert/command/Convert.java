@@ -3,7 +3,6 @@ package nexusvault.cli.extensions.convert.command;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -11,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import nexusvault.archive.IdxPath;
 import nexusvault.cli.core.App;
 import nexusvault.cli.core.cmd.AbstractCommandHandler;
 import nexusvault.cli.core.cmd.Argument;
@@ -25,7 +23,9 @@ import nexusvault.cli.extensions.convert.ConverterExtension;
 import nexusvault.cli.extensions.convert.resource.ArchiveResource;
 import nexusvault.cli.extensions.convert.resource.FileResource;
 import nexusvault.cli.extensions.convert.resource.Resource;
+import nexusvault.vault.IdxPath;
 
+@Deprecated
 public final class Convert extends AbstractCommandHandler {
 
 	@Override
@@ -84,7 +84,7 @@ public final class Convert extends AbstractCommandHandler {
 		boolean allFilesFound = true;
 
 		for (final var strPath : args.getUnnamedArgs()) {
-			final var path = Paths.get(strPath);
+			final var path = Path.of(strPath);
 			if (Files.exists(path)) {
 				targets.add(new FileResource(path));
 			} else {
@@ -163,14 +163,14 @@ public final class Convert extends AbstractCommandHandler {
 		final var missingFiles = new LinkedList<String>();
 
 		final var archiveExtension = App.getInstance().getExtension(ArchiveExtension.class);
-		final var archiveContainers = archiveExtension.getArchives();
-		if (archiveContainers.isEmpty()) {
+		final var archives = archiveExtension.getArchives();
+		if (archives.isEmpty()) {
 			sendMsg("No vaults are loaded. Use 'help' to learn how to load them");
 		} else {
 			for (final var possiblePath : possibleFiles) {
 				final var idxPath = IdxPath.createPathFrom(possiblePath);
-				for (final var container : archiveContainers) {
-					final var optionalEntry = idxPath.tryToResolve(container.getArchive().getRootDirectory());
+				for (final var archive : archives) {
+					final var optionalEntry = archive.find(idxPath);
 					if (optionalEntry.isPresent()) {
 						final var entry = optionalEntry.get();
 						if (entry.isFile()) {
@@ -192,7 +192,7 @@ public final class Convert extends AbstractCommandHandler {
 
 		final var pathVariations = new Path[] { App.getInstance().getAppConfig().getOutputPath(), App.getInstance().getAppConfig().getApplicationPath() };
 		for (final var possibleFile : possibleFiles) {
-			var path = Paths.get(possibleFile);
+			var path = Path.of(possibleFile);
 
 			if (!Files.exists(path)) {
 				if (path.isAbsolute()) {

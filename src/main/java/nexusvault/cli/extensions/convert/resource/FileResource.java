@@ -43,6 +43,27 @@ public final class FileResource implements Resource {
 	}
 
 	@Override
+	public byte[] getData() throws IOException {
+		return getDataAsBuffer().array();
+	}
+
+	@Override
+	public BufferedReader getDataAsReader(Charset cs) throws IOException {
+		return Files.newBufferedReader(this.path, cs);
+	}
+
+	@Override
+	public BinaryReader getDataAsBinaryReader() throws IOException {
+		return new SeekableByteChannelBinaryReader(Files.newByteChannel(this.path, StandardOpenOption.READ),
+				ByteBuffer.allocate(1024 * 8).order(ByteOrder.LITTLE_ENDIAN));
+	}
+
+	@Override
+	public InputStream getDataAsStream() throws IOException {
+		return Files.newInputStream(this.path, StandardOpenOption.READ);
+	}
+
+	@Override
 	public ByteBuffer getDataAsBuffer() throws IOException {
 		try (SeekableByteChannel channel = Files.newByteChannel(this.path, StandardOpenOption.READ)) {
 			final ByteBuffer data = ByteBuffer.allocate((int) channel.size()).order(ByteOrder.LITTLE_ENDIAN);
@@ -69,22 +90,6 @@ public final class FileResource implements Resource {
 
 			return data.flip();
 		}
-	}
-
-	@Override
-	public BufferedReader getDataAsReader(Charset cs) throws IOException {
-		return Files.newBufferedReader(this.path, cs);
-	}
-
-	@Override
-	public InputStream getDataAsStream() throws IOException {
-		return Files.newInputStream(this.path, StandardOpenOption.READ);
-	}
-
-	@Override
-	public BinaryReader getData() throws IOException {
-		return new SeekableByteChannelBinaryReader(Files.newByteChannel(this.path, StandardOpenOption.READ),
-				ByteBuffer.allocate(1024 * 8).order(ByteOrder.LITTLE_ENDIAN));
 	}
 
 }

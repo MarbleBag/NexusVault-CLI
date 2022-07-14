@@ -1,17 +1,20 @@
 package nexusvault.cli.extensions.convert.converter.tbl;
 
 import java.io.IOException;
-import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 
+import nexusvault.cli.core.PathUtil;
 import nexusvault.cli.core.cmd.ArgumentHelper;
+import nexusvault.cli.extensions.convert.ConversionManager;
 import nexusvault.cli.extensions.convert.Converter;
 import nexusvault.cli.extensions.convert.ConverterArgs;
 import nexusvault.cli.extensions.convert.ConverterFactory;
 import nexusvault.cli.extensions.convert.IsArgument;
 import nexusvault.cli.extensions.convert.IsFactory;
-import nexusvault.format.tbl.Table;
-import nexusvault.format.tbl.converter.CSV;
-import nexusvault.format.tbl.converter.CSVSimple;
+import nexusvault.export.tbl.csv.Csv;
+import nexusvault.format.tbl.TableReader;
 
 @IsFactory(id = "tbl2csv", fileExtensions = "tbl")
 public final class Tbl2CsvFactory implements ConverterFactory {
@@ -45,28 +48,32 @@ public final class Tbl2CsvFactory implements ConverterFactory {
 
 	@Override
 	public Converter createConverter() {
-		Tbl2Csv.CSVWriter writer;
-		if (this.simple) {
-			writer = new Tbl2Csv.CSVWriter() {
-				private final CSVSimple writer = new CSVSimple(getCellDelimiter());
+		return new Converter() {
+			private final Csv csv = new Csv(getCellDelimiter());
+			private final boolean isSimple = Tbl2CsvFactory.this.simple;
 
-				@Override
-				public void write(Table tbl, Writer writer) throws IOException {
-					this.writer.write(tbl, writer);
+			@Override
+			public void convert(ConversionManager manager) throws IOException {
+				final var resource = manager.getResource();
+				final var tbl = TableReader.read(resource.getData());
+
+				final var outputPath = manager.resolveOutputPath(PathUtil.replaceFileExtension(resource.getFile(), "csv"));
+
+				try (var writer = Files.newBufferedWriter(outputPath, Charset.forName("UTF8"), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING,
+						StandardOpenOption.WRITE)) {
+					if (this.isSimple) {
+						this.csv.writeSimple(tbl, writer);
+					} else {
+						this.csv.write(tbl, writer);
+					}
 				}
-			};
-		} else {
-			writer = new Tbl2Csv.CSVWriter() {
-				private final CSV writer = new CSV(getCellDelimiter());
+				manager.addCreatedFile(outputPath);
+			}
 
-				@Override
-				public void write(Table tbl, Writer writer) throws IOException {
-					this.writer.write(tbl, writer);
-				}
-			};
-		}
-
-		return new Tbl2Csv(writer);
+			@Override
+			public void deinitialize() {
+			}
+		};
 	}
 
 }

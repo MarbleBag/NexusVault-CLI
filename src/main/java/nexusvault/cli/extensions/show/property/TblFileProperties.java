@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import nexusvault.archive.IdxFileLink;
-import nexusvault.cli.extensions.show.property.ShowFileProperties.PropertyCollector;
+import nexusvault.cli.extensions.show.property.FileProperties.PropertyCollector;
 import nexusvault.format.tbl.TableReader;
+import nexusvault.vault.IdxEntry.IdxFileLink;
 
 final class TblFileProperties implements PropertyCollector {
 
@@ -23,8 +23,7 @@ final class TblFileProperties implements PropertyCollector {
 		final var properties = propertyCategory.computeIfAbsent("Table", e -> new HashMap<>());
 
 		try {
-			final var reader = new TableReader();
-			final var tbl = reader.read(file.getData());
+			final var tbl = TableReader.read(file.getData());
 			properties.put("Entries", String.valueOf(tbl.entries.length));
 			properties.put("Table name", String.valueOf(tbl.name));
 			properties.put("Columns", Arrays.stream(tbl.columns).map(e -> e.name).collect(Collectors.joining(", ")));

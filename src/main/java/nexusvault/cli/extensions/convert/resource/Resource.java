@@ -23,7 +23,9 @@ public interface Resource {
 
 	BufferedReader getDataAsReader(Charset cs) throws IOException;
 
+	BinaryReader getDataAsBinaryReader() throws IOException;
+
 	InputStream getDataAsStream() throws IOException;
 
-	BinaryReader getData() throws IOException;
+	byte[] getData() throws IOException;
 }

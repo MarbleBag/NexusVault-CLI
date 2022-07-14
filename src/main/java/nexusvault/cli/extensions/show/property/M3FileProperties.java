@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import nexusvault.archive.IdxFileLink;
-import nexusvault.cli.extensions.show.property.ShowFileProperties.PropertyCollector;
-import nexusvault.format.m3.v100.ModelReader;
+import nexusvault.cli.extensions.show.property.FileProperties.PropertyCollector;
+import nexusvault.format.m3.ModelReader;
+import nexusvault.vault.IdxEntry.IdxFileLink;
 
 final class M3FileProperties implements PropertyCollector {
 
@@ -21,9 +21,8 @@ final class M3FileProperties implements PropertyCollector {
 		final var properties = new HashMap<String, String>();
 
 		try {
-			final var reader = new ModelReader();
 			final var data = file.getData();
-			final var fileObj = reader.read(data);
+			final var fileObj = ModelReader.read(data);
 
 			final var modelGeometry = fileObj.getGeometry();
 

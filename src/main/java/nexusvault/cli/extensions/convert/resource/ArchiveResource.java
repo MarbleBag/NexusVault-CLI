@@ -1,17 +1,18 @@
 package nexusvault.cli.extensions.convert.resource;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 import kreed.io.util.BinaryReader;
-import kreed.io.util.ByteBufferBinaryReader;
-import kreed.io.util.ByteBufferInputStream;
-import nexusvault.archive.IdxFileLink;
+import kreed.io.util.ByteArrayBinaryReader;
+import nexusvault.vault.IdxEntry.IdxFileLink;
 
 public final class ArchiveResource implements Resource {
 
@@ -43,7 +44,7 @@ public final class ArchiveResource implements Resource {
 
 	@Override
 	public ByteBuffer getDataAsBuffer() throws IOException {
-		return this.fileLink.getData();
+		return ByteBuffer.wrap(getData()).order(ByteOrder.LITTLE_ENDIAN);
 	}
 
 	@Override
@@ -52,13 +53,18 @@ public final class ArchiveResource implements Resource {
 	}
 
 	@Override
-	public InputStream getDataAsStream() throws IOException {
-		return new ByteBufferInputStream(getDataAsBuffer());
+	public BinaryReader getDataAsBinaryReader() throws IOException {
+		return new ByteArrayBinaryReader(getData(), ByteOrder.LITTLE_ENDIAN);
 	}
 
 	@Override
-	public BinaryReader getData() throws IOException {
-		return new ByteBufferBinaryReader(getDataAsBuffer());
+	public InputStream getDataAsStream() throws IOException {
+		return new ByteArrayInputStream(getData());
+	}
+
+	@Override
+	public byte[] getData() throws IOException {
+		return this.fileLink.getData();
 	}
 
 }

@@ -1,25 +1,33 @@
 package nexusvault.cli.extensions.convert.converter.tex;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import nexusvault.cli.extensions.convert.Converter;
 import nexusvault.cli.extensions.convert.ConverterArgs;
 import nexusvault.cli.extensions.convert.ConverterException;
 import nexusvault.cli.extensions.convert.ConverterFactory;
 import nexusvault.cli.extensions.convert.IsArgument;
 import nexusvault.cli.extensions.convert.IsFactory;
-import nexusvault.format.tex.TexType;
+import nexusvault.format.tex.TextureType;
 
-@IsFactory(id = "png2tex", priority = 1, fileExtensions = { "png" })
+@IsFactory(id = "png2tex", fileExtensions = { "png" }, priority = 1)
 public final class Png2TexFactory implements ConverterFactory {
 
-	private TexType texType = TexType.ARGB1;
+	private TextureType texType = TextureType.ARGB1;
 	private int mipmapCount = -1;
 	private int quality = 100;
 	private final int[] defaultColor = new int[] { -1, -1, -1, -1 };
 	private int depth = 1;
 	private int sides = 1;
 
-	@IsArgument(name = "png2tex-type", description = "WS specific texture type. JPG may or may not work.")
-	public void setType(TexType texType) {
+	@IsArgument(name = "png2tex-type", description = "WS specific texture type. JPG may or may not work. Defaults to ARGB1.")
+	public void setType(TextureType texType) {
+		if (texType == null || texType == TextureType.UNKNOWN) {
+			throw new ConverterException(String.format("Unknown type '%s', known types are: %s", texType,
+					Arrays.asList(TextureType.values()).stream().map(Object::toString).collect(Collectors.joining(", "))));
+		}
+
 		this.texType = texType;
 	}
 
@@ -82,7 +90,7 @@ public final class Png2TexFactory implements ConverterFactory {
 				values -> setDefaultColor(Integer.parseInt(values[0]), Integer.parseInt(values[1]), Integer.parseInt(values[2]), Integer.parseInt(values[3])));
 		arg.onHas("png2tex-quality", value -> setQuality(Integer.parseInt(value)));
 		arg.onHas("png2tex-mipmaps", value -> setMipmaps(Integer.parseInt(value)));
-		arg.onHas("png2tex-type", value -> setType(TexType.resolve(value)));
+		arg.onHas("png2tex-type", value -> setType(TextureType.resolve(value)));
 		arg.onHas("png2tex-depth", value -> setDepth(Integer.parseInt(value)));
 		arg.onHas("png2tex-sides", value -> setSides(Integer.parseInt(value)));
 	}

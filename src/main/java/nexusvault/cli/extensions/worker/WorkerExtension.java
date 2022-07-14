@@ -11,8 +11,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.extension.AbstractExtension;
 
+@AutoInstantiate
 public final class WorkerExtension extends AbstractExtension {
 
 	private ExecutorService threadPool;
@@ -76,11 +78,11 @@ public final class WorkerExtension extends AbstractExtension {
 
 		private final T result;
 		private final Status status;
-		private final Exception error;
+		private final Throwable error;
 
 		public Report(Future<? extends T> future) {
 			Status status = Status.SUCCESSFUL;
-			Exception error = null;
+			Throwable error = null;
 			T result = null;
 
 			try {
@@ -105,7 +107,7 @@ public final class WorkerExtension extends AbstractExtension {
 			return this.status;
 		}
 
-		public Exception getError() {
+		public Throwable getError() {
 			return this.error;
 		}
 	}

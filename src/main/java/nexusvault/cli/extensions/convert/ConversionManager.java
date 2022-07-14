@@ -5,17 +5,16 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import nexusvault.archive.IdxPath;
 import nexusvault.cli.core.App;
 import nexusvault.cli.extensions.archive.ArchiveExtension;
 import nexusvault.cli.extensions.archive.NexusArchiveContainer;
 import nexusvault.cli.extensions.convert.resource.ArchiveResource;
 import nexusvault.cli.extensions.convert.resource.FileResource;
 import nexusvault.cli.extensions.convert.resource.Resource;
+import nexusvault.vault.IdxPath;
 
 public final class ConversionManager {
 
@@ -49,11 +48,10 @@ public final class ConversionManager {
 
 		final var idxPath = IdxPath.createPathFrom(path.toString());
 		final var archiveExtension = App.getInstance().getExtension(ArchiveExtension.class);
-		final List<NexusArchiveContainer> archiveContainer = archiveExtension.getArchives();
-		for (final NexusArchiveContainer wrapper : archiveContainer) {
-			final var resolvedEntry = idxPath.tryToResolve(wrapper.getArchive().getRootDirectory());
-			if (resolvedEntry.isPresent() && resolvedEntry.get().isFile()) {
-				return new ArchiveResource(resolvedEntry.get().asFile());
+		for (final NexusArchiveContainer archive : archiveExtension.getArchives()) {
+			final var entry = archive.find(idxPath);
+			if (entry.isPresent() && entry.get().isFile()) {
+				return new ArchiveResource(entry.get().asFile());
 			}
 		}
 		return null;

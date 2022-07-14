@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import nexusvault.archive.IdxFileLink;
-import nexusvault.cli.extensions.show.property.ShowFileProperties.PropertyCollector;
+import nexusvault.cli.extensions.show.property.FileProperties.PropertyCollector;
 import nexusvault.format.tex.TextureReader;
+import nexusvault.vault.IdxEntry.IdxFileLink;
 
 final class TexFileProperties implements PropertyCollector {
 
@@ -20,18 +20,15 @@ final class TexFileProperties implements PropertyCollector {
 		final var properties = new HashMap<String, String>();
 
 		try {
-			final var reader = TextureReader.buildDefault();
-			final var data = file.getData();
-			final var texObj = reader.read(data);
-
-			properties.put("Format", String.valueOf(texObj.getTextureImageFormat()));
-			properties.put("TexType", String.valueOf(texObj.getTextureDataType()));
-			properties.put("Width", String.valueOf(texObj.getImageWidth()));
-			properties.put("Height", String.valueOf(texObj.getImageHeight()));
-			properties.put("Mip Maps", String.valueOf(texObj.getMipMapCount()));
-			properties.put("Version", String.valueOf(texObj.getVersion()));
-			properties.put("Sides", String.valueOf(texObj.getSides()));
-			properties.put("Depth", String.valueOf(texObj.getDepth()));
+			final var texture = TextureReader.read(file.getData());
+			properties.put("Format", String.valueOf(texture.getImageFormat()));
+			properties.put("TexType", String.valueOf(texture.getTextureType()));
+			properties.put("Width", String.valueOf(texture.getWidth()));
+			properties.put("Height", String.valueOf(texture.getHeight()));
+			properties.put("Mip Maps", String.valueOf(texture.getMipMapCount()));
+			properties.put("Version", String.valueOf(texture.getVersion()));
+			properties.put("Sides", String.valueOf(texture.getSides()));
+			properties.put("Depth", String.valueOf(texture.getDepth()));
 		} catch (final IOException e) {
 
 		}

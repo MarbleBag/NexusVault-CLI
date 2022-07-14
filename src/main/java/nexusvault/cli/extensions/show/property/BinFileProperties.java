@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import nexusvault.archive.IdxFileLink;
-import nexusvault.cli.extensions.show.property.ShowFileProperties.PropertyCollector;
+import nexusvault.cli.extensions.show.property.FileProperties.PropertyCollector;
 import nexusvault.format.bin.LanguageReader;
+import nexusvault.vault.IdxEntry.IdxFileLink;
 
 final class BinFileProperties implements PropertyCollector {
 
@@ -20,14 +20,13 @@ final class BinFileProperties implements PropertyCollector {
 		final var properties = new HashMap<String, String>();
 
 		try {
-			final var reader = new LanguageReader();
 			final var data = file.getData();
-			final var fileObj = reader.read(data);
+			final var fileObj = LanguageReader.read(data);
 
-			properties.put("Locale long", String.valueOf(fileObj.getLocaleLong()));
-			properties.put("Locale short", String.valueOf(fileObj.getLocaleShort()));
-			properties.put("Locale tag", String.valueOf(fileObj.getLocaleTag()));
-			properties.put("Entries", String.valueOf(fileObj.entryCount()));
+			properties.put("Locale long", String.valueOf(fileObj.locale.longName));
+			properties.put("Locale short", String.valueOf(fileObj.locale.shortName));
+			properties.put("Locale tag", String.valueOf(fileObj.locale.tagName));
+			properties.put("Entries", String.valueOf(fileObj.entries.size()));
 		} catch (final IOException e) {
 
 		}

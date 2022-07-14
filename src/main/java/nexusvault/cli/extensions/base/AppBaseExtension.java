@@ -4,11 +4,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import nexusvault.cli.core.App;
+import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.exception.FileNotFoundException;
 import nexusvault.cli.core.exception.FileNotReadableException;
 import nexusvault.cli.core.extension.AbstractExtension;
 import nexusvault.cli.core.extension.ExtensionInfo;
 
+@AutoInstantiate
 @ExtensionInfo(priority = Integer.MAX_VALUE)
 public class AppBaseExtension extends AbstractExtension {
 

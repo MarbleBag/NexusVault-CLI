@@ -28,10 +28,16 @@ public final class ArgumentDescription {
 		ArgumentDescription.Builder6 setNumberOfArguments(int number);
 
 		ArgumentDescription.Builder6 setNumberOfArgumentsUnlimited();
+
+		ArgumentDescription.Builder5 setValueSeparator();
+
+		ArgumentDescription.Builder5 setValueSeparator(char separator);
 	}
 
 	public static interface Builder6 {
 		ArgumentDescription.BuilderEnd setNamesOfArguments(String... names);
+
+		ArgumentDescription build();
 	}
 
 	public static interface BuilderEnd {
@@ -46,6 +52,7 @@ public final class ArgumentDescription {
 		protected String nameShort;
 		protected int numberOfArgs = 0;
 		protected boolean required;
+		protected char valueSeparator;
 	}
 
 	public static final class CompactBuilder extends BuilderData {
@@ -94,6 +101,16 @@ public final class ArgumentDescription {
 
 		public CompactBuilder setRequired(boolean isCommandRequired) {
 			this.required = isCommandRequired;
+			return this;
+		}
+
+		public CompactBuilder setValueSeparator() {
+			this.valueSeparator = '=';
+			return this;
+		}
+
+		public CompactBuilder setValueSeparator(char separator) {
+			this.valueSeparator = separator;
 			return this;
 		}
 	}
@@ -163,6 +180,18 @@ public final class ArgumentDescription {
 			return this;
 		}
 
+		@Override
+		public Builder5 setValueSeparator() {
+			this.valueSeparator = '=';
+			return this;
+		}
+
+		@Override
+		public Builder5 setValueSeparator(char separator) {
+			this.valueSeparator = separator;
+			return this;
+		}
+
 	}
 
 	private static final int NUMBER_OF_ARGUMENTS_UNLIMITED = -1;
@@ -185,6 +214,8 @@ public final class ArgumentDescription {
 
 	private final boolean required;
 
+	private final char valueSeparator;
+
 	private ArgumentDescription(ArgumentDescription.BuilderData builder) {
 		this.name = builder.name;
 		this.nameShort = builder.nameShort;
@@ -193,6 +224,7 @@ public final class ArgumentDescription {
 		this.numberOfArgs = builder.numberOfArgs;
 		this.argumentOptional = builder.argumentOptional;
 		this.argumentNames = builder.argumentNames;
+		this.valueSeparator = builder.valueSeparator;
 	}
 
 	@Override
@@ -241,6 +273,14 @@ public final class ArgumentDescription {
 			return false;
 		}
 		return true;
+	}
+
+	public boolean hasValueSeparator() {
+		return this.valueSeparator > 0;
+	}
+
+	public char getValueSeparator() {
+		return this.valueSeparator;
 	}
 
 	public String[] getArgumentNames() {

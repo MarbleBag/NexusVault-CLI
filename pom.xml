@@ -5,7 +5,7 @@
 
 	<groupId>nexusvault</groupId>
 	<artifactId>nexusvault.cli</artifactId>
-	<version>0.3.1</version>
+	<version>0.4.0</version>
 
 	<properties>
 		<project.java.version>11</project.java.version>
@@ -13,13 +13,16 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<project.application.exe.name>NexusvaultCLI</project.application.exe.name>
 		<project.application.jar.name>nexusvault-cli</project.application.jar.name>
+		<nexusvault.maven.repo.local.id>nexusvault.cli.repo</nexusvault.maven.repo.local.id>
+		<nexusvault.maven.repo.local.name>local-maven-repo</nexusvault.maven.repo.local.name>
+		<nexusvault.maven.repo.local.url>file:\\\${project.basedir}\maven-repo</nexusvault.maven.repo.local.url>
 	</properties>
 
 	<repositories>
 		<repository>
-			<id>nexusvault.cli.repo</id>
-			<name>local-maven-repo</name>
-			<url>file:\\\${project.basedir}\maven-repo</url>
+			<id>${nexusvault.maven.repo.local.id}</id>
+			<name>${nexusvault.maven.repo.local.name}</name>
+			<url>${nexusvault.maven.repo.local.url}</url>
 		</repository>
 	</repositories>
 
@@ -154,37 +157,12 @@
 		<dependency>
 			<groupId>nexusvault</groupId>
 			<artifactId>nexusvault</artifactId>
-			<version>[3.1,4)</version>
+			<version>[5,6)</version>
 		</dependency>
 		<dependency>
 			<groupId>nexusvault</groupId>
-			<artifactId>nexusvault.format.bin</artifactId>
-			<version>[1,2)</version>
-		</dependency>
-		<dependency>
-			<groupId>nexusvault</groupId>
-			<artifactId>nexusvault.format.tex</artifactId>
-			<version>[4,5)</version>
-		</dependency>
-		<dependency>
-			<groupId>nexusvault</groupId>
-			<artifactId>nexusvault.format.tbl</artifactId>
-			<version>[2,3)</version>
-		</dependency>
-		<dependency>
-			<groupId>nexusvault</groupId>
-			<artifactId>nexusvault.format.m3</artifactId>
-			<version>[0.8,1)</version>
-		</dependency>
-		<dependency>
-			<groupId>nexusvault</groupId>
-			<artifactId>nexusvault.format.m3.export.gltf</artifactId>
-			<version>[0.6,2)</version>
-		</dependency>
-		<dependency>
-			<groupId>nexusvault</groupId>
-			<artifactId>nexusvault.format.m3.export.obj</artifactId>
-			<version>[0.5,2)</version>
+			<artifactId>nexusvault.export.m3.gltf</artifactId>
+			<version>[0.7,2)</version>
 		</dependency>
 	</dependencies>
 </project>

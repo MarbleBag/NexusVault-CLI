@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import nexusvault.cli.core.App;
+import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.extension.AbstractExtension;
 import nexusvault.cli.extensions.show.property.ShowFileProperties;
 import nexusvault.cli.extensions.show.search.ShowSearchResults;
 
+@AutoInstantiate
 public final class ShowExtension extends AbstractExtension {
 
 	public static interface Showable {

@@ -2,7 +2,6 @@ package nexusvault.cli.extensions.archive.command;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 
 import nexusvault.cli.core.App;
@@ -73,7 +72,7 @@ public final class SetArchivePath implements ArgumentHandler, CommandHandler {
 
 		final Path[] paths = new Path[args.length];
 		for (int i = 0; i < paths.length; ++i) {
-			paths[i] = Paths.get(args[i]);
+			paths[i] = Path.of(args[i]);
 
 			if (paths[i].endsWith("WildStar") && Files.isDirectory(paths[i])) {
 				final Path patchFolder = paths[i].resolve("Patch");

@@ -3,8 +3,8 @@ package nexusvault.cli.extensions.show.property;
 import java.util.HashMap;
 import java.util.Map;
 
-import nexusvault.archive.IdxFileLink;
-import nexusvault.cli.extensions.show.property.ShowFileProperties.PropertyCollector;
+import nexusvault.cli.extensions.show.property.FileProperties.PropertyCollector;
+import nexusvault.vault.IdxEntry.IdxFileLink;
 
 final class FilePathProperties implements PropertyCollector {
 
