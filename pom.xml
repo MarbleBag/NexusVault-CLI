@@ -13,16 +13,22 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<project.application.exe.name>NexusvaultCLI</project.application.exe.name>
 		<project.application.jar.name>nexusvault-cli</project.application.jar.name>
-		<nexusvault.maven.repo.local.id>nexusvault.cli.repo</nexusvault.maven.repo.local.id>
-		<nexusvault.maven.repo.local.name>local-maven-repo</nexusvault.maven.repo.local.name>
-		<nexusvault.maven.repo.local.url>file:\\\${project.basedir}\maven-repo</nexusvault.maven.repo.local.url>
+		<nexusvault-cli.maven.repo.id>nexusvault.cli.repo</nexusvault-cli.maven.repo.id>
+		<nexusvault-cli.maven.repo.name>local-maven-repo</nexusvault-cli.maven.repo.name>
+		<nexusvault-cli.maven.repo.url>file:\\\${project.basedir}\maven-repo</nexusvault-cli.maven.repo.url>
+		<nexusvault.maven.repo.id>nexusvault.maven-repo</nexusvault.maven.repo.id>
+		<nexusvault.maven.repo.url>file:\\\${project.basedir}\..\Nexusvault\nexusvault\maven-repo</nexusvault.maven.repo.url>
 	</properties>
 
 	<repositories>
 		<repository>
-			<id>${nexusvault.maven.repo.local.id}</id>
-			<name>${nexusvault.maven.repo.local.name}</name>
-			<url>${nexusvault.maven.repo.local.url}</url>
+			<id>${nexusvault-cli.maven.repo.id}</id>
+			<name>${nexusvault-cli.maven.repo.name}</name>
+			<url>${nexusvault-cli.maven.repo.url}</url>
+		</repository>
+		<repository>
+			<id>${nexusvault.maven.repo.id}</id>
+			<url>${nexusvault.maven.repo.url}</url>
 		</repository>
 	</repositories>
 

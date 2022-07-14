@@ -25,7 +25,8 @@ public final class ConvertFile extends AbstractCommandHandler {
 	@Override
 	public CommandDescription getCommandDescription() {
 		final var cmdBuilder = new CommandDescription.CompactBuilder();
-		cmdBuilder.setCommandName("convert-file");
+		cmdBuilder.setCommandName("convert");
+		cmdBuilder.addAlternativeNames("convert-file");
 		cmdBuilder.setDescription("Converts files from one format to another.");
 		for (final var arg : App.getInstance().getExtension(ConverterExtension.class).getCLIOptions()) {
 			cmdBuilder.addNamedArgument(arg);
