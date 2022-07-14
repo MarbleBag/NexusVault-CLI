@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com)
 
+## [0.4.0] - 2022-07-14
+### Added
+- Flag '--separate' to 'export' : if set, exported files will be stored into separate folders. While this is not necessary for most files, it can be useful when multiple models and their default textures are exported
+
+### Fixed
+- Mipmap generation for textures with transparent pixels
+
 ## [0.3.1] - 2021-12-20
 ### Added
 - tex2png; argument for mipmap extraction [ -tex2png-mipmaps ]
