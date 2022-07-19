@@ -39,7 +39,6 @@ import nexusvault.cli.core.command.Exit;
 import nexusvault.cli.core.command.Help;
 import nexusvault.cli.core.command.SetCmd;
 import nexusvault.cli.core.extension.Extension;
-import nexusvault.cli.model.ModelPropertyChangedEvent;
 
 public final class App {
 

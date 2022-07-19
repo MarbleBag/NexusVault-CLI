@@ -2,8 +2,6 @@ package nexusvault.cli.core;
 
 import java.nio.file.Path;
 
-import nexusvault.cli.model.ModelPropertyChangedEvent;
-
 public final class AppConfig {
 
 	public static abstract class AppConfigChangedEvent<T> extends ModelPropertyChangedEvent<T> {
