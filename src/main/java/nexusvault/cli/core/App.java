@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Properties;
@@ -27,7 +26,8 @@ import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
 import com.google.common.eventbus.Subscribe;
 
 import nexusvault.cli.Main;
-import nexusvault.cli.ModelSystem;
+import nexusvault.cli.core.AppConfig.AppConfigAppPathChangedEvent;
+import nexusvault.cli.core.AppConfig.AppConfigDebugModeChangedEvent;
 import nexusvault.cli.core.Console.Level;
 import nexusvault.cli.core.cmd.ArgumentHandler;
 import nexusvault.cli.core.cmd.ArgumentManager;
@@ -36,25 +36,12 @@ import nexusvault.cli.core.cmd.CommandFormatException;
 import nexusvault.cli.core.cmd.CommandHandler;
 import nexusvault.cli.core.cmd.CommandManager;
 import nexusvault.cli.core.command.Exit;
-import nexusvault.cli.core.command.HeadlessModeArgument;
 import nexusvault.cli.core.command.Help;
 import nexusvault.cli.core.command.SetCmd;
 import nexusvault.cli.core.extension.Extension;
-import nexusvault.cli.model.AppConfigModel;
-import nexusvault.cli.model.AppConfigModel.AppConfigAppPathChangedEvent;
-import nexusvault.cli.model.AppConfigModel.AppConfigDebugModeChangedEvent;
 import nexusvault.cli.model.ModelPropertyChangedEvent;
 
 public final class App {
-
-	private static Path getProjectLocation() {
-		try {
-			final Path currentLocation = Paths.get(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-			return currentLocation.getParent();
-		} catch (final URISyntaxException e) {
-			throw new IllegalStateException(e);
-		}
-	}
 
 	private final static Logger logger = LogManager.getLogger(App.class);
 
@@ -65,20 +52,16 @@ public final class App {
 	}
 
 	private EventManager eventManager;
-	private ExtensionManager extensionManager;
+	private BaseExtensionManager extensionManager;
 	private CommandLineManager cliSystem;
 	private BaseConsoleManager consoleManager;
-	private ConfigManager configManager;
-
-	@Deprecated
-	private ModelSystem modelSystem;
-	@Deprecated
-	private AppConfigModel appConfig;
 
 	private ArgumentManager argumentManager;
 	private CommandManager commandManager;
 
 	private boolean processConsole;
+
+	private AppConfig appConfig;
 
 	public App() {
 		if (app != null) {
@@ -91,12 +74,8 @@ public final class App {
 		return this.eventManager;
 	}
 
-	public AppConfigModel getAppConfig() {
+	public AppConfig getAppConfig() {
 		return this.appConfig;
-	}
-
-	public ConfigManager geConfig() {
-		return this.configManager;
 	}
 
 	public CommandLineManager getCLI() {
@@ -111,11 +90,6 @@ public final class App {
 		return this.consoleManager;
 	}
 
-	@Deprecated
-	public ModelSystem getModelSystem() {
-		return this.modelSystem;
-	}
-
 	// shortcut
 	public <T extends Extension> T getExtension(Class<T> extensionClass) {
 		return this.extensionManager.getExtension(extensionClass);
@@ -127,71 +101,88 @@ public final class App {
 			return;
 		}));
 
-		{ // config manager
-			// TODO
-		}
+		this.extensionManager = new BaseExtensionManager(this);
 
-		initializeModel();
-		// initializeLogging();
-		initializeAppProperties();
+		// console and logger
+		this.consoleManager = new BaseConsoleManager(this);
 
-		// updateLogger();
+		// event manager
+		this.eventManager = new EventBusSystem((exception, context) -> {
+			throw new RuntimeException(exception);
+		});
 
-		{ // console and logger
-			// LogManager.getLogger(App.class);
-			this.consoleManager = new BaseConsoleManager(this);
-		}
+		this.eventManager.registerEventHandler(new AppConfigObserver()); // TODO
 
-		{ // event manager
-			this.eventManager = new EventBusSystem((exception, context) -> {
-				throw new RuntimeException(exception);
-			});
-			this.eventManager.registerEventHandler(new AppConfigObserver()); // TODO
-		}
+		initializeAppConfig();
 
-		{ // command line manager
-			this.argumentManager = new ArgumentManager();
-			this.commandManager = new CommandManager();
-			this.cliSystem = new CommandLineManager() {
-				@Override
-				public void registerCommand(CommandHandler cmd) {
-					App.this.commandManager.registerCommand(cmd);
-				}
+		// command line manager
+		this.argumentManager = new ArgumentManager();
+		this.commandManager = new CommandManager();
+		this.cliSystem = new CommandLineManager() {
+			@Override
+			public void registerCommand(CommandHandler cmd) {
+				App.this.commandManager.registerCommand(cmd);
+			}
 
-				@Override
-				public void unregisterCommand(CommandHandler cmd) {
-					App.this.commandManager.unregisterCommand(cmd);
-				}
+			@Override
+			public void unregisterCommand(CommandHandler cmd) {
+				App.this.commandManager.unregisterCommand(cmd);
+			}
 
-				@Override
-				public void registerArgument(ArgumentHandler handler) {
-					App.this.argumentManager.registerArgumentHandler(handler);
-				}
-			};
+			@Override
+			public void registerArgument(ArgumentHandler handler) {
+				App.this.argumentManager.registerArgumentHandler(handler);
+			}
+		};
 
-			getCLI().registerArgument(new HeadlessModeArgument());
-			getCLI().registerCommand(new Exit((args) -> requestShutDown()));
-			getCLI().registerCommand(new SetCmd((args) -> setArguments(args.getUnnamedArgs())));
-			getCLI().registerCommand(new Help((args) -> {
-				final var output = getConsole().getWriter(Level.CONSOLE);
-				if (args.isNamedArgumentSet("cmd")) {
-					App.this.commandManager.printHelp(output);
-				} else if (args.isNamedArgumentSet("args")) {
-					App.this.argumentManager.printHelp(output);
-				} else {
-					App.this.argumentManager.printHelp(output);
-					App.this.commandManager.printHelp(output);
-				}
-			}));
-		}
+		getCLI().registerCommand(new Exit((args) -> requestShutDown()));
+		getCLI().registerCommand(new SetCmd((args) -> setArguments(args.getUnnamedArgs())));
+		getCLI().registerCommand(new Help((args) -> {
+			final var output = getConsole().getWriter(Level.CONSOLE);
+			if (args.isNamedArgumentSet("cmd")) {
+				App.this.commandManager.printHelp(output);
+			} else if (args.isNamedArgumentSet("args")) {
+				App.this.argumentManager.printHelp(output);
+			} else {
+				App.this.argumentManager.printHelp(output);
+				App.this.commandManager.printHelp(output);
+			}
+		}));
 
-		{ // extensions
-			final var manager = new BaseExtensionManager(this);
-			this.extensionManager = manager;
-			manager.loadExtensions("nexusvault.cli.extensions");
-		}
+		this.extensionManager.loadExtensions("nexusvault.cli.extensions");
 
 		// loadConfig();
+	}
+
+	private void initializeAppConfig() {
+		this.appConfig = new AppConfig();
+
+		{ // set application path
+			try {
+				final var currentLocation = Paths.get(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+				this.appConfig.setApplicationPath(currentLocation);
+			} catch (final URISyntaxException e) {
+				throw new IllegalStateException(e);
+			}
+		}
+
+		{ // set app version
+			final var properties = new Properties();
+
+			final var classLoader = this.getClass().getClassLoader();
+			final var propertyContent = classLoader.getResourceAsStream("app.properties");
+			if (propertyContent != null) {
+				try (propertyContent) {
+					properties.load(propertyContent);
+				} catch (final IOException e) {
+					logger.error(String.format("Unable to load app.properties"), e);
+				}
+			}
+
+			if (properties.containsKey("app.version")) {
+				this.appConfig.setApplicationVersion(properties.getProperty("app.version"));
+			}
+		}
 	}
 
 	protected void setHeadlessMode() {
@@ -291,38 +282,6 @@ public final class App {
 		// logger = LogManager.getLogger(App.class);
 	}
 
-	@Deprecated
-	private void initializeModel() {
-		this.modelSystem = new BaseModelSystem();
-
-		// maybe move this to AppBasePlugIn
-		this.appConfig = new AppConfigModel();
-		this.appConfig.setApplicationPath(getProjectLocation());
-		this.appConfig.setDebugMode(false);
-		// this.appConfig.setHeadlessMode(headlessMode);
-
-		this.modelSystem.registerModel(AppConfigModel.class, this.appConfig);
-	}
-
-	private void initializeAppProperties() {
-		// maybe move this to AppBasePlugIn
-		final var properties = new Properties();
-
-		final var classLoader = this.getClass().getClassLoader();
-		final var propertyContent = classLoader.getResourceAsStream("app.properties");
-		if (propertyContent != null) {
-			try (propertyContent) {
-				properties.load(propertyContent);
-			} catch (final IOException e) {
-				logger.error(String.format("Unable to load app.properties"), e);
-			}
-		}
-
-		if (properties.containsKey("app.version")) {
-			getAppConfig().setApplicationVersion(properties.getProperty("app.version"));
-		}
-	}
-
 	private final class AppConfigObserver {
 		@Subscribe
 		public void onAppConfigChangedEvent(ModelPropertyChangedEvent<?> event) {
@@ -359,18 +318,14 @@ public final class App {
 	}
 
 	public void closeApp() {
-
 		saveAppConfig();
 		savePlugInConfigs();
 
 		this.consoleManager = null;
-		this.modelSystem = null;
 		this.eventManager = null;
 		this.commandManager = null;
 		this.cliSystem = null;
 		this.extensionManager = null;
-		this.appConfig = null;
-		// TODO
 	}
 
 	private void saveAppConfig() {

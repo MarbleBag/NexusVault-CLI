@@ -1,14 +1,12 @@
 package nexusvault.cli.extensions.base.command;
 
 import nexusvault.cli.core.App;
-import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.Console.Level;
 import nexusvault.cli.core.cmd.Argument;
 import nexusvault.cli.core.cmd.ArgumentDescription;
 import nexusvault.cli.core.cmd.ArgumentHandler;
-import nexusvault.cli.extensions.base.AppBaseExtension;
 
-@AutoInstantiate
+// @AutoInstantiate
 final class NoConfigSave implements ArgumentHandler {
 
 	@Override
@@ -27,17 +25,17 @@ final class NoConfigSave implements ArgumentHandler {
 
 	@Override
 	public void execute(Argument arg) {
-		final AppBaseExtension configPlugin = App.getInstance().getExtensionManager().getExtension(AppBaseExtension.class);
+		final var config = App.getInstance().getAppConfig();
 
 		if (arg.getValue() == null) {
-			configPlugin.setConfigNotSaveable(true);
+			config.setConfigNotSaveable(true);
 		}
 
 		final String arg0 = arg.getValue().trim().toLowerCase();
 		if ("off".equals(arg0)) {
-			configPlugin.setConfigNotSaveable(false);
+			config.setConfigNotSaveable(false);
 		} else if ("on".equals(arg0)) {
-			configPlugin.setConfigNotSaveable(true);
+			config.setConfigNotSaveable(true);
 		} else {
 			App.getInstance().getConsole().println(Level.CONSOLE,
 					() -> String.format("Command 'config-no-save' does not accept '%s' as an argument. Use 'off' or 'on'.", arg0));
