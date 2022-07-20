@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com)
 
+## [0.4.1] - 2022-07-20
+### Fixed
+- An issue which prevented the export of some player model faces
+
 ## [0.4.0] - 2022-07-14
 ### Added
 - Flag '--separate' to 'export' : if set, exported files will be stored into separate folders. While this is not necessary for most files, it can be useful when multiple models and their default textures are exported
