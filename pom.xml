@@ -17,7 +17,7 @@
 		<nexusvault-cli.maven.repo.name>local-maven-repo</nexusvault-cli.maven.repo.name>
 		<nexusvault-cli.maven.repo.url>file:\\\${project.basedir}\maven-repo</nexusvault-cli.maven.repo.url>
 		<nexusvault.maven.repo.id>nexusvault.maven-repo</nexusvault.maven.repo.id>
-		<nexusvault.maven.repo.url>file:\\\${project.basedir}\..\Nexusvault\nexusvault\maven-repo</nexusvault.maven.repo.url>
+		<nexusvault.maven.repo.url>file:\\\${project.basedir}\..\Nexusvault-Java\nexusvault\maven-repo</nexusvault.maven.repo.url>
 	</properties>
 
 	<repositories>
