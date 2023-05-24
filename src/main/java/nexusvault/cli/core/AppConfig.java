@@ -2,6 +2,8 @@ package nexusvault.cli.core;
 
 import java.nio.file.Path;
 
+import java.nio.file.*;
+
 public final class AppConfig {
 
 	public static abstract class AppConfigChangedEvent<T> extends ModelPropertyChangedEvent<T> {
@@ -57,7 +59,16 @@ public final class AppConfig {
 	}
 
 	public void setApplicationPath(Path value) {
+		if(value == null)
+			throw new IllegalArgumentException("ApplicationPath can not be null");
+		
 		if (this.applicationPath == null || !this.applicationPath.equals(value)) {
+			if(Files.isRegularFile(value)){
+				value = value.getParent();
+				if(value==null)
+					throw new IllegalArgumentException("Invalid ApplicationPath: "+value);
+			}
+			
 			final var oldValue = this.applicationPath;
 			this.applicationPath = value;
 			App.getInstance().getEventSystem().postEvent(new AppConfigAppPathChangedEvent(oldValue, value));

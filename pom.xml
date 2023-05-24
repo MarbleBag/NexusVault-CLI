@@ -14,7 +14,7 @@
 		<project.application.exe.name>NexusvaultCLI</project.application.exe.name>
 		<project.application.jar.name>nexusvault-cli</project.application.jar.name>
 		<nexusvault.maven.repo.id>nexusvault.maven-repo</nexusvault.maven.repo.id>
-		<nexusvault.maven.repo.url>file:\\\${project.basedir}\..\Nexusvault\nexusvault\maven-repo</nexusvault.maven.repo.url>
+		<nexusvault.maven.repo.url>file:\\\${project.basedir}\..\NexusVault-Java\nexusvault\maven-repo</nexusvault.maven.repo.url>
 	</properties>
 
 	<repositories>

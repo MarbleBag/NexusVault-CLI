@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Properties;
@@ -157,12 +158,15 @@ public final class App {
 		this.appConfig = new AppConfig();
 
 		{ // set application path
-			try {
-				final var currentLocation = Paths.get(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-				this.appConfig.setApplicationPath(currentLocation);
-			} catch (final URISyntaxException e) {
-				throw new IllegalStateException(e);
-			}
+//			try {
+//				final var workingDirectory = Paths.get(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+//				this.appConfig.setApplicationPath(workingDirectory);
+//			} catch (final URISyntaxException e) {
+//				throw new IllegalStateException(e);
+//			}
+			
+			final var workingDirectory = Path.of("").toAbsolutePath();
+			this.appConfig.setApplicationPath(workingDirectory);
 		}
 
 		{ // set app version
