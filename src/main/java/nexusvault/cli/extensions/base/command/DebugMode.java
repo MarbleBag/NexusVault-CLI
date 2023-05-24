@@ -6,7 +6,6 @@ import nexusvault.cli.core.Console.Level;
 import nexusvault.cli.core.cmd.Argument;
 import nexusvault.cli.core.cmd.ArgumentDescription;
 import nexusvault.cli.core.cmd.ArgumentHandler;
-import nexusvault.cli.extensions.base.AppBaseExtension;
 
 @AutoInstantiate
 final class DebugMode implements ArgumentHandler {
@@ -27,18 +26,18 @@ final class DebugMode implements ArgumentHandler {
 
 	@Override
 	public void execute(Argument arg) {
-		final AppBaseExtension configPlugin = App.getInstance().getExtensionManager().getExtension(AppBaseExtension.class);
+		final var config = App.getInstance().getAppConfig();
 
 		if (arg.getValue() == null) {
-			configPlugin.setDebugMode(!configPlugin.getDebugMode());
+			config.setDebugMode(!config.getDebugMode());
 			return;
 		}
 
 		final String arg0 = arg.getValue().trim().toLowerCase();
 		if ("off".equals(arg0)) {
-			configPlugin.setDebugMode(false);
+			config.setDebugMode(false);
 		} else if ("on".equals(arg0)) {
-			configPlugin.setDebugMode(true);
+			config.setDebugMode(true);
 		} else {
 			App.getInstance().getConsole().println(Level.CONSOLE,
 					() -> String.format("Command 'debug' does not accept '%s' as an argument. Use 'off' or 'on'.", arg0));

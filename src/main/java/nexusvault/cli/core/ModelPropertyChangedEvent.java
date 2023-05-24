@@ -1,4 +1,4 @@
-package nexusvault.cli.model;
+package nexusvault.cli.core;
 
 public class ModelPropertyChangedEvent<T> {
 	private final String eventName;

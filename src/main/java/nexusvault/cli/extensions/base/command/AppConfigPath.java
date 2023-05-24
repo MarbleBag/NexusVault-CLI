@@ -7,7 +7,6 @@ import nexusvault.cli.core.AutoInstantiate;
 import nexusvault.cli.core.cmd.Argument;
 import nexusvault.cli.core.cmd.ArgumentDescription;
 import nexusvault.cli.core.cmd.ArgumentHandler;
-import nexusvault.cli.extensions.base.AppBaseExtension;
 
 @AutoInstantiate
 public final class AppConfigPath implements ArgumentHandler {
@@ -30,7 +29,7 @@ public final class AppConfigPath implements ArgumentHandler {
 	@Override
 	public void execute(Argument args) {
 		final Path path = Path.of(args.getValue());
-		App.getInstance().getExtensionManager().getExtension(AppBaseExtension.class).setConfigPath(path);
+		App.getInstance().getAppConfig().setConfigPath(path);
 	}
 
 }

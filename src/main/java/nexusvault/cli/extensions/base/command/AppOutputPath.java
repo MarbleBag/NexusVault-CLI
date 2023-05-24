@@ -10,7 +10,6 @@ import nexusvault.cli.core.cmd.ArgumentHandler;
 import nexusvault.cli.core.cmd.Arguments;
 import nexusvault.cli.core.cmd.CommandDescription;
 import nexusvault.cli.core.cmd.CommandHandler;
-import nexusvault.cli.extensions.base.AppBaseExtension;
 
 @AutoInstantiate
 final class AppOutputPath implements ArgumentHandler, CommandHandler {
@@ -43,13 +42,13 @@ final class AppOutputPath implements ArgumentHandler, CommandHandler {
 	@Override
 	public void onCommand(Arguments args) {
 		final Path path = Path.of(args.getUnnamedArgs()[0]);
-		App.getInstance().getExtensionManager().getExtension(AppBaseExtension.class).setOutputPath(path);
+		App.getInstance().getAppConfig().setOutputPath(path);
 	}
 
 	@Override
 	public void execute(Argument args) {
 		final Path path = Path.of(args.getValue());
-		App.getInstance().getExtensionManager().getExtension(AppBaseExtension.class).setOutputPath(path);
+		App.getInstance().getAppConfig().setOutputPath(path);
 	}
 
 	@Override
